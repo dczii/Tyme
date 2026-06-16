@@ -6,8 +6,6 @@ import {
   Play, 
   Square, 
   Trash2, 
-  Copy, 
-  Edit3, 
   AlertTriangle, 
   Folder, 
   Tag, 
@@ -16,8 +14,6 @@ import {
   Calendar,
   Sparkles,
   ArrowRight,
-  ArrowUp,
-  ArrowDown,
   X
 } from 'lucide-react';
 import { TimeEntry, Project, Tag as TagType } from '../types';
@@ -51,9 +47,7 @@ const ROW_HEIGHT = 56; // tall row for nice click targets and reading text
 const formatHoursAndMinutes = (minutes: number): string => {
   const hrs = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  if (hrs > 0 && mins > 0) return `${hrs}h ${mins}m`;
-  if (hrs > 0) return `${hrs}h`;
-  return `${mins}m`;
+  return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
 };
 
 const parseDurationStringToMinutes = (str: string): number | null => {
@@ -529,73 +523,7 @@ export default function CalendarView({
     };
   };
 
-  // Fast adjustments to handle resizing/drags in visual increments
-  // (Provides high SaaS responsive standard of moving/scaling logged blocks)
-  const shiftEntryTimes = (entry: TimeEntry, hoursDelta: number) => {
-    const parseTime = (timeStr: string) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      return { h, m };
-    };
 
-    const { h: sh, m: sm } = parseTime(entry.startTime);
-    const { h: eh, m: em } = parseTime(entry.endTime);
-
-    const formatTime = (hours: number, minutes: number) => {
-      const clampedH = (hours + 24) % 24;
-      return `${String(clampedH).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    };
-
-    const newStart = formatTime(sh + hoursDelta, sm);
-    const newEnd = formatTime(eh + hoursDelta, em);
-
-    onUpdateEntry({
-      ...entry,
-      startTime: newStart,
-      endTime: newEnd,
-      durationMinutes: calculateDurationMinutes(newStart, newEnd)
-    });
-  };
-
-  const scaleEntryDuration = (entry: TimeEntry, minuteDelta: number) => {
-    const parseTime = (timeStr: string) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      return { h, m };
-    };
-
-    const { h: eh, m: em } = parseTime(entry.endTime);
-    
-    // Add delta to end minutes
-    let newMinutesTotal = eh * 60 + em + minuteDelta;
-    if (newMinutesTotal < 0) newMinutesTotal = 0;
-    if (newMinutesTotal > 24 * 60) newMinutesTotal = 24 * 60;
-
-    const newH = Math.floor(newMinutesTotal / 60) % 24;
-    const newM = newMinutesTotal % 60;
-    const newEndStr = `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
-
-    if (timeStringToDecimal(newEndStr) <= timeStringToDecimal(entry.startTime)) {
-      return; // prevent negative duration
-    }
-
-    onUpdateEntry({
-      ...entry,
-      endTime: newEndStr,
-      durationMinutes: calculateDurationMinutes(entry.startTime, newEndStr)
-    });
-  };
-
-  // Quick helper to duplicate entries
-  const handleDuplicate = (entry: TimeEntry) => {
-    onAddEntry({
-      description: `${entry.description} (Copy)`,
-      projectId: entry.projectId,
-      tags: entry.tags,
-      date: entry.date,
-      startTime: entry.startTime,
-      endTime: entry.endTime,
-      durationMinutes: entry.durationMinutes
-    });
-  };
 
   // Quick project insertion handler
   const handleCreateProjectInline = (e: React.FormEvent) => {
@@ -1106,67 +1034,7 @@ export default function CalendarView({
                               </div>
                             )}
 
-                            {/* Action popover trigger overlays */}
-                            <div 
-                              onClick={(e) => e.stopPropagation()} 
-                              className="opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity bg-[#130d0a]/95 backdrop-blur-md rounded-lg border border-[#3c2518]/60 px-1 py-0.5 pl-2 shadow-sm"
-                            >
-                              {/* Fast Time Shift Arrow Buttons */}
-                              <button
-                                onClick={() => shiftEntryTimes(entry, -1)}
-                                className="p-1 rounded hover:bg-slate-500/10 cursor-pointer text-slate-400 hover:text-white"
-                                title="Shift 1 hr earlier"
-                              >
-                                <ArrowUp className="h-3 w-3" />
-                              </button>
-                              <button
-                                onClick={() => shiftEntryTimes(entry, 1)}
-                                className="p-1 rounded hover:bg-slate-500/10 cursor-pointer text-slate-400 hover:text-white"
-                                title="Shift 1 hr later"
-                              >
-                                <ArrowDown className="h-3 w-3" />
-                              </button>
 
-                              {/* Fast Resize duration buttons */}
-                              <button
-                                onClick={() => scaleEntryDuration(entry, 30)}
-                                className="px-1 text-[9px] font-mono font-bold text-[#dda67a] rounded border border-[#dda67a]/25 hover:bg-[#dda67a]/15 cursor-pointer"
-                                title="Extend duration +30m"
-                              >
-                                +30
-                              </button>
-                              <button
-                                onClick={() => scaleEntryDuration(entry, -30)}
-                                className="px-1 text-[9px] font-mono font-bold text-red-400 rounded border border-red-500/20 hover:bg-red-500/10 cursor-pointer"
-                                title="Shrink duration -30m"
-                              >
-                                -30
-                              </button>
-
-                              <button
-                                onClick={() => handleDuplicate(entry)}
-                                className="p-1 rounded hover:bg-slate-500/10 cursor-pointer text-slate-400 hover:text-[#dda67a]"
-                                title="Duplicate Entry"
-                              >
-                                <Copy className="h-3.5 w-3.5" />
-                              </button>
-
-                              <button
-                                onClick={() => setEditingEntry(entry)}
-                                className="p-1 rounded hover:bg-slate-500/10 cursor-pointer text-slate-400 hover:text-[#dda67a]"
-                                title="Edit Entry Details"
-                              >
-                                <Edit3 className="h-3.5 w-3.5" />
-                              </button>
-
-                              <button
-                                onClick={() => onDeleteEntry(entry.id)}
-                                className="p-1 rounded hover:bg-slate-500/10 cursor-pointer text-slate-400 hover:text-red-500"
-                                title="Delete Entry"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
                           </div>
                         </div>
                       );

@@ -1,10 +1,10 @@
 import { TimeEntry, Project } from './types';
 
-// Convert minutes to a formatted string like "4:30" or "0:45"
+// Convert minutes to a formatted string like "04:30" or "00:45"
 export function formatMinutesHHMM(minutes: number): string {
   const hrs = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return `${hrs}:${String(mins).padStart(2, '0')}`;
+  return `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
 }
 
 // Convert minutes to hours float like "4.50h" or "0.75h"
