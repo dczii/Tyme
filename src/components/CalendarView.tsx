@@ -363,8 +363,17 @@ export default function CalendarView({
   const [newEntryStartTime, setNewEntryStartTime] = useState<string>('09:00');
   const [newEntryEndTime, setNewEntryEndTime] = useState<string>('12:00');
   const [modalDurationStr, setModalDurationStr] = useState<string>('3:00');
+  const [editDurationStr, setEditDurationStr] = useState<string>('');
   const [modalSelectedTags, setModalSelectedTags] = useState<string[]>([]);
   const [showModalTagDropdown, setShowModalTagDropdown] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (editingEntry) {
+      setEditDurationStr(formatMinutesHHMM(editingEntry.durationMinutes));
+    } else {
+      setEditDurationStr('');
+    }
+  }, [editingEntry?.id]);
 
   // Time dynamics helper changes
   const handleStartTimeChange = (newStart: string) => {
@@ -385,6 +394,21 @@ export default function CalendarView({
     if (parsedMins !== null && parsedMins >= 0) {
       const updatedEnd = addMinutesToTime(newEntryStartTime, parsedMins);
       setNewEntryEndTime(updatedEnd);
+    }
+  };
+
+  const handleEditDurationStrChange = (newDurStr: string) => {
+    if (!editingEntry) return;
+    setEditDurationStr(newDurStr);
+    const parsedMins = parseDurationStringToMinutes(newDurStr);
+    if (parsedMins !== null && parsedMins >= 0) {
+      const updatedEnd = addMinutesToTime(editingEntry.startTime, parsedMins);
+      const newDur = calculateDurationMinutes(editingEntry.startTime, updatedEnd);
+      setEditingEntry({
+        ...editingEntry,
+        endTime: updatedEnd,
+        durationMinutes: newDur
+      });
     }
   };
 
@@ -1052,7 +1076,7 @@ export default function CalendarView({
       {/* 4. Edit Detail Dialog Modal overlay */}
       {editingEntry && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-[#140d09] rounded-2xl w-full max-w-md p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl">
+          <div className="bg-[#140d09] rounded-2xl w-full max-w-[620px] p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl">
             <h3 className="text-base font-display font-bold text-white flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-[#dda67a]" />
               <span>Modify Time Entry</span>
@@ -1121,51 +1145,65 @@ export default function CalendarView({
                 </div>
               </div>
 
-              {/* Date & Timeline Picker */}
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-[#ecd0b9]/60 block mb-1">Date</label>
-                  <input 
-                    type="date"
-                    value={editingEntry.date}
-                    onChange={(e) => setEditingEntry({ ...editingEntry, date: e.target.value })}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none"
+              {/* Time and date section */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[#ecd0b9]/60 block">Time and date</label>
+                
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 bg-[#120b07] p-3 rounded-xl border border-[#3e271a]/50">
+                  {/* Dynamic Duration Box */}
+                  <input
+                    type="text"
+                    value={editDurationStr}
+                    onChange={(e) => handleEditDurationStrChange(e.target.value)}
+                    placeholder="1:00"
+                    className="bg-[#241610] border border-[#3e271a] px-3 py-2 rounded-lg text-base font-bold text-[#dda67a] w-[90px] text-center font-mono outline-none focus:border-[#dda67a] transition shadow-inner"
+                    title="Edit duration (H:MM) to update end time automatically"
                   />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#ecd0b9]/60 block mb-1">Start Time</label>
-                  <input 
-                    type="time"
-                    value={editingEntry.startTime}
-                    onChange={(e) => {
-                      const newStart = e.target.value;
-                      const newDur = calculateDurationMinutes(newStart, editingEntry.endTime);
-                      setEditingEntry({ ...editingEntry, startTime: newStart, durationMinutes: newDur });
-                    }}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-[#ecd0b9]/60 block mb-1">End Time</label>
-                  <input 
-                    type="time"
-                    value={editingEntry.endTime}
-                    onChange={(e) => {
-                      const newEnd = e.target.value;
-                      const newDur = calculateDurationMinutes(editingEntry.startTime, newEnd);
-                      setEditingEntry({ ...editingEntry, endTime: newEnd, durationMinutes: newDur });
-                    }}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none"
-                  />
-                </div>
-              </div>
+                  
+                  {/* Dotted separator */}
+                  <div className="hidden sm:block h-6 border-l border-dashed border-[#3e271a]/50" />
 
-              {/* Duration info summary */}
-              <div className="p-3 bg-[#1c120c] border border-[#3e271a]/50 rounded-xl flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#ecd0b9]/60">Calculated Duration:</span>
-                <span className="font-mono font-bold text-[#dda67a] tracking-wider">
-                  {formatMinutesHHMM(editingEntry.durationMinutes)} ({(editingEntry.durationMinutes / 60).toFixed(2)} hours)
-                </span>
+                  {/* Horizontal Time Input Interval Wrapper */}
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="time" 
+                      required
+                      value={editingEntry.startTime} 
+                      onChange={(e) => {
+                        const newStart = e.target.value;
+                        const newDur = calculateDurationMinutes(newStart, editingEntry.endTime);
+                        setEditingEntry({ ...editingEntry, startTime: newStart, durationMinutes: newDur });
+                        setEditDurationStr(formatMinutesHHMM(newDur));
+                      }}
+                      className="bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer"
+                    />
+                    <span className="text-[#ecd0b9]/50">-</span>
+                    <input 
+                      type="time" 
+                      required
+                      value={editingEntry.endTime} 
+                      onChange={(e) => {
+                        const newEnd = e.target.value;
+                        const newDur = calculateDurationMinutes(editingEntry.startTime, newEnd);
+                        setEditingEntry({ ...editingEntry, endTime: newEnd, durationMinutes: newDur });
+                        setEditDurationStr(formatMinutesHHMM(newDur));
+                      }}
+                      className="bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Calendar symbol icon */}
+                  <Calendar className="h-4 w-4 text-[#ecd0b9]/50 shrink-0" />
+
+                  {/* Date selection picker */}
+                  <input 
+                    type="date" 
+                    required
+                    value={editingEntry.date} 
+                    onChange={(e) => setEditingEntry({ ...editingEntry, date: e.target.value })}
+                    className="bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-xs text-center font-bold text-white outline-none flex-1 focus:border-[#dda67a] transition cursor-pointer"
+                  />
+                </div>
               </div>
             </div>
 
