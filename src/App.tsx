@@ -4,7 +4,7 @@ import CalendarView from './components/CalendarView';
 import ReportsView from './components/ReportsView';
 import SettingsView from './components/SettingsView';
 import LoginScreen from './components/LoginScreen';
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { TimeEntry, Project, Tag, PageView, UserProfile } from './types';
 import { 
   INITIAL_PROJECTS, 
@@ -186,7 +186,17 @@ export default function App() {
   // Delete time entry
   const handleDeleteEntry = async (id: string) => {
     if (firebaseUser) {
-      await deleteEntryFromFS(firebaseUser.uid, id);
+      const entryToDelete = entries.find(e => e.id === id);
+      const description = entryToDelete?.description || 'Task';
+      try {
+        await deleteEntryFromFS(firebaseUser.uid, id);
+        toast.success("Task deleted successfully", {
+          description: `"${description}" has been removed.`,
+          duration: 3000
+        });
+      } catch (err) {
+        toast.error("Failed to delete task. Please check your connection.");
+      }
     }
   };
 
