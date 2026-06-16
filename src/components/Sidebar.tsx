@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { PageView, UserProfile } from '../types';
 import BrandLogo from './BrandLogo';
+import packageJson from '../../package.json';
 
 interface SidebarProps {
   currentView: PageView;
@@ -195,7 +196,7 @@ export default function Sidebar({
 
         <div className={`flex justify-between items-center px-1 transition-all duration-300 ${isCollapsed ? 'justify-center' : ''}`}>
           <span className="text-[10px] font-mono text-[#ecd0b9]/40">
-            v1.1.0
+            v{packageJson.version}
           </span>
           <span className={`text-[10px] font-mono text-[#ecd0b9]/40 uppercase tracking-widest transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
             Dark Mode
