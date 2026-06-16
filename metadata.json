@@ -1,0 +1,6 @@
+{
+  "name": "Tyme",
+  "description": "A professional SaaS-style time tracking application inspired by Clockify, supporting a weekly calendar view, report filtering, aggregate metrics, and data export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

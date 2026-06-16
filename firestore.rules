@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global default catch-all denial
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper primitives for authentication and secure identity validation
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn();
+    }
+
+    // Master path-variable identity gating check
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    // Path Variable injection protection
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation blueprints for all entities to prevent data pollution
+    function isValidUser(data) {
+      return data.email is string && data.email.size() > 0 && data.email.size() <= 256
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 128
+        && (!('picture' in data) || (data.picture is string && data.picture.size() <= 1024))
+        && (!('workdayTargetHours' in data) || (data.workdayTargetHours is number && data.workdayTargetHours >= 1 && data.workdayTargetHours <= 24))
+        && (!('logoStyle' in data) || (data.logoStyle is string && (data.logoStyle == 'classic' || data.logoStyle == 'minimalist' || data.logoStyle == 'hourglass')));
+    }
+
+    function isValidProject(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 128
+        && data.color is string && data.color.size() <= 32
+        && (!('client' in data) || (data.client is string && data.client.size() <= 128));
+    }
+
+    function isValidTag(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 128;
+    }
+
+    function isValidTimeEntry(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.description is string && data.description.size() <= 2048
+        && (!('projectId' in data) || (data.projectId is string && data.projectId.size() <= 128))
+        && data.tags is list && data.tags.size() <= 20
+        && data.date is string && data.date.size() == 10
+        && data.startTime is string && data.startTime.size() == 5
+        && data.endTime is string && data.endTime.size() == 5
+        && data.durationMinutes is number && data.durationMinutes >= 0 && data.durationMinutes <= 1440;
+    }
+
+    // Rules matches for resources sandboxed beneath user hierarchy paths
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(incoming()) && incoming().email == request.auth.token.email;
+      allow update: if isOwner(userId) && isValidUser(incoming()) && incoming().email == existing().email;
+      allow delete: if false; // Accounts are read/write but not deleted in this app
+
+      match /projects/{projectId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(projectId) && isValidProject(incoming()) && incoming().userId == userId;
+        allow update: if isOwner(userId) && isValidProject(incoming()) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /tags/{tagId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(tagId) && isValidTag(incoming()) && incoming().userId == userId;
+        allow update: if isOwner(userId) && isValidTag(incoming()) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+
+      match /entries/{entryId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(entryId) && isValidTimeEntry(incoming()) && incoming().userId == userId;
+        allow update: if isOwner(userId) && isValidTimeEntry(incoming()) && incoming().userId == userId;
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}
