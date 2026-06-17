@@ -98,6 +98,14 @@ export default function CalendarView({
     return getMonday(new Date("2026-06-15"));
   });
 
+  const [activeDayIndex, setActiveDayIndex] = useState<number>(() => {
+    const todayStr = formatDateYYYYMMDD(new Date());
+    const monday = getMonday(new Date("2026-06-15"));
+    const days = getWeekDays(monday);
+    const idx = days.findIndex((d) => formatDateYYYYMMDD(d) === todayStr);
+    return idx !== -1 ? idx : 0;
+  });
+
   // Range Picker states and references
   const [showRangePicker, setShowRangePicker] = useState<boolean>(false);
   const [pickerYear, setPickerYear] = useState<number>(2026);
@@ -524,7 +532,13 @@ export default function CalendarView({
   };
 
   const jumpToToday = () => {
-    setCurrentWeekMonday(getMonday(new Date("2026-06-15")));
+    const today = new Date();
+    const monday = getMonday(new Date("2026-06-15"));
+    setCurrentWeekMonday(monday);
+    const days = getWeekDays(monday);
+    const todayStr = formatDateYYYYMMDD(today);
+    const idx = days.findIndex((d) => formatDateYYYYMMDD(d) === todayStr);
+    setActiveDayIndex(idx !== -1 ? idx : 0);
   };
 
   // Sub-metrics per day
@@ -983,12 +997,156 @@ export default function CalendarView({
         </div>
       </section>
 
-      {/* 3. The 7-Day Weekly Calendar Vertical Grid */}
-      <div className='flex-1 p-4 md:p-6 overflow-y-auto overflow-x-auto min-w-0 md:min-w-[700px] bg-[#1a110a]/10'>
-        <div
-          id='calendar-week-grid'
-          className='border border-[#3c2518]/45 rounded-3xl overflow-hidden bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
-        >
+      {/* 3. The Calendar Content Area */}
+      <div className='flex-1 overflow-y-auto bg-[#1a110a]/10 relative'>
+        {/* MOBILE DAY VIEW (< md) */}
+        <div className='md:hidden flex flex-col pb-24'>
+          {/* Day Selector Tabs */}
+          <div className='grid grid-cols-7 gap-1 bg-[#150d0a]/90 backdrop-blur-md border-b border-[#3c2518]/45 p-2 sticky top-0 z-25'>
+            {weekDays.map((dateObj, idx) => {
+              const dayStr = formatDateYYYYMMDD(dateObj);
+              const totalMins = getDailyTotalMinutes(dayStr);
+              const isSelected = idx === activeDayIndex;
+              const isToday = dayStr === formatDateYYYYMMDD(new Date());
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setActiveDayIndex(idx)}
+                  className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition duration-150 cursor-pointer
+                    ${
+                      isSelected
+                        ? "bg-[#a66e46] text-[#fff6f0] shadow-md shadow-[#4a2b16]/40"
+                        : isToday
+                          ? "bg-[#a66e46]/10 text-[#dda67a] border border-[#a66e46]/25"
+                          : "text-[#ecd0b9]/60 hover:text-[#ecd0b9] hover:bg-white/[0.02]"
+                    }`}
+                >
+                  <span className='text-[9px] font-bold tracking-wider uppercase opacity-85'>
+                    {dateObj.toLocaleDateString("en-US", { weekday: "short" }).substring(0, 3)}
+                  </span>
+                  <span className='text-sm font-semibold font-display mt-0.5'>
+                    {dateObj.getDate()}
+                  </span>
+                  <span
+                    className={`text-[8px] font-mono font-bold mt-1 px-1 rounded-full
+                    ${
+                      isSelected
+                        ? "bg-black/20 text-[#fff6f0]"
+                        : totalMins > 0
+                          ? "bg-[#4a2d1a]/40 text-[#dda67a]"
+                          : "text-[#ecd0b9]/30"
+                    }`}
+                  >
+                    {totalMins > 0 ? formatMinutesHHMM(totalMins) : "0:00"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active Day Entries List */}
+          {(() => {
+            const activeDayStr = formattedWeekDays[activeDayIndex] || formattedWeekDays[0];
+            const activeDayEntries = getDailyEntries(activeDayStr).sort((a, b) =>
+              a.startTime.localeCompare(b.startTime)
+            );
+
+            if (activeDayEntries.length > 0) {
+              return (
+                <div className='space-y-3 p-4'>
+                  {activeDayEntries.map((entry) => {
+                    const proj = entry.projectId
+                      ? projects.find((p) => p.id === entry.projectId)
+                      : null;
+                    const hasOverlap = checkHasOverlap(entry);
+                    return (
+                      <div
+                        key={entry.id}
+                        onClick={() => setEditingEntry(entry)}
+                        className='bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-pointer active:scale-[0.99] transition duration-150'
+                        style={{
+                          borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
+                          borderColor: hasOverlap ? "#ef4444" : undefined,
+                        }}
+                      >
+                        <div className='flex justify-between items-start gap-2'>
+                          <div className='min-w-0'>
+                            {proj && (
+                              <div className='flex items-center gap-1.5 mb-1'>
+                                <span
+                                  className='h-2 w-2 rounded-full shrink-0'
+                                  style={{ backgroundColor: proj.color }}
+                                />
+                                <span
+                                  className='text-[11px] font-semibold tracking-wide truncate'
+                                  style={{ color: proj.color }}
+                                >
+                                  {proj.name}
+                                </span>
+                              </div>
+                            )}
+                            <h4 className='text-sm font-semibold text-white leading-snug break-words'>
+                              {entry.description || "No Description"}
+                            </h4>
+                          </div>
+                          <span className='text-sm font-mono font-bold text-[#dda67a] bg-[#dda67a]/10 px-2 py-0.5 rounded-lg shrink-0'>
+                            {formatHoursAndMinutes(entry.durationMinutes)}
+                          </span>
+                        </div>
+
+                        <div className='flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#3d2516]/20'>
+                          <span className='text-[11px] font-mono text-[#ecd0b9]/60'>
+                            {entry.startTime} - {entry.endTime}
+                          </span>
+
+                          <div className='flex items-center gap-1.5'>
+                            {hasOverlap && (
+                              <div className='flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/10 text-red-500 text-[9px] font-bold'>
+                                <AlertTriangle className='h-3 w-3' />
+                                <span>Overlap</span>
+                              </div>
+                            )}
+
+                            {entry.tags.map((tag, tIdx) => (
+                              <span
+                                key={tIdx}
+                                className='px-2 py-0.5 rounded text-[9px] font-medium bg-[#1d1410] border border-[#3e271a]/65 text-[#ecd0b9]/75'
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            } else {
+              return (
+                <div className='flex flex-col items-center justify-center py-20 px-4 text-center'>
+                  <div className='h-12 w-12 rounded-full bg-[#3d2416]/20 flex items-center justify-center mb-3'>
+                    <Clock className='h-6 w-6 text-[#dda67a]/60' />
+                  </div>
+                  <p className='text-sm font-semibold text-[#ecd0b9]/80'>
+                    No time logged for this day
+                  </p>
+                  <p className='text-xs text-[#ecd0b9]/50 mt-1'>
+                    Tap the floating button below or start a live timer to log hours.
+                  </p>
+                </div>
+              );
+            }
+          })()}
+        </div>
+
+        {/* DESKTOP WEEKLY GRID (>= md) */}
+        <div className='hidden md:block p-6 min-w-[700px] overflow-x-auto'>
+          <div
+            id='calendar-week-grid'
+            className='border border-[#3c2518]/45 rounded-3xl overflow-hidden bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
+          >
           {/* Calendar Headers columns */}
           <div className='grid grid-cols-[44px_repeat(7,1fr)] md:grid-cols-[60px_repeat(7,1fr)] border-b border-[#3c2518]/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
             {/* Hour marker blank header */}
@@ -1163,6 +1321,25 @@ export default function CalendarView({
             </div>
           </div>
         </div>
+      </div>
+        
+        {/* Mobile Floating Action Button (FAB) for adding entry */}
+        <button
+          onClick={() => {
+            const activeDayStr = formattedWeekDays[activeDayIndex] || formattedWeekDays[0];
+            setNewEntryDate(activeDayStr);
+            setNewEntryStartTime("09:00");
+            setNewEntryEndTime("10:00");
+            setModalDurationStr("1:00");
+            setModalSelectedTags([]);
+            setShowModalTagDropdown(false);
+            setIsCreateModalOpen(true);
+          }}
+          className='md:hidden fixed bottom-20 right-6 z-40 h-14 w-14 rounded-full bg-[#a66e46] hover:bg-[#8e5a34] text-white flex items-center justify-center shadow-lg shadow-[#4a2b16]/50 cursor-pointer active:scale-95 transition-all duration-150'
+          title='Add Time Entry'
+        >
+          <Plus className='h-6 w-6' />
+        </button>
       </div>
 
       {/* 4. Edit Detail Dialog Modal overlay */}
