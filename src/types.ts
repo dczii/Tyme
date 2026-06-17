@@ -36,4 +36,5 @@ export interface UserProfile {
   email: string;
   name: string;
   picture: string;
+  hourlyRate?: number;
 }

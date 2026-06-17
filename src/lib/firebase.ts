@@ -180,7 +180,7 @@ export async function fetchGoogleContacts(): Promise<GoogleContact[]> {
 // Realtime User Document State
 export const subscribeToUserProfile = (
   userId: string,
-  onUpdate: (userData: UserProfile & { workdayTargetHours: number; logoStyle: 'classic' | 'minimalist' | 'hourglass' }) => void
+  onUpdate: (userData: UserProfile & { workdayTargetHours: number; logoStyle: 'classic' | 'minimalist' | 'hourglass'; hourlyRate: number }) => void
 ) => {
   const path = `users/${userId}`;
   return onSnapshot(
@@ -193,7 +193,8 @@ export const subscribeToUserProfile = (
           name: data.name || '',
           picture: data.picture || '',
           workdayTargetHours: data.workdayTargetHours ?? 8,
-          logoStyle: data.logoStyle ?? 'classic'
+          logoStyle: data.logoStyle ?? 'classic',
+          hourlyRate: data.hourlyRate ?? 1
         });
       }
     },
@@ -206,7 +207,7 @@ export const subscribeToUserProfile = (
 // Set User profile settings
 export const saveUserProfileToFS = async (
   userId: string,
-  profile: Partial<UserProfile & { workdayTargetHours: number; logoStyle: string }>
+  profile: Partial<UserProfile & { workdayTargetHours: number; logoStyle: string; hourlyRate: number }>
 ) => {
   const path = `users/${userId}`;
   try {

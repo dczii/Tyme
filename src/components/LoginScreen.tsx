@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Shield, AlertCircle, Sparkles, Info } from 'lucide-react';
 import { UserProfile } from '../types';
 import { googleSignIn } from '../lib/firebase';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface LoginScreenProps {
   onLoginSuccess: (profile: UserProfile) => void;
@@ -106,21 +107,37 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             )}
           </button>
 
-          {mode === 'register' && (
-            <div className="bg-[#2d1b11]/40 border border-[#5e3820]/30 rounded-xl p-3 flex items-start gap-2.5 text-[11px] text-[#dda67a]/90 leading-relaxed animate-fadeIn">
-              <Info className="h-4 w-4 shrink-0 text-[#dda67a] mt-0.5" />
-              <span>
-                To ensure secure single sign-on synchronization of your workspace, Tyme supports registration exclusively via Google accounts. No password setup is required.
-              </span>
-            </div>
-          )}
+          <AnimatePresence>
+            {mode === 'register' && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="bg-[#2d1b11]/40 border border-[#5e3820]/30 rounded-xl p-3 flex items-start gap-2.5 text-[11px] text-[#dda67a]/90 leading-relaxed overflow-hidden"
+              >
+                <Info className="h-4 w-4 shrink-0 text-[#dda67a] mt-0.5" />
+                <span>
+                  To ensure secure single sign-on synchronization of your workspace, Tyme supports registration exclusively via Google accounts. No password setup is required.
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {error && (
-            <div className="bg-red-950/45 border border-red-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 animate-fadeIn">
-              <AlertCircle className="h-4.5 w-4.5 shrink-0 text-red-400 mt-0.5" />
-              <span>{error}</span>
-            </div>
-          )}
+          <AnimatePresence>
+            {error && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: 'auto', y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="bg-red-950/45 border border-red-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 overflow-hidden"
+              >
+                <AlertCircle className="h-4.5 w-4.5 shrink-0 text-red-400 mt-0.5" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {isLoading && !error && (
             <p className="text-[10px] text-center text-[#ecd0b9]/40 font-mono">

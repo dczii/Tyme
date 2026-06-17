@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { TimeEntry, Project, Tag as TagType } from "../types";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "motion/react";
 import {
   getMonday,
   getWeekDays,
@@ -1055,16 +1056,21 @@ export default function CalendarView({
             if (activeDayEntries.length > 0) {
               return (
                 <div className='space-y-3 p-4'>
-                  {activeDayEntries.map((entry) => {
-                    const proj = entry.projectId
-                      ? projects.find((p) => p.id === entry.projectId)
-                      : null;
-                    const hasOverlap = checkHasOverlap(entry);
-                    return (
-                      <div
-                        key={entry.id}
-                        onClick={() => setEditingEntry(entry)}
-                        className='bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-pointer active:scale-[0.99] transition duration-150'
+                  <AnimatePresence initial={false}>
+                    {activeDayEntries.map((entry) => {
+                      const proj = entry.projectId
+                        ? projects.find((p) => p.id === entry.projectId)
+                        : null;
+                      const hasOverlap = checkHasOverlap(entry);
+                      return (
+                        <motion.div
+                          key={entry.id}
+                          layout
+                          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95, y: -10, transition: { duration: 0.15 } }}
+                          onClick={() => setEditingEntry(entry)}
+                          className='bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-pointer active:scale-[0.99] transition duration-150'
                         style={{
                           borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
                           borderColor: hasOverlap ? "#ef4444" : undefined,
@@ -1118,9 +1124,10 @@ export default function CalendarView({
                             ))}
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               );
             } else {
@@ -1252,19 +1259,24 @@ export default function CalendarView({
                     style={{ gridColumnStart: dIndex + 1 }}
                     className='h-full relative px-1'
                   >
-                    {dayEntries.map((entry) => {
-                      const proj = entry.projectId
-                        ? projects.find((p) => p.id === entry.projectId)
-                        : null;
-                      const hasOverlap = checkHasOverlap(entry);
-                      const pos = getEntryPositionStyles(entry);
+                    <AnimatePresence initial={false}>
+                      {dayEntries.map((entry) => {
+                        const proj = entry.projectId
+                          ? projects.find((p) => p.id === entry.projectId)
+                          : null;
+                        const hasOverlap = checkHasOverlap(entry);
+                        const pos = getEntryPositionStyles(entry);
 
-                      return (
-                        <div
-                          key={entry.id}
-                          onClick={() => setEditingEntry(entry)}
-                          className='absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden cursor-pointer
-                            bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg hover:scale-[1.01]'
+                        return (
+                          <motion.div
+                            key={entry.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+                            onClick={() => setEditingEntry(entry)}
+                            className='absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden cursor-pointer
+                              bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg hover:scale-[1.01]'
                           style={{
                             ...pos,
                             borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
@@ -1312,9 +1324,10 @@ export default function CalendarView({
                               </div>
                             )}
                           </div>
-                        </div>
-                      );
-                    })}
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
                   </div>
                 );
               })}
@@ -1343,16 +1356,30 @@ export default function CalendarView({
       </div>
 
       {/* 4. Edit Detail Dialog Modal overlay */}
-      {editingEntry && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setEditingEntry(null);
-            }
-          }}
-          className='fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in'
-        >
-          <div className='bg-[#140d09] rounded-2xl w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl'>
+      <AnimatePresence>
+        {editingEntry && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setEditingEntry(null);
+              }
+            }}
+            className='fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50'
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
+              animate={{ 
+                scale: 1, 
+                y: 0, 
+                opacity: 1,
+                transition: { type: "spring", damping: 25, stiffness: 350 }
+              }}
+              exit={{ scale: 0.95, y: 15, opacity: 0, transition: { duration: 0.15 } }}
+              className='bg-[#140d09] rounded-2xl w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl'
+            >
             <h3 className='text-base font-display font-bold text-white flex items-center gap-2 mb-4'>
               <Sparkles className='h-5 w-5 text-[#dda67a]' />
               <span>Modify Time Entry</span>
@@ -1537,22 +1564,37 @@ export default function CalendarView({
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+    </AnimatePresence>
 
       {/* 5. Create Fast Slot entry dialog Modal */}
-      {isCreateModalOpen && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsCreateModalOpen(false);
-              setShowModalTagDropdown(false);
-            }
-          }}
-          className='fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 animate-fade-in animate-duration-200'
-        >
-          <div className='bg-[#1a110a] rounded-xl border border-[#3e271a] w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-white'>
+      <AnimatePresence>
+        {isCreateModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setIsCreateModalOpen(false);
+                setShowModalTagDropdown(false);
+              }
+            }}
+            className='fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50'
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
+              animate={{ 
+                scale: 1, 
+                y: 0, 
+                opacity: 1,
+                transition: { type: "spring", damping: 25, stiffness: 350 }
+              }}
+              exit={{ scale: 0.95, y: 15, opacity: 0, transition: { duration: 0.15 } }}
+              className='bg-[#1a110a] rounded-xl border border-[#3e271a] w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-white'
+            >
             {/* Header */}
             <div className='px-6 py-4 border-b border-[#3e271a]/60 flex items-center justify-between'>
               <h3 className='text-lg font-medium text-white tracking-tight'>Add time entry</h3>
@@ -1761,9 +1803,10 @@ export default function CalendarView({
                 </button>
               </div>
             </form>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </div>
+    </AnimatePresence>
+  </div>
   );
 }

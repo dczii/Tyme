@@ -33,6 +33,7 @@ export default function App() {
   // Core visual settings
   const [logoStyle, setLogoStyle] = useState<'classic' | 'minimalist' | 'hourglass'>('classic');
   const [workdayTargetHours, setWorkdayTargetHours] = useState<number>(8);
+  const [hourlyRate, setHourlyRate] = useState<number>(1);
 
   const theme = 'dark';
 
@@ -80,6 +81,7 @@ export default function App() {
     const unsubProfile = subscribeToUserProfile(uid, (data) => {
       if (data.logoStyle) setLogoStyle(data.logoStyle);
       if (data.workdayTargetHours) setWorkdayTargetHours(data.workdayTargetHours);
+      if (data.hourlyRate !== undefined) setHourlyRate(data.hourlyRate);
     });
 
     // Seed/Save initial profile if not in DB yet
@@ -140,6 +142,13 @@ export default function App() {
     setWorkdayTargetHours(hours);
     if (firebaseUser) {
       await saveUserProfileToFS(firebaseUser.uid, { workdayTargetHours: hours });
+    }
+  };
+
+  const saveHourlyRate = async (rate: number) => {
+    setHourlyRate(rate);
+    if (firebaseUser) {
+      await saveUserProfileToFS(firebaseUser.uid, { hourlyRate: rate });
     }
   };
 
@@ -293,6 +302,7 @@ export default function App() {
             tags={tags}
             onDeleteEntry={handleDeleteEntry}
             onDuplicateEntry={handleAddEntry}
+            hourlyRate={hourlyRate}
           />
         )}
 
@@ -305,6 +315,8 @@ export default function App() {
             onDeleteTag={handleDeleteTag}
             workdayTargetHours={workdayTargetHours}
             onUpdateTargetHours={saveTargetHours}
+            hourlyRate={hourlyRate}
+            onUpdateHourlyRate={saveHourlyRate}
             logoStyle={logoStyle}
             onLogoStyleChange={saveLogoStyle}
             user={user}

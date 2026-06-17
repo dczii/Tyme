@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FolderPlus, Sliders, HelpCircle, Shield } from "lucide-react";
+import { FolderPlus, Sliders, HelpCircle, Shield, Coins } from "lucide-react";
 import { Project, Tag, UserProfile } from "../types";
 import { toast } from "sonner";
+import HourlyRateControl from "./HourlyRateControl";
 
 interface SettingsViewProps {
   projects: Project[];
@@ -11,6 +12,8 @@ interface SettingsViewProps {
   onDeleteTag: (id: string) => void;
   workdayTargetHours: number;
   onUpdateTargetHours: (hours: number) => void;
+  hourlyRate: number;
+  onUpdateHourlyRate: (rate: number) => Promise<void> | void;
   logoStyle: "classic" | "minimalist" | "hourglass";
   onLogoStyleChange: (style: "classic" | "minimalist" | "hourglass") => void;
   user: UserProfile;
@@ -37,6 +40,8 @@ export default function SettingsView({
   onDeleteTag,
   workdayTargetHours,
   onUpdateTargetHours,
+  hourlyRate,
+  onUpdateHourlyRate,
   logoStyle,
   onLogoStyleChange,
   user,
@@ -179,6 +184,26 @@ export default function SettingsView({
 
         {/* Column 2: Quick configuration */}
         <div className='space-y-6'>
+          {/* Billing & Hourly Rate Card */}
+          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
+            <h3 className='text-sm font-display font-bold text-white mb-4 flex items-center gap-2'>
+              <Coins className='h-5 w-5 text-[#dda67a]' />
+              <span>Billing & Rates</span>
+            </h3>
+
+            <div className='space-y-4'>
+              <p className='text-xs text-[#ecd0b9]/75 font-sans leading-relaxed'>
+                Configure your default billable rate. Changes auto-save instantly and apply to all report billing calculations and CSV/PDF exports.
+              </p>
+
+              <HourlyRateControl
+                rate={hourlyRate}
+                onSave={onUpdateHourlyRate}
+                variant="full"
+              />
+            </div>
+          </div>
+
           {/* Productivity Target parameters */}
           <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
             <h3 className='text-sm font-display font-bold text-white mb-4 flex items-center gap-2'>

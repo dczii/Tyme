@@ -10,6 +10,7 @@ import {
 import { PageView, UserProfile } from '../types';
 import BrandLogo from './BrandLogo';
 import packageJson from '../../package.json';
+import { motion, AnimatePresence } from 'motion/react';
 
 interface SidebarProps {
   currentView: PageView;
@@ -70,10 +71,14 @@ export default function Sidebar({
                     : 'text-[#bdae9c]/50 active:text-[#bdae9c]/80'
                   }`}
               >
-                <div className={`relative ${isActive ? '' : ''}`}>
+                <div className="relative">
                   <Icon className={`h-5 w-5 transition-transform duration-200 ${isActive ? 'stroke-[2.25px] scale-110' : 'stroke-[1.75px]'}`} />
                   {isActive && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#dda67a]" />
+                    <motion.span 
+                      layoutId="mobileNavActiveDot"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-1 w-1 rounded-full bg-[#dda67a]" 
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
                   )}
                 </div>
                 <span className={`text-[10px] font-semibold tracking-wide transition-all duration-200 ${isActive ? 'text-[#dda67a]' : ''}`}>
@@ -128,14 +133,24 @@ export default function Sidebar({
                   <div className="h-10 w-12 rounded-xl bg-[#201410] border border-[#3d2416]/55 flex items-center justify-center p-1 shadow-md shadow-black/30 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
                     <BrandLogo size={22} className="brightness-125 select-none pointer-events-none" />
                   </div>
-                  <div className={`min-w-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 flex-1 ml-1'}`}>
-                    <h1 className="font-sans font-semibold text-base leading-none tracking-tight text-white whitespace-nowrap">
-                      Tyme
-                    </h1>
-                    <p className="text-[9px] font-mono text-[#ecd0b9]/60 tracking-wider uppercase mt-1 truncate max-w-[120px]" title={projectName}>
-                      {projectName || 'Espresso'}
-                    </p>
-                  </div>
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.div
+                        initial={{ opacity: 0, width: 0, x: -10 }}
+                        animate={{ opacity: 1, width: 'auto', x: 0 }}
+                        exit={{ opacity: 0, width: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="min-w-0 flex-1 ml-1 overflow-hidden"
+                      >
+                        <h1 className="font-sans font-semibold text-base leading-none tracking-tight text-white whitespace-nowrap">
+                          Tyme
+                        </h1>
+                        <p className="text-[9px] font-mono text-[#ecd0b9]/60 tracking-wider uppercase mt-1 truncate max-w-[120px]" title={projectName}>
+                          {projectName || 'Espresso'}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
 
@@ -144,14 +159,24 @@ export default function Sidebar({
                   <div className="h-10 w-12 flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105">
                     <BrandLogo size={24} className="brightness-110 select-none pointer-events-none" />
                   </div>
-                  <div className={`min-w-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 flex-1 ml-1'}`}>
-                    <h1 className="font-sans font-semibold text-[10px] leading-none tracking-[0.2em] uppercase text-[#ecd0b9] whitespace-nowrap">
-                      T y m e
-                    </h1>
-                    <p className="text-[8px] font-mono text-[#ecd0b9]/45 tracking-widest uppercase mt-1 truncate max-w-[120px]" title={projectName}>
-                      {projectName || 'Swiss'}
-                    </p>
-                  </div>
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.div
+                        initial={{ opacity: 0, width: 0, x: -10 }}
+                        animate={{ opacity: 1, width: 'auto', x: 0 }}
+                        exit={{ opacity: 0, width: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="min-w-0 flex-1 ml-1 overflow-hidden"
+                      >
+                        <h1 className="font-sans font-semibold text-[10px] leading-none tracking-[0.2em] uppercase text-[#ecd0b9] whitespace-nowrap">
+                          T y m e
+                        </h1>
+                        <p className="text-[8px] font-mono text-[#ecd0b9]/45 tracking-widest uppercase mt-1 truncate max-w-[120px]" title={projectName}>
+                          {projectName || 'Swiss'}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
 
@@ -160,14 +185,24 @@ export default function Sidebar({
                   <div className="h-10 w-12 rounded-xl bg-gradient-to-tr from-[#2d1b11] via-[#1a110a] to-[#0d0705] border border-[#dda67a]/20 flex items-center justify-center p-1 shadow shadow-[#dda67a]/10 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
                     <BrandLogo size={22} className="brightness-125 select-none pointer-events-none" />
                   </div>
-                  <div className={`min-w-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 flex-1 ml-1'}`}>
-                    <h1 className="font-sans font-bold text-base leading-none tracking-tight text-white flex items-center gap-1 whitespace-nowrap">
-                      tyme<span className="h-1.5 w-1.5 rounded-full bg-[#dda67a] animate-pulse"></span>
-                    </h1>
-                    <p className="text-[8px] font-mono text-[#ecd0b9]/60 tracking-widest uppercase mt-1 truncate max-w-[120px]" title={projectName}>
-                      {projectName || 'Clock'}
-                    </p>
-                  </div>
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.div
+                        initial={{ opacity: 0, width: 0, x: -10 }}
+                        animate={{ opacity: 1, width: 'auto', x: 0 }}
+                        exit={{ opacity: 0, width: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="min-w-0 flex-1 ml-1 overflow-hidden"
+                      >
+                        <h1 className="font-sans font-bold text-base leading-none tracking-tight text-white flex items-center gap-1 whitespace-nowrap">
+                          tyme<span className="h-1.5 w-1.5 rounded-full bg-[#dda67a] animate-pulse"></span>
+                        </h1>
+                        <p className="text-[8px] font-mono text-[#ecd0b9]/60 tracking-widest uppercase mt-1 truncate max-w-[120px]" title={projectName}>
+                          {projectName || 'Clock'}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </>
               )}
             </div>
@@ -183,18 +218,35 @@ export default function Sidebar({
                   key={item.id}
                   id={`sidebar-link-${item.id}`}
                   onClick={() => onViewChange(item.id)}
-                  className={`w-full flex items-center rounded-xl font-medium text-sm transition-all duration-300 cursor-pointer text-left border
+                  className={`w-full flex items-center rounded-xl font-medium text-sm transition-all duration-300 cursor-pointer text-left border relative
                     ${isCollapsed ? 'justify-center p-3' : 'gap-3 px-4 py-3'}
                     ${isActive
-                      ? 'bg-[#2d1b11]/60 text-[#ecd0b9] border-[#5e3820]/60 shadow-lg shadow-black/10'
+                      ? 'text-[#ecd0b9] border-[#5e3820]/60 shadow-lg shadow-black/10'
                       : 'border-transparent text-[#bdae9c]/70 hover:text-white hover:bg-white/5 hover:backdrop-blur-sm'
                     }`}
                   title={isCollapsed ? item.label : undefined}
                 >
-                  <Icon className={`h-4.5 w-4.5 shrink-0 transition-transform duration-200 ${isActive ? 'stroke-[2.25px] text-[#dda67a]' : 'stroke-[1.75px]'}`} />
-                  <span className={`transition-all duration-300 ease-in-out truncate whitespace-nowrap ${isCollapsed ? 'opacity-0 w-0 overflow-hidden ml-0' : 'opacity-100 flex-1 ml-1'}`}>
-                    {item.label}
-                  </span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeNavBackground"
+                      className="absolute inset-0 bg-[#2d1b11]/60 rounded-xl -z-10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <Icon className={`h-4.5 w-4.5 shrink-0 transition-transform duration-200 relative z-10 ${isActive ? 'stroke-[2.25px] text-[#dda67a]' : 'stroke-[1.75px]'}`} />
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.span
+                        initial={{ opacity: 0, width: 0, x: -5 }}
+                        animate={{ opacity: 1, width: 'auto', x: 0 }}
+                        exit={{ opacity: 0, width: 0, x: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="truncate whitespace-nowrap flex-1 ml-1 relative z-10 overflow-hidden"
+                      >
+                        {item.label}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </button>
               );
             })}
@@ -212,24 +264,41 @@ export default function Sidebar({
                 title={`${user.name} (${user.email})`}
                 referrerPolicy="no-referrer"
               />
-              <div className={`min-w-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'opacity-0 w-0 overflow-hidden pointer-events-none' : 'opacity-100 flex-1 ml-1'}`}>
-                <p className="text-xs font-bold text-white truncate max-w-[100px]" title={user.name}>
-                  {user.name}
-                </p>
-                <p className="text-[9px] font-mono text-[#ecd0b9]/40 truncate max-w-[100px]" title={user.email}>
-                  {user.email}
-                </p>
-              </div>
+              <AnimatePresence>
+                {!isCollapsed && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0, x: -10 }}
+                    animate={{ opacity: 1, width: 'auto', x: 0 }}
+                    exit={{ opacity: 0, width: 0, x: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="min-w-0 flex-1 ml-1 overflow-hidden"
+                  >
+                    <p className="text-xs font-bold text-white truncate max-w-[100px]" title={user.name}>
+                      {user.name}
+                    </p>
+                    <p className="text-[9px] font-mono text-[#ecd0b9]/40 truncate max-w-[100px]" title={user.email}>
+                      {user.email}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             
-            <button
-              onClick={onLogout}
-              className={`p-1.5 rounded-lg border border-transparent hover:border-red-500/20 text-[#ecd0b9]/50 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer shrink-0 ml-1 hover:scale-105 duration-100
-                ${isCollapsed ? 'hidden opacity-0' : 'block opacity-100'}`}
-              title="Logout"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <AnimatePresence>
+              {!isCollapsed && (
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.15 }}
+                  onClick={onLogout}
+                  className="p-1.5 rounded-lg border border-transparent hover:border-red-500/20 text-[#ecd0b9]/50 hover:text-red-400 hover:bg-red-500/10 transition-all cursor-pointer shrink-0 ml-1 hover:scale-105 duration-100"
+                  title="Logout"
+                >
+                  <LogOut className="h-4 w-4" />
+                </motion.button>
+              )}
+            </AnimatePresence>
           </div>
 
           {isCollapsed && (

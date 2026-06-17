@@ -38,6 +38,7 @@ interface ReportsViewProps {
   tags: TagType[];
   onDeleteEntry: (id: string) => void;
   onDuplicateEntry: (entry: TimeEntry) => void;
+  hourlyRate: number;
 }
 
 export default function ReportsView({
@@ -46,6 +47,7 @@ export default function ReportsView({
   tags,
   onDeleteEntry,
   onDuplicateEntry,
+  hourlyRate,
 }: ReportsViewProps) {
   // Preset select
   const [datePreset, setDatePreset] = useState<PresetFilterType>("thisMonth");
@@ -58,9 +60,6 @@ export default function ReportsView({
   const [selectedProjId, setSelectedProjId] = useState<string>("");
   const [selectedTag, setSelectedTag] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
-
-  // Customizable billing rate for PDF report calculation
-  const [hourlyRate, setHourlyRate] = useState<number>(1);
 
   const [roundingActive, setRoundingActive] = useState<boolean>(false);
 
@@ -1064,22 +1063,14 @@ export default function ReportsView({
             <RotateCcw className='h-4.5 w-4.5' />
           </button>
 
-          {/* Hourly Billing Rate Selector */}
-          <div
-            className='flex items-center gap-1.5 border border-[#3d2416]/55 bg-[#24150d]/40 px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs text-[#ecd0b9]'
-            title='Set billable rate per hour'
+          {/* Hourly Billing Rate (View Only) */}
+          <div 
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 text-xs font-semibold text-[#ecd0b9]"
+            title="Hourly billing rate (Configure in Settings)"
           >
-            <span className='font-medium'>Rate:</span>
-            <span className='font-mono text-[#dda67a] font-bold'>$</span>
-            <input
-              type='number'
-              min='0'
-              max='999'
-              value={hourlyRate}
-              onChange={(e) => setHourlyRate(Math.max(0, parseInt(e.target.value) || 0))}
-              className='w-8 bg-transparent text-white focus:outline-none font-mono font-bold outline-none text-center'
-            />
-            <span className='text-[9px] text-[#ecd0b9]/45'>/hr</span>
+            <DollarSign className="h-3.5 w-3.5 text-[#dda67a]" />
+            <span className="font-mono font-bold text-white">${Number(hourlyRate).toFixed(2).replace(/\.00$/, "")}</span>
+            <span className="text-[10px] text-[#ecd0b9]/60">/hr</span>
           </div>
 
           {/* Export CSV button */}
@@ -1141,7 +1132,7 @@ export default function ReportsView({
                 <span className='text-xs font-sans font-normal text-[#ecd0b9]/50'>USD</span>
               </h4>
               <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
-                Based on flat billable rate of ${hourlyRate}/hr
+                Based on flat billable rate of {hourlyRate.toLocaleString("en-US", { style: "currency", currency: "USD" })}/hr
               </p>
             </div>
             <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400'>
