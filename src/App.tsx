@@ -6,11 +6,6 @@ import SettingsView from './components/SettingsView';
 import LoginScreen from './components/LoginScreen';
 import { Toaster, toast } from 'sonner';
 import { TimeEntry, Project, Tag, PageView, UserProfile } from './types';
-import { 
-  INITIAL_PROJECTS, 
-  INITIAL_TAGS, 
-  INITIAL_TIME_ENTRIES 
-} from './initialData';
 import {
   initAuth,
   logoutUser,
@@ -96,32 +91,17 @@ export default function App() {
 
     // B. Subscribe to Projects
     const unsubProjects = subscribeToProjects(uid, (projs) => {
-      if (projs.length === 0) {
-        // Seed default projects
-        INITIAL_PROJECTS.forEach(p => saveProjectToFS(uid, p));
-      } else {
-        setProjects(projs);
-      }
+      setProjects(projs);
     });
 
     // C. Subscribe to Tags
     const unsubTags = subscribeToTags(uid, (tgs) => {
-      if (tgs.length === 0) {
-        // Seed default tags
-        INITIAL_TAGS.forEach(t => saveTagToFS(uid, t));
-      } else {
-        setTags(tgs);
-      }
+      setTags(tgs);
     });
 
     // D. Subscribe to Entries
     const unsubEntries = subscribeToEntries(uid, (ents) => {
-      if (ents.length === 0) {
-        // Seed default entries
-        INITIAL_TIME_ENTRIES.forEach(e => saveEntryToFS(uid, e));
-      } else {
-        setEntries(ents);
-      }
+      setEntries(ents);
     });
 
     return () => {

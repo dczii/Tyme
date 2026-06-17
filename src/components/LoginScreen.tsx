@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, AlertCircle, Sparkles } from 'lucide-react';
+import { Shield, AlertCircle, Sparkles, Info } from 'lucide-react';
 import { UserProfile } from '../types';
 import { googleSignIn } from '../lib/firebase';
 
@@ -10,6 +10,7 @@ interface LoginScreenProps {
 export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState<'signin' | 'register'>('signin');
 
   const handleOpenGoogleAuth = async () => {
     setError('');
@@ -57,9 +58,13 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#a66e46] to-[#4f2f18] flex items-center justify-center text-[#fdf4ee] shadow-xl shadow-[#4a2b16]/60 mb-4 scale-102">
             <Shield className="h-7 w-7 text-[#ffdda6]" strokeWidth={1.5} />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">Welcome to Tyme</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+            {mode === 'signin' ? 'Welcome to Tyme' : 'Create your Account'}
+          </h1>
           <p className="text-xs text-[#ecd0b9]/70 mt-2 max-w-[280px] leading-relaxed">
-            Time-tracking dashboard aligned to your active enterprise workspace.
+            {mode === 'signin'
+              ? 'Time-tracking dashboard aligned to your active enterprise workspace.'
+              : 'Register now using Google OAuth to configure and sync your workspace.'}
           </p>
         </div>
 
@@ -96,10 +101,19 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span>Sign in with Google</span>
+                <span>{mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}</span>
               </>
             )}
           </button>
+
+          {mode === 'register' && (
+            <div className="bg-[#2d1b11]/40 border border-[#5e3820]/30 rounded-xl p-3 flex items-start gap-2.5 text-[11px] text-[#dda67a]/90 leading-relaxed animate-fadeIn">
+              <Info className="h-4 w-4 shrink-0 text-[#dda67a] mt-0.5" />
+              <span>
+                To ensure secure single sign-on synchronization of your workspace, Tyme supports registration exclusively via Google accounts. No password setup is required.
+              </span>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-950/45 border border-red-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 animate-fadeIn">
@@ -114,6 +128,22 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </p>
           )}
 
+        </div>
+
+        {/* Toggle Mode Link */}
+        <div className="mt-6 pt-5 border-t border-[#3e271a]/30 w-full text-center">
+          <p className="text-xs text-[#ecd0b9]/60">
+            {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
+            <button
+              onClick={() => {
+                setMode(mode === 'signin' ? 'register' : 'signin');
+                setError('');
+              }}
+              className="text-[#dda67a] hover:text-[#f3be94] font-semibold transition cursor-pointer hover:underline focus:outline-none"
+            >
+              {mode === 'signin' ? 'Register' : 'Sign in'}
+            </button>
+          </p>
         </div>
 
         <div className="mt-8 text-center text-[10px] text-[#ecd0b9]/25 font-mono tracking-wide uppercase leading-normal max-w-[270px]">

@@ -23,6 +23,7 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 - **🔌 Google Contacts Integration**: Connect your account using Google OAuth to automatically synchronize client references from Google People API into your settings.
 - **⚙️ Customization**: Configure your daily workday target hours and choose between three custom branding logo styles (*Classic*, *Minimalist*, and *Hourglass*).
 - **🔒 Secure Sync**: Instant, real-time database synchronization via Cloud Firestore with strict access control and identity validation.
+- **🆕 Fresh Workspace**: Starts completely clean without pre-populated mock projects, tags, or time entries, enabling immediate production tracking.
 
 ---
 
@@ -55,7 +56,6 @@ Tyme/
 │   │   └── firebase.ts           # Firestore schema queries, security logging & People API contact fetch
 │   ├── App.tsx                   # Central router & state container
 │   ├── index.css                 # Global theme variables, animations & fonts
-│   ├── initialData.ts            # Seeding data for new workspaces
 │   ├── types.ts                  # TypeScript definitions for Projects, Tags, and Entries
 │   └── utils.ts                  # Date formatting, math, and duration helpers
 ├── firestore.rules               # Strict Firestore database security rules
