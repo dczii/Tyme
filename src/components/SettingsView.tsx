@@ -76,6 +76,12 @@ export default function SettingsView({
       return;
     }
 
+    // Only save if the name actually changed from the database/current value
+    const currentName = projects[0]?.name || "";
+    if (projName.trim() === currentName) {
+      return;
+    }
+
     const delayDebounceFn = setTimeout(async () => {
       try {
         await onUpdateSingleProject(projName.trim(), undefined, projColor);
