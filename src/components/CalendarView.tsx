@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -387,6 +387,18 @@ export default function CalendarView({
   const [modalSelectedTags, setModalSelectedTags] = useState<string[]>([]);
   const [showModalTagDropdown, setShowModalTagDropdown] = useState<boolean>(false);
 
+  // Drag-and-drop state
+  const [draggedEntryId, setDraggedEntryId] = useState<string | null>(null);
+  const [dragGhostPosition, setDragGhostPosition] = useState<{ dayIndex: number; startHour: number } | null>(null);
+  const draggedEntryDuration = useRef<number>(0);
+  const gridBodyRef = useRef<HTMLDivElement>(null);
+
+  // Mobile touch drag state
+  const [touchDragEntryId, setTouchDragEntryId] = useState<string | null>(null);
+  const [touchDragPosition, setTouchDragPosition] = useState<{ x: number; y: number } | null>(null);
+  const touchDragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
+
   useEffect(() => {
     if (editingEntry) {
       setEditDurationStr(formatMinutesHHMM(editingEntry.durationMinutes));
@@ -395,10 +407,15 @@ export default function CalendarView({
     }
   }, [editingEntry?.id]);
 
-  // Listen for Escape key to close open modals
+  // Listen for Escape key to close open modals or cancel drag
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (draggedEntryId) {
+          setDraggedEntryId(null);
+          setDragGhostPosition(null);
+          return;
+        }
         if (editingEntry) {
           setEditingEntry(null);
         }
@@ -409,14 +426,14 @@ export default function CalendarView({
       }
     };
 
-    if (editingEntry || isCreateModalOpen) {
+    if (editingEntry || isCreateModalOpen || draggedEntryId) {
       window.addEventListener("keydown", handleKeyDown);
     }
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [editingEntry, isCreateModalOpen]);
+  }, [editingEntry, isCreateModalOpen, draggedEntryId]);
 
   // Time dynamics helper changes
   const handleStartTimeChange = (newStart: string) => {
@@ -626,6 +643,7 @@ export default function CalendarView({
 
   // Quick form setup to handle adding a slot
   const handleSlotClicked = (dateStr: string, hourVal: number) => {
+    if (draggedEntryId) return; // Don't open modal during drag
     setNewEntryDate(dateStr);
     const startStr = `${String(hourVal).padStart(2, "0")}:00`;
     const endStr = `${String(hourVal + 1).padStart(2, "0")}:00`;
@@ -636,6 +654,199 @@ export default function CalendarView({
     setShowModalTagDropdown(false);
     setIsCreateModalOpen(true);
   };
+
+  // --- Drag-and-Drop Helpers ---
+
+  // Convert a Y pixel offset in the grid body to a time string snapped to 15-min increments
+  const yPositionToTime = useCallback((y: number): string => {
+    const hourOffset = y / ROW_HEIGHT;
+    const absoluteHour = HOURS[0] + hourOffset;
+    // Snap to nearest 15 minutes
+    const totalMinutes = Math.round(absoluteHour * 60);
+    const snappedMinutes = Math.round(totalMinutes / 15) * 15;
+    const clampedMinutes = Math.max(HOURS[0] * 60, Math.min((HOURS[HOURS.length - 1] + 1) * 60 - 1, snappedMinutes));
+    const h = Math.floor(clampedMinutes / 60);
+    const m = clampedMinutes % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+  }, []);
+
+  // Desktop drag start
+  const handleEntryDragStart = useCallback((entry: TimeEntry, e: React.DragEvent) => {
+    setDraggedEntryId(entry.id);
+    draggedEntryDuration.current = entry.durationMinutes;
+    // Set drag image to a small transparent pixel to use our custom ghost
+    const ghost = document.createElement("div");
+    ghost.style.width = "1px";
+    ghost.style.height = "1px";
+    ghost.style.opacity = "0";
+    document.body.appendChild(ghost);
+    e.dataTransfer.setDragImage(ghost, 0, 0);
+    e.dataTransfer.effectAllowed = "move";
+    // Clean up the ghost element after a frame
+    requestAnimationFrame(() => document.body.removeChild(ghost));
+  }, []);
+
+  // Desktop drag over grid body — compute ghost position
+  const handleGridDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    if (!gridBodyRef.current || !draggedEntryId) return;
+
+    const gridRect = gridBodyRef.current.getBoundingClientRect();
+    const y = e.clientY - gridRect.top;
+
+    // The hour column takes up the first 60px (md) or 44px — detect from the DOM
+    const hourColWidth = window.innerWidth >= 768 ? 60 : 44;
+    const x = e.clientX - gridRect.left - hourColWidth;
+    const dayAreaWidth = gridRect.width - hourColWidth;
+    const dayIndex = Math.max(0, Math.min(6, Math.floor((x / dayAreaWidth) * 7)));
+
+    // Compute the start hour from Y position (snapped to 15 min)
+    const hourOffset = y / ROW_HEIGHT;
+    const absoluteHour = HOURS[0] + hourOffset;
+    const totalMinutes = Math.round(absoluteHour * 60);
+    const snappedMinutes = Math.round(totalMinutes / 15) * 15;
+    const startHour = snappedMinutes / 60;
+
+    setDragGhostPosition({ dayIndex, startHour });
+  }, [draggedEntryId]);
+
+  // Desktop drop handler
+  const handleGridDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    if (!draggedEntryId || !dragGhostPosition) {
+      setDraggedEntryId(null);
+      setDragGhostPosition(null);
+      return;
+    }
+
+    const entry = entries.find(en => en.id === draggedEntryId);
+    if (!entry) {
+      setDraggedEntryId(null);
+      setDragGhostPosition(null);
+      return;
+    }
+
+    const newDate = formattedWeekDays[dragGhostPosition.dayIndex];
+    const startMinutes = Math.round(dragGhostPosition.startHour * 60);
+    const endMinutes = startMinutes + entry.durationMinutes;
+    const startH = Math.floor(startMinutes / 60);
+    const startM = startMinutes % 60;
+    const endH = Math.floor(endMinutes / 60);
+    const endM = endMinutes % 60;
+    const newStartTime = `${String(startH).padStart(2, "0")}:${String(startM).padStart(2, "0")}`;
+    const newEndTime = `${String(endH).padStart(2, "0")}:${String(endM).padStart(2, "0")}`;
+
+    // Only update if something actually changed
+    if (newDate !== entry.date || newStartTime !== entry.startTime) {
+      onUpdateEntry({
+        ...entry,
+        date: newDate,
+        startTime: newStartTime,
+        endTime: newEndTime,
+      });
+      toast.success("Entry moved", {
+        description: `${entry.description || "Untitled"} → ${newStartTime}–${newEndTime}`,
+        duration: 2000,
+      });
+    }
+
+    setDraggedEntryId(null);
+    setDragGhostPosition(null);
+  }, [draggedEntryId, dragGhostPosition, entries, formattedWeekDays, onUpdateEntry]);
+
+  // Desktop drag end (cleanup)
+  const handleDragEnd = useCallback(() => {
+    setDraggedEntryId(null);
+    setDragGhostPosition(null);
+  }, []);
+
+  // --- Mobile Touch Drag Handlers ---
+
+  const handleTouchDragStart = useCallback((entry: TimeEntry, e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartPosRef.current = { x: touch.clientX, y: touch.clientY };
+    // Long press to initiate drag (400ms)
+    touchDragTimerRef.current = setTimeout(() => {
+      setTouchDragEntryId(entry.id);
+      draggedEntryDuration.current = entry.durationMinutes;
+      setTouchDragPosition({ x: touch.clientX, y: touch.clientY });
+    }, 400);
+  }, []);
+
+  const handleTouchDragMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    // Cancel long-press if finger moves significantly before timer fires
+    if (touchStartPosRef.current && !touchDragEntryId) {
+      const dx = touch.clientX - touchStartPosRef.current.x;
+      const dy = touch.clientY - touchStartPosRef.current.y;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        if (touchDragTimerRef.current) {
+          clearTimeout(touchDragTimerRef.current);
+          touchDragTimerRef.current = null;
+        }
+      }
+    }
+    if (!touchDragEntryId) return;
+    e.preventDefault();
+    setTouchDragPosition({ x: touch.clientX, y: touch.clientY });
+
+    // Check if finger is over day selector tabs to highlight
+    const dayTabs = document.querySelectorAll('[data-day-tab-index]');
+    dayTabs.forEach((tab) => {
+      const rect = tab.getBoundingClientRect();
+      if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+          touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        const idx = parseInt(tab.getAttribute('data-day-tab-index') || '0');
+        setActiveDayIndex(idx);
+      }
+    });
+  }, [touchDragEntryId]);
+
+  const handleTouchDragEnd = useCallback((e: React.TouchEvent) => {
+    if (touchDragTimerRef.current) {
+      clearTimeout(touchDragTimerRef.current);
+      touchDragTimerRef.current = null;
+    }
+    touchStartPosRef.current = null;
+
+    if (!touchDragEntryId) return;
+
+    const entry = entries.find(en => en.id === touchDragEntryId);
+    if (entry) {
+      // Determine which day tab the touch ended on
+      const activeDayStr = formattedWeekDays[activeDayIndex] || formattedWeekDays[0];
+
+      // If date changed, update the entry
+      if (activeDayStr !== entry.date) {
+        onUpdateEntry({
+          ...entry,
+          date: activeDayStr,
+        });
+        toast.success("Entry moved", {
+          description: `${entry.description || "Untitled"} moved to ${weekDays[activeDayIndex]?.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`,
+          duration: 2000,
+        });
+      }
+    }
+
+    setTouchDragEntryId(null);
+    setTouchDragPosition(null);
+  }, [touchDragEntryId, entries, formattedWeekDays, activeDayIndex, weekDays, onUpdateEntry]);
+
+  // Ghost indicator position styles for desktop
+  const getGhostStyles = useCallback(() => {
+    if (!dragGhostPosition || !draggedEntryId) return null;
+    const startHourLimit = HOURS[0];
+    const topOffset = (dragGhostPosition.startHour - startHourLimit) * ROW_HEIGHT;
+    const durationHours = draggedEntryDuration.current / 60;
+    const heightOffset = Math.max(28, durationHours * ROW_HEIGHT);
+    return {
+      top: `${topOffset}px`,
+      height: `${heightOffset}px`,
+      gridColumnStart: dragGhostPosition.dayIndex + 1,
+    };
+  }, [dragGhostPosition, draggedEntryId]);
 
   return (
     <div className='flex-1 flex flex-col min-w-0 z-10'>
@@ -1013,6 +1224,7 @@ export default function CalendarView({
               return (
                 <button
                   key={idx}
+                  data-day-tab-index={idx}
                   onClick={() => setActiveDayIndex(idx)}
                   className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition duration-150 cursor-pointer
                     ${
@@ -1067,10 +1279,18 @@ export default function CalendarView({
                           key={entry.id}
                           layout
                           initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          animate={{
+                            opacity: touchDragEntryId === entry.id ? 0.3 : 1,
+                            scale: touchDragEntryId === entry.id ? 0.95 : 1,
+                            y: 0
+                          }}
                           exit={{ opacity: 0, scale: 0.95, y: -10, transition: { duration: 0.15 } }}
-                          onClick={() => setEditingEntry(entry)}
-                          className='bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-pointer active:scale-[0.99] transition duration-150'
+                          onClick={() => { if (!touchDragEntryId) setEditingEntry(entry); }}
+                          onTouchStart={(e) => handleTouchDragStart(entry, e)}
+                          onTouchMove={handleTouchDragMove}
+                          onTouchEnd={handleTouchDragEnd}
+                          className={`bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-grab active:cursor-grabbing active:scale-[0.99] transition duration-150
+                            ${touchDragEntryId === entry.id ? 'opacity-30 border-dashed' : ''}`}
                         style={{
                           borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
                           borderColor: hasOverlap ? "#ef4444" : undefined,
@@ -1146,6 +1366,38 @@ export default function CalendarView({
               );
             }
           })()}
+
+          {/* Mobile touch drag floating card */}
+          {touchDragEntryId && touchDragPosition && (() => {
+            const dragEntry = entries.find(e => e.id === touchDragEntryId);
+            if (!dragEntry) return null;
+            const proj = dragEntry.projectId ? projects.find(p => p.id === dragEntry.projectId) : null;
+            return (
+              <div
+                className='fixed z-[100] pointer-events-none'
+                style={{
+                  left: touchDragPosition.x - 100,
+                  top: touchDragPosition.y - 30,
+                  width: 200,
+                }}
+              >
+                <div
+                  className='bg-[#1c120c]/90 backdrop-blur-xl border-2 border-[#dda67a]/50 rounded-2xl p-3 shadow-2xl'
+                  style={{ borderLeft: `4px solid ${proj?.color || '#a66e46'}` }}
+                >
+                  <p className='text-xs font-semibold text-white truncate'>
+                    {dragEntry.description || 'Untitled'}
+                  </p>
+                  <p className='text-[10px] font-mono text-[#dda67a] mt-1'>
+                    {dragEntry.startTime} – {dragEntry.endTime}
+                  </p>
+                  <p className='text-[9px] text-[#ecd0b9]/50 mt-0.5'>
+                    Drag to a day tab to move
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* DESKTOP WEEKLY GRID (>= md) */}
@@ -1217,8 +1469,12 @@ export default function CalendarView({
 
           {/* Grid Rows body area */}
           <div
+            ref={gridBodyRef}
             className='relative overflow-y-visible'
             style={{ height: `${HOURS.length * ROW_HEIGHT}px` }}
+            onDragOver={handleGridDragOver}
+            onDrop={handleGridDrop}
+            onDragLeave={() => setDragGhostPosition(null)}
           >
             {/* Background hourly lines */}
             {HOURS.map((hour, idx) => (
@@ -1240,7 +1496,10 @@ export default function CalendarView({
                     <div
                       key={dIdx}
                       onClick={() => handleSlotClicked(formattedWeekDays[dIdx], hour)}
-                      className='border-r border-white/20 dark:border-slate-800/20 last:border-r-0 pointer-events-auto hover:bg-white/40 dark:hover:bg-white/[0.02] cursor-cell transition duration-75 relative'
+                      onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                      onDrop={handleGridDrop}
+                      className={`border-r border-white/20 dark:border-slate-800/20 last:border-r-0 pointer-events-auto cursor-cell transition duration-75 relative
+                        ${draggedEntryId ? 'hover:bg-[#a66e46]/10' : 'hover:bg-white/40 dark:hover:bg-white/[0.02]'}`}
                       title='Click slot to log hours'
                     />
                   ))}
@@ -1267,16 +1526,22 @@ export default function CalendarView({
                         const hasOverlap = checkHasOverlap(entry);
                         const pos = getEntryPositionStyles(entry);
 
+                        const isDragging = draggedEntryId === entry.id;
+
                         return (
                           <motion.div
                             key={entry.id}
                             layout
                             initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            animate={{ opacity: isDragging ? 0.3 : 1, scale: isDragging ? 0.97 : 1 }}
                             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
-                            onClick={() => setEditingEntry(entry)}
-                            className='absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden cursor-pointer
-                              bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg hover:scale-[1.01]'
+                            draggable
+                            onDragStart={(e: any) => handleEntryDragStart(entry, e)}
+                            onDragEnd={handleDragEnd}
+                            onClick={() => { if (!draggedEntryId) setEditingEntry(entry); }}
+                            className={`absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden
+                              bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg
+                              ${isDragging ? 'opacity-30 border-dashed cursor-grabbing scale-[0.97]' : 'cursor-grab hover:scale-[1.01]'}`}
                           style={{
                             ...pos,
                             borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
@@ -1332,6 +1597,49 @@ export default function CalendarView({
                 );
               })}
             </div>
+
+            {/* Drag ghost preview indicator — positioned absolutely outside the grid to avoid displacing columns */}
+            {dragGhostPosition && draggedEntryId && (() => {
+              const ghostStyles = getGhostStyles();
+              if (!ghostStyles) return null;
+              const draggedEntry = entries.find(e => e.id === draggedEntryId);
+              const proj = draggedEntry?.projectId ? projects.find(p => p.id === draggedEntry.projectId) : null;
+              const hourColWidth = window.innerWidth >= 768 ? 60 : 44;
+              const dayAreaWidth = gridBodyRef.current ? gridBodyRef.current.offsetWidth - hourColWidth : 0;
+              const colWidthPx = dayAreaWidth / 7;
+              const colLeftPx = hourColWidth + dragGhostPosition.dayIndex * colWidthPx;
+              return (
+                <div
+                  className='absolute pointer-events-none px-1'
+                  style={{
+                    left: `${colLeftPx}px`,
+                    width: `${colWidthPx}px`,
+                    top: ghostStyles.top,
+                    height: ghostStyles.height,
+                  }}
+                >
+                  <div
+                    className='h-full w-full rounded-xl border-2 border-dashed border-[#dda67a]/70 bg-[#a66e46]/15 backdrop-blur-sm flex flex-col justify-center items-center'
+                    style={{ borderLeftWidth: '4px', borderLeftStyle: 'solid', borderLeftColor: proj?.color || '#a66e46' }}
+                  >
+                    <span className='text-[10px] font-mono font-bold text-[#dda67a]/90'>
+                      {(() => {
+                        const startMins = Math.round(dragGhostPosition.startHour * 60);
+                        const endMins = startMins + (draggedEntry?.durationMinutes || 60);
+                        const sH = Math.floor(startMins / 60);
+                        const sM = startMins % 60;
+                        const eH = Math.floor(endMins / 60);
+                        const eM = endMins % 60;
+                        return `${String(sH).padStart(2, '0')}:${String(sM).padStart(2, '0')} – ${String(eH).padStart(2, '0')}:${String(eM).padStart(2, '0')}`;
+                      })()}
+                    </span>
+                    <span className='text-[9px] text-[#ecd0b9]/50 mt-0.5 truncate px-2 max-w-full'>
+                      {draggedEntry?.description || 'Untitled'}
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </div>
