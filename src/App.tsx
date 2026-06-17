@@ -250,7 +250,7 @@ export default function App() {
   return (
     <div 
       id="app-root-container"
-      className="min-h-screen flex text-slate-200 bg-[#0c0806] font-sans relative overflow-hidden dark"
+      className="min-h-screen flex flex-col md:flex-row text-slate-200 bg-[#0c0806] font-sans relative overflow-hidden dark"
     >
       {/* Animated/Glowing Background Shapes for Frosted Glass Espresso Theme */}
       <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full blur-[100px] pointer-events-none bg-[#4a2b16]/25 animate-pulse duration-5000"></div>

@@ -7,7 +7,26 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Custom scrollbars and styling tweaks */
+/* ========== Mobile-first base resets ========== */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+/* Smooth scrolling containers */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Safe area bottom padding utility for bottom nav */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ========== Scrollbar styles ========== */
+/* Desktop scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -23,6 +42,25 @@
   background-color: rgba(156, 163, 175, 0.45);
 }
 
+/* Hide scrollbars on mobile (touch devices) for cleaner look */
+@media (hover: none) and (pointer: coarse) {
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  * {
+    scrollbar-width: none;
+  }
+}
+
+/* ========== Mobile bottom nav spacing ========== */
+/* Add bottom padding to main content on mobile to prevent overlap with fixed bottom nav */
+@media (max-width: 767px) {
+  #app-root-container > main {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ========== Print styles ========== */
 @media print {
   html, body {
     background-color: #ffffff !important;
@@ -32,4 +70,3 @@
     print-color-adjust: exact !important;
   }
 }
-

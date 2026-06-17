@@ -39,13 +39,13 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   return (
-    <div id="login-container-root" className="min-h-screen w-full flex items-center justify-center bg-[#0c0806] text-slate-100 p-4 relative overflow-hidden font-sans">
+    <div id="login-container-root" className="min-h-screen w-full flex items-center justify-center bg-[#0c0806] text-slate-100 p-4 pb-safe relative overflow-hidden font-sans">
       {/* Espresso Theme Ambient Visuals */}
       <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#4a2b16]/30 animate-pulse duration-[6s]"></div>
       <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#9a6a42]/15 animate-pulse duration-[8s]"></div>
 
       {/* Glassmorphism Credentials Panel */}
-      <div className="w-full max-w-[430px] bg-[#140d0a]/75 backdrop-blur-2xl border border-[#3e271a] rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-[430px] bg-[#140d0a]/75 backdrop-blur-2xl border border-[#3e271a] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl relative z-10 flex flex-col items-center">
         
         {/* Workspace Flag */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-[#2d1b11]/60 border border-[#5e3820]/40 rounded-full text-[10px] font-mono text-[#dda67a] tracking-wider uppercase">
@@ -74,7 +74,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           <button
             onClick={handleOpenGoogleAuth}
             disabled={isLoading}
-            className="w-full bg-white hover:bg-slate-50 active:bg-slate-100 text-[#1f1f1f] text-sm font-semibold py-3.5 px-5 rounded-xl border border-slate-200/80 transition shadow-lg cursor-pointer flex items-center justify-center gap-3 select-none duration-150 disabled:opacity-85 text-center"
+            className="w-full bg-white hover:bg-slate-50 active:bg-slate-100 text-[#1f1f1f] text-sm font-semibold py-4 md:py-3.5 px-5 rounded-xl border border-slate-200/80 transition shadow-lg cursor-pointer flex items-center justify-center gap-3 select-none duration-150 disabled:opacity-85 text-center min-h-[48px]"
           >
             {isLoading ? (
               <div className="flex items-center gap-2.5">

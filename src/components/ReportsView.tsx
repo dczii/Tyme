@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Filter, 
-  Calendar, 
-  Tag as TagIcon, 
-  Folder, 
-  Search, 
-  Download, 
-  Printer, 
+import React, { useState, useMemo } from "react";
+import {
+  Filter,
+  Calendar,
+  Tag as TagIcon,
+  Folder,
+  Search,
+  Download,
+  Printer,
   RotateCcw,
   Copy,
   Trash2,
@@ -15,22 +15,22 @@ import {
   TrendingUp,
   FileSpreadsheet,
   Plus,
-  DollarSign
-} from 'lucide-react';
-import { TimeEntry, Project, Tag as TagType, ReportFilter } from '../types';
-import { 
-  formatMinutesHHMM, 
-  formatMinutesDecimal, 
-  exportToCSV, 
-  formatDateFriendly, 
-  calculateDurationMinutes 
-} from '../utils';
-import BrandLogo from './BrandLogo';
-import { jsPDF } from 'jspdf';
-import { toast } from 'sonner';
+  DollarSign,
+} from "lucide-react";
+import { TimeEntry, Project, Tag as TagType, ReportFilter } from "../types";
+import {
+  formatMinutesHHMM,
+  formatMinutesDecimal,
+  exportToCSV,
+  formatDateFriendly,
+  calculateDurationMinutes,
+} from "../utils";
+import BrandLogo from "./BrandLogo";
+import { jsPDF } from "jspdf";
+import { toast } from "sonner";
 
 // Predefined filtering options
-type PresetFilterType = 'thisWeek' | 'lastWeek' | 'thisMonth' | 'lastMonth' | 'allTime';
+type PresetFilterType = "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "allTime";
 
 interface ReportsViewProps {
   entries: TimeEntry[];
@@ -45,22 +45,22 @@ export default function ReportsView({
   projects,
   tags,
   onDeleteEntry,
-  onDuplicateEntry
+  onDuplicateEntry,
 }: ReportsViewProps) {
   // Preset select
-  const [datePreset, setDatePreset] = useState<PresetFilterType>('thisMonth');
-  
+  const [datePreset, setDatePreset] = useState<PresetFilterType>("thisMonth");
+
   // Custom dates
-  const [customStart, setCustomStart] = useState<string>('2026-06-01');
-  const [customEnd, setCustomEnd] = useState<string>('2026-06-30');
+  const [customStart, setCustomStart] = useState<string>("2026-06-01");
+  const [customEnd, setCustomEnd] = useState<string>("2026-06-30");
 
   // Filter criteria options
-  const [selectedProjId, setSelectedProjId] = useState<string>('');
-  const [selectedTag, setSelectedTag] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedProjId, setSelectedProjId] = useState<string>("");
+  const [selectedTag, setSelectedTag] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Customizable billing rate for PDF report calculation
-  const [hourlyRate, setHourlyRate] = useState<number>(42);
+  const [hourlyRate, setHourlyRate] = useState<number>(1);
 
   const [roundingActive, setRoundingActive] = useState<boolean>(false);
 
@@ -73,62 +73,64 @@ export default function ReportsView({
   // 1. Filter Logic
   const filteredEntries = useMemo(() => {
     // Determine start and end ranges based on presets
-    let minDateStr = '';
-    let maxDateStr = '';
-    
+    let minDateStr = "";
+    let maxDateStr = "";
+
     const parseYYYYMMDD = (d: Date) => {
       const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
       return `${y}-${m}-${day}`;
     };
 
-    const refDate = new Date('2026-06-15'); // Reference calendar date
+    const refDate = new Date("2026-06-15"); // Reference calendar date
 
-    if (datePreset === 'thisWeek') {
+    if (datePreset === "thisWeek") {
       // Mon Jun 15 - Sun Jun 21, 2026
-      minDateStr = '2026-06-15';
-      maxDateStr = '2026-06-21';
-    } else if (datePreset === 'lastWeek') {
+      minDateStr = "2026-06-15";
+      maxDateStr = "2026-06-21";
+    } else if (datePreset === "lastWeek") {
       // Prior week: Mon Jun 8 - Sun Jun 14, 2026
-      minDateStr = '2026-06-08';
-      maxDateStr = '2026-06-14';
-    } else if (datePreset === 'thisMonth') {
+      minDateStr = "2026-06-08";
+      maxDateStr = "2026-06-14";
+    } else if (datePreset === "thisMonth") {
       // June 1 to June 30, 2026
-      minDateStr = '2026-06-01';
-      maxDateStr = '2026-06-30';
-    } else if (datePreset === 'lastMonth') {
+      minDateStr = "2026-06-01";
+      maxDateStr = "2026-06-30";
+    } else if (datePreset === "lastMonth") {
       // May 1 to May 31, 2026
-      minDateStr = '2026-05-01';
-      maxDateStr = '2026-05-31';
-    } else if (datePreset === 'allTime') {
-      minDateStr = '2000-01-01';
-      maxDateStr = '2100-12-31';
+      minDateStr = "2026-05-01";
+      maxDateStr = "2026-05-31";
+    } else if (datePreset === "allTime") {
+      minDateStr = "2000-01-01";
+      maxDateStr = "2100-12-31";
     }
 
-    return entries.filter(entry => {
-      // Range validation
-      const d = entry.date;
-      if (minDateStr && maxDateStr) {
-        if (d < minDateStr || d > maxDateStr) return false;
-      }
+    return entries
+      .filter((entry) => {
+        // Range validation
+        const d = entry.date;
+        if (minDateStr && maxDateStr) {
+          if (d < minDateStr || d > maxDateStr) return false;
+        }
 
-      // Project filter
-      if (selectedProjId && entry.projectId !== selectedProjId) return false;
+        // Project filter
+        if (selectedProjId && entry.projectId !== selectedProjId) return false;
 
-      // Tag filter
-      if (selectedTag && !entry.tags.includes(selectedTag)) return false;
+        // Tag filter
+        if (selectedTag && !entry.tags.includes(selectedTag)) return false;
 
-      // Search keyword filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const descMatch = entry.description.toLowerCase().includes(query);
-        const tagsMatch = entry.tags.some(t => t.toLowerCase().includes(query));
-        if (!descMatch && !tagsMatch) return false;
-      }
+        // Search keyword filter
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase();
+          const descMatch = entry.description.toLowerCase().includes(query);
+          const tagsMatch = entry.tags.some((t) => t.toLowerCase().includes(query));
+          if (!descMatch && !tagsMatch) return false;
+        }
 
-      return true;
-    }).sort((a, b) => b.date.localeCompare(a.date)); // Sort by newest date first
+        return true;
+      })
+      .sort((a, b) => b.date.localeCompare(a.date)); // Sort by newest date first
   }, [entries, datePreset, selectedProjId, selectedTag, searchQuery]);
 
   // 2. Metrics aggregates
@@ -137,7 +139,7 @@ export default function ReportsView({
   }, [filteredEntries, roundingActive]);
 
   const distinctDaysCount = useMemo(() => {
-    const daysSet = new Set(filteredEntries.map(e => e.date));
+    const daysSet = new Set(filteredEntries.map((e) => e.date));
     return Math.max(1, daysSet.size);
   }, [filteredEntries]);
 
@@ -149,12 +151,12 @@ export default function ReportsView({
   // Project distribution matching custom donut charts
   const projectAggregates = useMemo(() => {
     const map: Record<string, { mins: number; color: string; name: string }> = {};
-    
-    filteredEntries.forEach(entry => {
-      const projId = entry.projectId || 'unassigned';
-      const proj = projects.find(p => p.id === projId);
-      const name = proj ? proj.name : 'No Project';
-      const color = proj ? proj.color : '#64748b'; // slate
+
+    filteredEntries.forEach((entry) => {
+      const projId = entry.projectId || "unassigned";
+      const proj = projects.find((p) => p.id === projId);
+      const name = proj ? proj.name : "No Project";
+      const color = proj ? proj.color : "#64748b"; // slate
 
       if (!map[projId]) {
         map[projId] = { mins: 0, color, name };
@@ -168,29 +170,31 @@ export default function ReportsView({
   // Day distribution for Custom Bar Chart
   const dailyDistribution = useMemo(() => {
     const map: Record<string, number> = {};
-    
+
     // Sort and aggregate daily logs
-    filteredEntries.forEach(entry => {
+    filteredEntries.forEach((entry) => {
       map[entry.date] = (map[entry.date] || 0) + getDisplayMinutes(entry.durationMinutes);
     });
 
     const dates = Object.keys(map).sort();
-    return dates.map(dt => {
-      const parts = dt.split('-');
-      const monthFriendly = parts[1] === '06' ? 'Jun' : parts[1] === '05' ? 'May' : 'Date';
-      return {
-        label: `${monthFriendly} ${parts[2]}`,
-        mins: map[dt]
-      };
-    }).slice(-12); // Display last 12 active logging days to keep chart beautiful on all screens
+    return dates
+      .map((dt) => {
+        const parts = dt.split("-");
+        const monthFriendly = parts[1] === "06" ? "Jun" : parts[1] === "05" ? "May" : "Date";
+        return {
+          label: `${monthFriendly} ${parts[2]}`,
+          mins: map[dt],
+        };
+      })
+      .slice(-12); // Display last 12 active logging days to keep chart beautiful on all screens
   }, [filteredEntries, roundingActive]);
 
   // Generate and download a highly polished professional PDF report from data (matching Tyme style)
   const handlePrintPDF = () => {
     const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'pt',
-      format: 'a4'
+      orientation: "portrait",
+      unit: "pt",
+      format: "a4",
     });
 
     const pageHeight = doc.internal.pageSize.getHeight(); // ~841.89 pt
@@ -203,23 +207,23 @@ export default function ReportsView({
 
     // Standard Tyme page footer drawer
     const drawPageFooter = (num: number) => {
-      doc.setFont('Helvetica', 'normal');
+      doc.setFont("Helvetica", "normal");
       doc.setFontSize(8.5);
       doc.setTextColor(110, 110, 110);
       const footerY = pageHeight - 30;
       doc.text("Dczii's workspace", margin, footerY);
-      doc.text("Created with Tyme", pageWidth / 2, footerY, { align: 'center' });
-      doc.text(String(num), pageWidth - margin, footerY, { align: 'right' });
+      doc.text("Created with Tyme", pageWidth / 2, footerY, { align: "center" });
+      doc.text(String(num), pageWidth - margin, footerY, { align: "right" });
     };
 
     // Vector drawing helper for perfectly smooth donut charts
     const drawDonut = (
-      cx: number, 
-      cy: number, 
-      rOuter: number, 
-      rInner: number, 
-      segmentsList: any[], 
-      centerTxt: string
+      cx: number,
+      cy: number,
+      rOuter: number,
+      rInner: number,
+      segmentsList: any[],
+      centerTxt: string,
     ) => {
       let currentAngle = -Math.PI / 2; // Start from top
       const totalSecMins = segmentsList.reduce((sum, s) => sum + s.mins, 0);
@@ -230,11 +234,11 @@ export default function ReportsView({
         const pct = seg.mins / totalSecMins;
         const angleSweep = pct * Math.PI * 2;
 
-        const hexColor = seg.color || '#0288d1';
+        const hexColor = seg.color || "#0288d1";
         const r = parseInt(hexColor.slice(1, 3), 16) || 2;
         const g = parseInt(hexColor.slice(3, 5), 16) || 136;
         const b = parseInt(hexColor.slice(5, 7), 16) || 209;
-        
+
         doc.setFillColor(r, g, b);
         doc.setDrawColor(r, g, b);
 
@@ -244,10 +248,13 @@ export default function ReportsView({
           const nextAlpha = currentAngle + ((i + 1) / steps) * angleSweep;
 
           doc.triangle(
-            cx, cy,
-            cx + rOuter * Math.cos(alpha), cy + rOuter * Math.sin(alpha),
-            cx + rOuter * Math.cos(nextAlpha), cy + rOuter * Math.sin(nextAlpha),
-            'F'
+            cx,
+            cy,
+            cx + rOuter * Math.cos(alpha),
+            cy + rOuter * Math.sin(alpha),
+            cx + rOuter * Math.cos(nextAlpha),
+            cy + rOuter * Math.sin(nextAlpha),
+            "F",
           );
         }
         currentAngle += angleSweep;
@@ -255,22 +262,22 @@ export default function ReportsView({
 
       // Hollow inner white circle
       doc.setFillColor(255, 255, 255);
-      doc.circle(cx, cy, rInner, 'F');
+      doc.circle(cx, cy, rInner, "F");
 
       // Thin inner outline
       doc.setDrawColor(240, 240, 240);
       doc.setLineWidth(0.5);
-      doc.circle(cx, cy, rInner, 'D');
+      doc.circle(cx, cy, rInner, "D");
 
       // Center title text
-      doc.setFont('Helvetica', 'bold');
+      doc.setFont("Helvetica", "bold");
       doc.setFontSize(10.5);
       doc.setTextColor(24, 24, 27);
-      doc.text(centerTxt, cx, cy + 3.5, { align: 'center' });
+      doc.text(centerTxt, cx, cy + 3.5, { align: "center" });
     };
 
     // --- TITLE HEADER ---
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setFontSize(22);
     doc.setTextColor(24, 24, 27); // Zinc-900
     doc.text("Summary report", margin, posY);
@@ -278,16 +285,16 @@ export default function ReportsView({
     // Tyme brand logo (Top-Right)
     const logoX = pageWidth - margin - 85;
     const logoY = posY - 7;
-    
+
     // Draw outer dark cocoa rounded button/icon
     doc.setFillColor(66, 49, 36); // #423124 (Dark Brown)
-    doc.roundedRect(logoX, logoY, 20, 20, 4, 4, 'F');
-    
+    doc.roundedRect(logoX, logoY, 20, 20, 4, 4, "F");
+
     // Inner beige/gold circle
     doc.setDrawColor(221, 166, 122); // #dda67a
     doc.setLineWidth(1.5);
-    doc.circle(logoX + 10, logoY + 10, 5.5, 'D');
-    
+    doc.circle(logoX + 10, logoY + 10, 5.5, "D");
+
     // Elegant clock/arrow hand
     doc.setDrawColor(255, 255, 255);
     doc.setLineWidth(1.2);
@@ -295,50 +302,53 @@ export default function ReportsView({
     doc.line(logoX + 10, logoY + 10, logoX + 13.5, logoY + 10);
 
     // Text label "tyme" using beautiful deep chocolate shade
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setFontSize(16.5);
     doc.setTextColor(66, 49, 36);
     doc.text("tyme", logoX + 25, logoY + 15);
 
     // Subtitle (Date range)
     posY += 18;
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont("Helvetica", "normal");
     doc.setFontSize(10.5);
     doc.setTextColor(110, 110, 110);
     doc.text(printDateRangeStr, margin, posY);
 
     // Metrics Row inline
     posY += 28;
-    const amountVal = ((totalMinutes / 60) * hourlyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const amountVal = ((totalMinutes / 60) * hourlyRate).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont("Helvetica", "normal");
     doc.setFontSize(11);
     doc.setTextColor(110, 110, 110);
     doc.text("Total: ", margin, posY);
 
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setTextColor(24, 24, 27);
     let shiftX = margin + doc.getTextWidth("Total: ");
     doc.text(formatMinutesHHMM(totalMinutes), shiftX, posY);
 
     shiftX += doc.getTextWidth(formatMinutesHHMM(totalMinutes)) + 15;
 
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont("Helvetica", "normal");
     doc.setTextColor(110, 110, 110);
     doc.text("Billable: ", shiftX, posY);
 
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setTextColor(24, 24, 27);
     shiftX += doc.getTextWidth("Billable: ");
     doc.text(formatMinutesHHMM(totalMinutes), shiftX, posY);
 
     shiftX += doc.getTextWidth(formatMinutesHHMM(totalMinutes)) + 15;
 
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont("Helvetica", "normal");
     doc.setTextColor(110, 110, 110);
     doc.text("Amount: ", shiftX, posY);
 
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setTextColor(24, 24, 27);
     shiftX += doc.getTextWidth("Amount: ");
     const amountValStr = `${amountVal} USD`;
@@ -347,7 +357,7 @@ export default function ReportsView({
     // -- CHART TIMELINE SECTION --
     posY += 30;
 
-    const maxMinsValue = Math.max(...printChartData.map(d => d.mins), 60);
+    const maxMinsValue = Math.max(...printChartData.map((d) => d.mins), 60);
     const maxHoursVal = maxMinsValue / 60;
     const chartMaxHours = Math.max(5.0, Math.ceil(maxHoursVal));
 
@@ -360,18 +370,18 @@ export default function ReportsView({
     doc.setLineWidth(0.5);
     for (let i = 0; i <= 5; i++) {
       const ratio = i / 5;
-      const lineY = chartY + chartHeight - (ratio * chartHeight);
+      const lineY = chartY + chartHeight - ratio * chartHeight;
 
       // Grid line
       doc.setDrawColor(235, 235, 235);
       doc.line(chartX, lineY, chartX + chartWidth, lineY);
 
       // Y Label
-      doc.setFont('Helvetica', 'normal');
+      doc.setFont("Helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor(110, 110, 110);
       const labelHours = ratio * chartMaxHours;
-      doc.text(`${labelHours.toFixed(1)}h`, chartX - 6, lineY + 3, { align: 'right' });
+      doc.text(`${labelHours.toFixed(1)}h`, chartX - 6, lineY + 3, { align: "right" });
     }
 
     // Plots
@@ -388,12 +398,12 @@ export default function ReportsView({
 
         if (barHeight > 0) {
           doc.setFillColor(139, 195, 74); // Vibrant Clockify Green
-          doc.rect(bX, bY, barWidth, barHeight, 'F');
+          doc.rect(bX, bY, barWidth, barHeight, "F");
         }
 
         const showLabel = barCount <= 12 || idx % Math.ceil(barCount / 12) === 0;
         if (showLabel) {
-          doc.setFont('Helvetica', 'normal');
+          doc.setFont("Helvetica", "normal");
           doc.setFontSize(7.5);
           doc.setTextColor(120, 120, 120);
           doc.text(item.label, bX + barWidth / 2, chartY + chartHeight + 11, { angle: -35 });
@@ -404,7 +414,7 @@ export default function ReportsView({
     posY += chartHeight + 45;
 
     // -- PROJECT ALLOCATIONS SECTION --
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setFontSize(11.5);
     doc.setTextColor(24, 24, 27);
     doc.text("Project", margin, posY);
@@ -420,40 +430,49 @@ export default function ReportsView({
 
     if (printProjectDonutSegments.length > 0) {
       printProjectDonutSegments.forEach((segment) => {
-        const hexColor = segment.color || '#0288d1';
+        const hexColor = segment.color || "#0288d1";
         const rVal = parseInt(hexColor.slice(1, 3), 16) || 2;
         const gVal = parseInt(hexColor.slice(3, 5), 16) || 136;
         const bVal = parseInt(hexColor.slice(5, 7), 16) || 209;
 
         // Color bullet
         doc.setFillColor(rVal, gVal, bVal);
-        doc.circle(margin + 124, projY + 5.5, 3, 'F');
+        doc.circle(margin + 124, projY + 5.5, 3, "F");
 
         // Project Title
-        doc.setFont('Helvetica', 'bold');
+        doc.setFont("Helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(40, 40, 45);
         doc.text(segment.name, margin + 134, projY + 9);
 
         // Duration
-        doc.setFont('Helvetica', 'bold');
+        doc.setFont("Helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(24, 24, 27);
-        doc.text(formatMinutesHHMM(segment.mins), pageWidth - margin - 50, projY + 9, { align: 'right' });
+        doc.text(formatMinutesHHMM(segment.mins), pageWidth - margin - 50, projY + 9, {
+          align: "right",
+        });
 
         // Percent
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont("Helvetica", "normal");
         doc.setTextColor(110, 110, 110);
-        doc.text(`${segment.percentage}%`, pageWidth - margin, projY + 9, { align: 'right' });
+        doc.text(`${segment.percentage}%`, pageWidth - margin, projY + 9, { align: "right" });
 
         projY += 16;
       });
 
       // Draw donut chart on left
-      drawDonut(margin + 45, projYStart + 35, 32, 18, printProjectDonutSegments, formatMinutesHHMM(totalMinutes));
+      drawDonut(
+        margin + 45,
+        projYStart + 35,
+        32,
+        18,
+        printProjectDonutSegments,
+        formatMinutesHHMM(totalMinutes),
+      );
       posY = Math.max(projYStart + 75, projY) + 25;
     } else {
-      doc.setFont('Helvetica', 'normal');
+      doc.setFont("Helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(140, 140, 140);
       doc.text("No active projects", margin, posY);
@@ -461,7 +480,7 @@ export default function ReportsView({
     }
 
     // -- DESCRIPTION ALLOCATIONS SECTION --
-    doc.setFont('Helvetica', 'bold');
+    doc.setFont("Helvetica", "bold");
     doc.setFontSize(11.5);
     doc.setTextColor(24, 24, 27);
     doc.text("Description", margin, posY);
@@ -485,7 +504,14 @@ export default function ReportsView({
 
         if (descY + rowHeight > pageHeight - 60) {
           if (currentIsFirstPageOfDesc && !drewDescDonut) {
-            drawDonut(margin + 45, descYStart + 35, 32, 18, printDescDonutSegments, formatMinutesHHMM(totalMinutes));
+            drawDonut(
+              margin + 45,
+              descYStart + 35,
+              32,
+              18,
+              printDescDonutSegments,
+              formatMinutesHHMM(totalMinutes),
+            );
             drewDescDonut = true;
           }
 
@@ -496,7 +522,7 @@ export default function ReportsView({
           currentIsFirstPageOfDesc = false;
         }
 
-        const hexColor = segment.color || '#dda67a';
+        const hexColor = segment.color || "#dda67a";
         const rVal = parseInt(hexColor.slice(1, 3), 16) || 221;
         const gVal = parseInt(hexColor.slice(3, 5), 16) || 166;
         const bVal = parseInt(hexColor.slice(5, 7), 16) || 122;
@@ -510,37 +536,44 @@ export default function ReportsView({
         const pctX = pageWidth - margin;
 
         // Bullet
-        doc.circle(bulletX, descY + 5.5, 3, 'F');
+        doc.circle(bulletX, descY + 5.5, 3, "F");
 
         // Text lines
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont("Helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(24, 24, 27);
         wrappedDescLines.forEach((line, lIdx) => {
-          doc.text(line, textX, descY + 9 + (lIdx * 11));
+          doc.text(line, textX, descY + 9 + lIdx * 11);
         });
 
         // Values
-        doc.setFont('Helvetica', 'bold');
+        doc.setFont("Helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(24, 24, 27);
-        doc.text(formatMinutesHHMM(segment.mins), durX, descY + 9, { align: 'right' });
+        doc.text(formatMinutesHHMM(segment.mins), durX, descY + 9, { align: "right" });
 
-        doc.setFont('Helvetica', 'normal');
+        doc.setFont("Helvetica", "normal");
         doc.setTextColor(110, 110, 110);
-        doc.text(`${segment.percentage}%`, pctX, descY + 9, { align: 'right' });
+        doc.text(`${segment.percentage}%`, pctX, descY + 9, { align: "right" });
 
         descY += rowHeight;
       });
 
       if (currentIsFirstPageOfDesc && !drewDescDonut) {
-        drawDonut(margin + 45, descYStart + 35, 32, 18, printDescDonutSegments, formatMinutesHHMM(totalMinutes));
+        drawDonut(
+          margin + 45,
+          descYStart + 35,
+          32,
+          18,
+          printDescDonutSegments,
+          formatMinutesHHMM(totalMinutes),
+        );
         drewDescDonut = true;
       }
 
       posY = descY + 20;
     } else {
-      doc.setFont('Helvetica', 'normal');
+      doc.setFont("Helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(140, 140, 140);
       doc.text("No active descriptions", margin, posY);
@@ -558,12 +591,12 @@ export default function ReportsView({
     }
 
     // Ledger Header Row
-    doc.setFont('Helvetica', 'normal');
+    doc.setFont("Helvetica", "normal");
     doc.setFontSize(9.5);
     doc.setTextColor(110, 110, 110);
     doc.text("Project / Description", margin, posY);
-    doc.text("Duration", pageWidth - margin - 100, posY, { align: 'right' });
-    doc.text("Amount", pageWidth - margin, posY, { align: 'right' });
+    doc.text("Duration", pageWidth - margin - 100, posY, { align: "right" });
+    doc.text("Amount", pageWidth - margin, posY, { align: "right" });
 
     posY += 5;
     doc.setDrawColor(200, 200, 200);
@@ -580,22 +613,22 @@ export default function ReportsView({
           posY = 50;
         }
 
-        const projName = group.project?.name || 'Unassigned Workspace tasks';
-        const clientLabel = group.project?.client ? ` - ${group.project.client}` : '';
+        const projName = group.project?.name || "Unassigned Workspace tasks";
+        const clientLabel = group.project?.client ? ` - ${group.project.client}` : "";
         const fullProjTitle = `${projName}${clientLabel}`;
         const groupMins = group.totalMins;
         const groupAmount = (groupMins / 60) * hourlyRate;
 
         // Write Project Group Header Row (Bold)
-        doc.setFont('Helvetica', 'bold');
+        doc.setFont("Helvetica", "bold");
         doc.setFontSize(10);
         doc.setTextColor(24, 24, 27);
         doc.text(fullProjTitle, margin, posY);
 
-        doc.text(formatMinutesHHMM(groupMins), pageWidth - margin - 100, posY, { align: 'right' });
+        doc.text(formatMinutesHHMM(groupMins), pageWidth - margin - 100, posY, { align: "right" });
 
-        const formattedGrpAmt = `${groupAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
-        doc.text(formattedGrpAmt, pageWidth - margin, posY, { align: 'right' });
+        const formattedGrpAmt = `${groupAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+        doc.text(formattedGrpAmt, pageWidth - margin, posY, { align: "right" });
 
         posY += 6;
         doc.setDrawColor(220, 220, 220);
@@ -604,9 +637,13 @@ export default function ReportsView({
         posY += 15;
 
         // Write indented individual ledger tasks
-        const tasks = Object.values(group.descriptions) as { mins: number; description: string; tags: string[] }[];
+        const tasks = Object.values(group.descriptions) as {
+          mins: number;
+          description: string;
+          tags: string[];
+        }[];
         tasks.forEach((task) => {
-          const taskText = task.description || 'No description';
+          const taskText = task.description || "No description";
           const wrappedLines = doc.splitTextToSize(taskText, contentWidth - 140) as string[];
           const blockHeight = Math.max(14, wrappedLines.length * 11) + 6;
 
@@ -616,27 +653,29 @@ export default function ReportsView({
             pageNum += 1;
             posY = 50;
 
-            doc.setFont('Helvetica', 'normal');
+            doc.setFont("Helvetica", "normal");
             doc.setFontSize(8.5);
             doc.setTextColor(110, 110, 110);
             doc.text(`${fullProjTitle} (continued)`, margin, posY);
             posY += 15;
           }
 
-          doc.setFont('Helvetica', 'normal');
+          doc.setFont("Helvetica", "normal");
           doc.setFontSize(9);
           doc.setTextColor(60, 60, 60);
           wrappedLines.forEach((line, lIdx) => {
-            doc.text(line, margin + 15, posY + 8 + (lIdx * 11));
+            doc.text(line, margin + 15, posY + 8 + lIdx * 11);
           });
 
           // Duration
-          doc.text(formatMinutesHHMM(task.mins), pageWidth - margin - 100, posY + 8, { align: 'right' });
+          doc.text(formatMinutesHHMM(task.mins), pageWidth - margin - 100, posY + 8, {
+            align: "right",
+          });
 
           // Amount
           const taskAmount = (task.mins / 60) * hourlyRate;
-          const formattedTaskAmt = `${taskAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
-          doc.text(formattedTaskAmt, pageWidth - margin, posY + 8, { align: 'right' });
+          const formattedTaskAmt = `${taskAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
+          doc.text(formattedTaskAmt, pageWidth - margin, posY + 8, { align: "right" });
 
           posY += blockHeight;
 
@@ -650,7 +689,7 @@ export default function ReportsView({
         posY += 8;
       });
     } else {
-      doc.setFont('Helvetica', 'normal');
+      doc.setFont("Helvetica", "normal");
       doc.setFontSize(9.5);
       doc.setTextColor(150, 150, 150);
       doc.text("No workspace logs logged.", margin, posY);
@@ -661,30 +700,30 @@ export default function ReportsView({
     drawPageFooter(pageNum);
 
     // Save
-    const safeFilename = `Tyme_Report_${printDateRangeStr.replace(/\s+/g, '_').replace(/,/g, '')}.pdf`;
+    const safeFilename = `Tyme_Report_${printDateRangeStr.replace(/\s+/g, "_").replace(/,/g, "")}.pdf`;
     doc.save(safeFilename);
 
     toast.success("Summary report exported successfully!", {
       description: `Saved as ${safeFilename}`,
-      duration: 4000
+      duration: 4000,
     });
   };
 
   // Quick reset helper
   const handleResetFilters = () => {
-    setDatePreset('thisMonth');
-    setSelectedProjId('');
-    setSelectedTag('');
-    setSearchQuery('');
+    setDatePreset("thisMonth");
+    setSelectedProjId("");
+    setSelectedTag("");
+    setSearchQuery("");
   };
 
   // SVGs pie parameters
   const donutChartSegments = useMemo(() => {
     let total = projectAggregates.reduce((acc, p) => acc + p.mins, 0);
     if (total === 0) return [];
-    
+
     let cumAngle = -90; // start top position (clock direction)
-    return projectAggregates.map(p => {
+    return projectAggregates.map((p) => {
       const pct = p.mins / total;
       const angle = pct * 360;
       const startAngle = cumAngle;
@@ -692,51 +731,61 @@ export default function ReportsView({
       cumAngle += angle;
 
       // Coordinate converter helper
-      const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
-        const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      const polarToCartesian = (
+        centerX: number,
+        centerY: number,
+        radius: number,
+        angleInDegrees: number,
+      ) => {
+        const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
         return {
-          x: centerX + (radius * Math.cos(angleInRadians)),
-          y: centerY + (radius * Math.sin(angleInRadians))
+          x: centerX + radius * Math.cos(angleInRadians),
+          y: centerY + radius * Math.sin(angleInRadians),
         };
       };
 
-      const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
+      const describeArc = (
+        x: number,
+        y: number,
+        radius: number,
+        startAngle: number,
+        endAngle: number,
+      ) => {
         const start = polarToCartesian(x, y, radius, endAngle);
         const end = polarToCartesian(x, y, radius, startAngle);
         const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
-        return [
-          "M", start.x, start.y, 
-          "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-        ].join(" ");
+        return ["M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(
+          " ",
+        );
       };
 
       const pathData = describeArc(100, 100, 70, startAngle, endAngle);
-      
+
       return {
         ...p,
         pathData,
-        percentage: (pct * 100).toFixed(1)
+        percentage: (pct * 100).toFixed(1),
       };
     });
   }, [projectAggregates]);
 
   // 1. Generate full scale continuous range of dates for printing X Axis
   const datesInRange = useMemo(() => {
-    let minDateStr = '';
-    let maxDateStr = '';
-    
-    if (datePreset === 'thisWeek') {
-      minDateStr = '2026-06-15';
-      maxDateStr = '2026-06-21';
-    } else if (datePreset === 'lastWeek') {
-      minDateStr = '2026-06-08';
-      maxDateStr = '2026-06-14';
-    } else if (datePreset === 'thisMonth') {
-      minDateStr = '2026-06-01';
-      maxDateStr = '2026-06-30';
-    } else if (datePreset === 'lastMonth') {
-      minDateStr = '2026-05-01';
-      maxDateStr = '2026-05-31';
+    let minDateStr = "";
+    let maxDateStr = "";
+
+    if (datePreset === "thisWeek") {
+      minDateStr = "2026-06-15";
+      maxDateStr = "2026-06-21";
+    } else if (datePreset === "lastWeek") {
+      minDateStr = "2026-06-08";
+      maxDateStr = "2026-06-14";
+    } else if (datePreset === "thisMonth") {
+      minDateStr = "2026-06-01";
+      maxDateStr = "2026-06-30";
+    } else if (datePreset === "lastMonth") {
+      minDateStr = "2026-05-01";
+      maxDateStr = "2026-05-31";
     } else {
       if (filteredEntries.length === 0) return [];
       const dateSorted = [...filteredEntries].sort((a, b) => a.date.localeCompare(b.date));
@@ -744,8 +793,8 @@ export default function ReportsView({
       maxDateStr = dateSorted[dateSorted.length - 1].date;
     }
 
-    const start = new Date(minDateStr + 'T00:00:00');
-    const end = new Date(maxDateStr + 'T00:00:00');
+    const start = new Date(minDateStr + "T00:00:00");
+    const end = new Date(maxDateStr + "T00:00:00");
     const arr: Date[] = [];
     const current = new Date(start);
 
@@ -760,52 +809,56 @@ export default function ReportsView({
 
   // 2. Fetch specific duration mapped to indices list for high-precision SVG drawing on print
   const printChartData = useMemo(() => {
-    return datesInRange.map(dateObj => {
+    return datesInRange.map((dateObj) => {
       const yStr = dateObj.getFullYear();
-      const mStr = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const dStr = String(dateObj.getDate()).padStart(2, '0');
+      const mStr = String(dateObj.getMonth() + 1).padStart(2, "0");
+      const dStr = String(dateObj.getDate()).padStart(2, "0");
       const dateKey = `${yStr}-${mStr}-${dStr}`;
-      
+
       const dayMins = filteredEntries
-        .filter(e => e.date === dateKey)
+        .filter((e) => e.date === dateKey)
         .reduce((sum, e) => sum + getDisplayMinutes(e.durationMinutes), 0);
 
-      const friendlyLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-      
+      const friendlyLabel = dateObj.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+
       return {
         dateStr: dateKey,
         label: friendlyLabel,
-        mins: dayMins
+        mins: dayMins,
       };
     });
   }, [datesInRange, filteredEntries, roundingActive]);
 
   // 3. Formatted Printable Date Range string
   const printDateRangeStr = useMemo(() => {
-    let minDateStr = '';
-    let maxDateStr = '';
-    
-    if (datePreset === 'thisWeek') {
-      minDateStr = '06/15/2026';
-      maxDateStr = '06/21/2026';
-    } else if (datePreset === 'lastWeek') {
-      minDateStr = '06/08/2026';
-      maxDateStr = '06/14/2026';
-    } else if (datePreset === 'thisMonth') {
-      minDateStr = '06/01/2026';
-      maxDateStr = '06/30/2026';
-    } else if (datePreset === 'lastMonth') {
-      minDateStr = '05/01/2026';
-      maxDateStr = '05/31/2026';
+    let minDateStr = "";
+    let maxDateStr = "";
+
+    if (datePreset === "thisWeek") {
+      minDateStr = "06/15/2026";
+      maxDateStr = "06/21/2026";
+    } else if (datePreset === "lastWeek") {
+      minDateStr = "06/08/2026";
+      maxDateStr = "06/14/2026";
+    } else if (datePreset === "thisMonth") {
+      minDateStr = "06/01/2026";
+      maxDateStr = "06/30/2026";
+    } else if (datePreset === "lastMonth") {
+      minDateStr = "05/01/2026";
+      maxDateStr = "05/31/2026";
     } else {
-      if (filteredEntries.length === 0) return 'All Records';
+      if (filteredEntries.length === 0) return "All Records";
       const sorted = [...filteredEntries].sort((a, b) => a.date.localeCompare(b.date));
-      const minD = new Date(sorted[0].date + 'T00:00:00');
-      const maxD = new Date(sorted[sorted.length - 1].date + 'T00:00:00');
-      
+      const minD = new Date(sorted[0].date + "T00:00:00");
+      const maxD = new Date(sorted[sorted.length - 1].date + "T00:00:00");
+
       const formatD = (d: Date) => {
-        const m = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
+        const m = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
         return `${m}/${day}/${d.getFullYear()}`;
       };
       return `${formatD(minD)} - ${formatD(maxD)}`;
@@ -817,11 +870,20 @@ export default function ReportsView({
   const descriptionAggregates = useMemo(() => {
     const map: Record<string, { mins: number; name: string; color: string }> = {};
     const palette = [
-      '#a66e46', '#dda67a', '#c5b3a6', '#5c4033', '#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'
+      "#a66e46",
+      "#dda67a",
+      "#c5b3a6",
+      "#5c4033",
+      "#10b981",
+      "#3b82f6",
+      "#f59e0b",
+      "#ec4899",
+      "#8b5cf6",
+      "#06b6d4",
     ];
 
-    filteredEntries.forEach(entry => {
-      const desc = entry.description.trim() || 'No Description';
+    filteredEntries.forEach((entry) => {
+      const desc = entry.description.trim() || "No Description";
       if (!map[desc]) {
         const color = palette[Object.keys(map).length % palette.length];
         map[desc] = { mins: 0, name: desc, color };
@@ -836,39 +898,49 @@ export default function ReportsView({
   const printProjectDonutSegments = useMemo(() => {
     let total = projectAggregates.reduce((acc, p) => acc + p.mins, 0);
     if (total === 0) return [];
-    
+
     let cumAngle = -90;
-    return projectAggregates.map(p => {
+    return projectAggregates.map((p) => {
       const pct = p.mins / total;
       const angle = pct * 360;
       const startAngle = cumAngle;
       const endAngle = cumAngle + angle;
       cumAngle += angle;
 
-      const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
-        const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      const polarToCartesian = (
+        centerX: number,
+        centerY: number,
+        radius: number,
+        angleInDegrees: number,
+      ) => {
+        const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
         return {
-          x: centerX + (radius * Math.cos(angleInRadians)),
-          y: centerY + (radius * Math.sin(angleInRadians))
+          x: centerX + radius * Math.cos(angleInRadians),
+          y: centerY + radius * Math.sin(angleInRadians),
         };
       };
 
-      const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
-        const isFullCircle = (endAngle - startAngle) >= 359.9;
+      const describeArc = (
+        x: number,
+        y: number,
+        radius: number,
+        startAngle: number,
+        endAngle: number,
+      ) => {
+        const isFullCircle = endAngle - startAngle >= 359.9;
         const actualEnd = isFullCircle ? startAngle + 359.99 : endAngle;
         const start = polarToCartesian(x, y, radius, actualEnd);
         const end = polarToCartesian(x, y, radius, startAngle);
-        const largeArcFlag = (actualEnd - startAngle) <= 180 ? "0" : "1";
-        return [
-          "M", start.x, start.y, 
-          "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-        ].join(" ");
+        const largeArcFlag = actualEnd - startAngle <= 180 ? "0" : "1";
+        return ["M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(
+          " ",
+        );
       };
 
       return {
         ...p,
         pathData: describeArc(100, 100, 70, startAngle, endAngle),
-        percentage: (pct * 100).toFixed(1)
+        percentage: (pct * 100).toFixed(1),
       };
     });
   }, [projectAggregates]);
@@ -876,77 +948,90 @@ export default function ReportsView({
   const printDescDonutSegments = useMemo(() => {
     let total = descriptionAggregates.reduce((acc, p) => acc + p.mins, 0);
     if (total === 0) return [];
-    
+
     let cumAngle = -90;
-    return descriptionAggregates.map(p => {
+    return descriptionAggregates.map((p) => {
       const pct = p.mins / total;
       const angle = pct * 360;
       const startAngle = cumAngle;
       const endAngle = cumAngle + angle;
       cumAngle += angle;
 
-      const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
-        const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+      const polarToCartesian = (
+        centerX: number,
+        centerY: number,
+        radius: number,
+        angleInDegrees: number,
+      ) => {
+        const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
         return {
-          x: centerX + (radius * Math.cos(angleInRadians)),
-          y: centerY + (radius * Math.sin(angleInRadians))
+          x: centerX + radius * Math.cos(angleInRadians),
+          y: centerY + radius * Math.sin(angleInRadians),
         };
       };
 
-      const describeArc = (x: number, y: number, radius: number, startAngle: number, endAngle: number) => {
-        const isFullCircle = (endAngle - startAngle) >= 359.9;
+      const describeArc = (
+        x: number,
+        y: number,
+        radius: number,
+        startAngle: number,
+        endAngle: number,
+      ) => {
+        const isFullCircle = endAngle - startAngle >= 359.9;
         const actualEnd = isFullCircle ? startAngle + 359.99 : endAngle;
         const start = polarToCartesian(x, y, radius, actualEnd);
         const end = polarToCartesian(x, y, radius, startAngle);
-        const largeArcFlag = (actualEnd - startAngle) <= 180 ? "0" : "1";
-        return [
-          "M", start.x, start.y, 
-          "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y
-        ].join(" ");
+        const largeArcFlag = actualEnd - startAngle <= 180 ? "0" : "1";
+        return ["M", start.x, start.y, "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y].join(
+          " ",
+        );
       };
 
       return {
         ...p,
         pathData: describeArc(100, 100, 70, startAngle, endAngle),
-        percentage: (pct * 100).toFixed(1)
+        percentage: (pct * 100).toFixed(1),
       };
     });
   }, [descriptionAggregates]);
 
   // 6. Group all time entries specifically for detailed PDF style table
   const detailedLedgerGroups = useMemo(() => {
-    const projectGroups: Record<string, {
-      project: Project | null;
-      totalMins: number;
-      descriptions: Record<string, { mins: number; description: string; tags: string[] }>;
-    }> = {};
+    const projectGroups: Record<
+      string,
+      {
+        project: Project | null;
+        totalMins: number;
+        descriptions: Record<string, { mins: number; description: string; tags: string[] }>;
+      }
+    > = {};
 
-    filteredEntries.forEach(entry => {
-      const projId = entry.projectId || 'unassigned';
-      const proj = projects.find(p => p.id === projId) || null;
-      
+    filteredEntries.forEach((entry) => {
+      const projId = entry.projectId || "unassigned";
+      const proj = projects.find((p) => p.id === projId) || null;
+
       if (!projectGroups[projId]) {
         projectGroups[projId] = {
           project: proj,
           totalMins: 0,
-          descriptions: {}
+          descriptions: {},
         };
       }
 
       const group = projectGroups[projId];
       group.totalMins += entry.durationMinutes;
 
-      const descKey = entry.description.trim() || 'No Description';
+      const descKey = entry.description.trim() || "No Description";
       if (!group.descriptions[descKey]) {
         group.descriptions[descKey] = {
           mins: 0,
           description: descKey,
-          tags: []
+          tags: [],
         };
       }
-      
+
       group.descriptions[descKey].mins += entry.durationMinutes;
-      entry.tags.forEach(t => {
+      entry.tags.forEach((t) => {
         if (!group.descriptions[descKey].tags.includes(t)) {
           group.descriptions[descKey].tags.push(t);
         }
@@ -957,195 +1042,208 @@ export default function ReportsView({
   }, [filteredEntries, projects]);
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 z-10 overflow-y-auto">
+    <div className='flex-1 flex flex-col min-w-0 z-10 overflow-y-auto'>
       {/* 1. Page Header with Print & Export actions */}
-      <header className="p-4 border-b shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#120805]/40 backdrop-blur-md border-[#321c11]/45 print:hidden">
+      <header className='p-4 border-b shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#120805]/40 backdrop-blur-md border-[#321c11]/45 print:hidden'>
         <div>
-          <h2 className="text-xl font-display font-semibold text-white">
-            Time Analysis & Reports
-          </h2>
-          <p className="text-xs text-[#ecd0b9]/65 mt-1">
-            Displaying <span className="font-semibold text-[#dda67a]">{filteredEntries.length} entries</span> based on current selected criteria
+          <h2 className='text-xl font-display font-semibold text-white'>Time Analysis & Reports</h2>
+          <p className='text-xs text-[#ecd0b9]/65 mt-1'>
+            Displaying{" "}
+            <span className='font-semibold text-[#dda67a]'>{filteredEntries.length} entries</span>{" "}
+            based on current selected criteria
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className='flex items-center gap-1.5 sm:gap-2 overflow-x-auto'>
           {/* Reset Filters */}
-          <button 
+          <button
             onClick={handleResetFilters}
-            className="p-2 text-[#ecd0b9]/50 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer"
-            title="Reset Filters"
+            className='p-2 text-[#ecd0b9]/50 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer'
+            title='Reset Filters'
           >
-            <RotateCcw className="h-4.5 w-4.5" />
+            <RotateCcw className='h-4.5 w-4.5' />
           </button>
 
           {/* Hourly Billing Rate Selector */}
-          <div className="flex items-center gap-1.5 border border-[#3d2416]/55 bg-[#24150d]/40 px-3 py-2 rounded-xl text-xs text-[#ecd0b9]" title="Set billable rate per hour">
-            <span className="font-medium">Rate:</span>
-            <span className="font-mono text-[#dda67a] font-bold">$</span>
-            <input 
-              type="number" 
-              min="0"
-              max="999"
-              value={hourlyRate} 
-              onChange={(e) => setHourlyRate(Math.max(0, parseInt(e.target.value) || 0))} 
-              className="w-8 bg-transparent text-white focus:outline-none font-mono font-bold outline-none text-center"
+          <div
+            className='flex items-center gap-1.5 border border-[#3d2416]/55 bg-[#24150d]/40 px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs text-[#ecd0b9]'
+            title='Set billable rate per hour'
+          >
+            <span className='font-medium'>Rate:</span>
+            <span className='font-mono text-[#dda67a] font-bold'>$</span>
+            <input
+              type='number'
+              min='0'
+              max='999'
+              value={hourlyRate}
+              onChange={(e) => setHourlyRate(Math.max(0, parseInt(e.target.value) || 0))}
+              className='w-8 bg-transparent text-white focus:outline-none font-mono font-bold outline-none text-center'
             />
-            <span className="text-[9px] text-[#ecd0b9]/45">/hr</span>
+            <span className='text-[9px] text-[#ecd0b9]/45'>/hr</span>
           </div>
 
           {/* Export CSV button */}
-          <button 
+          <button
             onClick={() => exportToCSV(filteredEntries, projects)}
             disabled={filteredEntries.length === 0}
-            className="px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 cursor-pointer text-[#ecd0b9] hover:bg-[#3d2416]/60 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition"
+            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 cursor-pointer text-[#ecd0b9] hover:bg-[#3d2416]/60 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition'
           >
-            <Download className="h-4 w-4 text-emerald-400" />
-            <span>Export CSV</span>
+            <Download className='h-4 w-4 text-emerald-400' />
+            <span className='hidden sm:inline'>Export CSV</span>
           </button>
 
           {/* Create custom print button (works as export PDF!) */}
-          <button 
+          <button
             onClick={handlePrintPDF}
             disabled={filteredEntries.length === 0}
-            className="px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl bg-[#a66e46] cursor-pointer text-white hover:bg-[#8e5a34] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-[#4a2b16]/30 transition"
+            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl bg-[#a66e46] cursor-pointer text-white hover:bg-[#8e5a34] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-[#4a2b16]/30 transition'
           >
-            <Printer className="h-4 w-4" />
-            <span>Print Report (PDF)</span>
+            <Printer className='h-4 w-4' />
+            <span className='hidden sm:inline'>Print Report (PDF)</span>
           </button>
         </div>
       </header>
 
       {/* 3. Metrics Summary widgets section */}
-      <section className="p-4 md:p-6 space-y-6 print:hidden">
-        
+      <section className='p-4 md:p-6 space-y-6 print:hidden'>
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           {/* Card 1: Total logged hours */}
-          <div className="bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between">
+          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className="text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold">Total Hours Tracked</p>
-              <h4 className="text-2xl font-display font-bold text-white mt-2 font-mono">
+              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+                Total Hours Tracked
+              </p>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
                 {formatMinutesHHMM(totalMinutes)}
               </h4>
-              <p className="text-[10px] text-[#ecd0b9]/45 mt-1">
+              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
                 Equivalent to {formatMinutesDecimal(totalMinutes)} decimal hours
               </p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-[#dda67a]/20 flex items-center justify-center text-[#dda67a]">
-              <BarChart2 className="h-6 w-6 stroke-[2px]" />
+            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-[#dda67a]/20 flex items-center justify-center text-[#dda67a]'>
+              <BarChart2 className='h-6 w-6 stroke-[2px]' />
             </div>
           </div>
 
           {/* Card 2: Total Amount */}
-          <div className="bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between">
+          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className="text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold">Total Amount</p>
-              <h4 className="text-2xl font-display font-bold text-white mt-2 font-mono">
-                ${((totalMinutes / 60) * hourlyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-xs font-sans font-normal text-[#ecd0b9]/50">USD</span>
+              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+                Total Amount
+              </p>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
+                $
+                {((totalMinutes / 60) * hourlyRate).toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                <span className='text-xs font-sans font-normal text-[#ecd0b9]/50'>USD</span>
               </h4>
-              <p className="text-[10px] text-[#ecd0b9]/45 mt-1">
+              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
                 Based on flat billable rate of ${hourlyRate}/hr
               </p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <DollarSign className="h-6 w-6" />
+            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400'>
+              <DollarSign className='h-6 w-6' />
             </div>
           </div>
 
           {/* Card 3: Total Logs Count */}
-          <div className="bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between">
+          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className="text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold">Entries Logged</p>
-              <h4 className="text-2xl font-display font-bold text-white mt-2 font-mono">
+              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+                Entries Logged
+              </p>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
                 {filteredEntries.length}
               </h4>
-              <p className="text-[10px] text-[#ecd0b9]/45 mt-1">
+              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
                 Total standalone logged task intervals matching criteria
               </p>
             </div>
-            <div className="h-12 w-12 rounded-xl bg-[#a66e46]/20 flex items-center justify-center text-white">
-              <Sparkles className="h-6 w-6" />
+            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-[#a66e46]/20 flex items-center justify-center text-white'>
+              <Sparkles className='h-6 w-6' />
             </div>
           </div>
-
         </div>
 
         {/* 4. Visual Analytics Section */}
-        <div className="space-y-6">
-          
+        <div className='space-y-6'>
           {/* Replicated Full-Width Timeline Hours Chart (styled to match screenshot) */}
-          <div className="bg-[#11171d] border border-[#232f3b]/70 rounded-2xl shadow-2xl overflow-hidden">
-            
+          <div className='bg-[#11171d] border border-[#232f3b]/70 rounded-2xl shadow-2xl overflow-hidden'>
             {/* Screenshot top-bar replicate flow */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#17212a] px-5 py-3.5 border-b border-[#232f3b]/60 gap-4">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-mono text-[#ecd0b9]/55 font-bold uppercase tracking-wider">Total:</span>
-                <span className="text-lg font-bold font-mono text-white">
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#17212a] px-5 py-3.5 border-b border-[#232f3b]/60 gap-4'>
+              <div className='flex items-center gap-1.5'>
+                <span className='text-xs font-mono text-[#ecd0b9]/55 font-bold uppercase tracking-wider'>
+                  Total:
+                </span>
+                <span className='text-lg font-bold font-mono text-white'>
                   {formatMinutesHHMM(totalMinutes)}
                 </span>
               </div>
-              
-              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] uppercase font-mono text-[#ecd0b9]/50 font-bold tracking-wider">Date Range:</span>
-                  <div className="relative">
+
+              <div className='flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-[10px] uppercase font-mono text-[#ecd0b9]/50 font-bold tracking-wider'>
+                    Date Range:
+                  </span>
+                  <div className='relative'>
                     <select
                       value={datePreset}
                       onChange={(e) => setDatePreset(e.target.value as PresetFilterType)}
-                      className="text-xs font-sans font-bold bg-[#11171d] hover:bg-[#1a2530] text-white border border-[#2d3a46] rounded-xl pl-3 pr-8 py-1.5 outline-none cursor-pointer transition appearance-none min-w-[140px]"
+                      className='text-xs font-sans font-bold bg-[#11171d] hover:bg-[#1a2530] text-white border border-[#2d3a46] rounded-xl pl-3 pr-8 py-1.5 outline-none cursor-pointer transition appearance-none min-w-[120px] md:min-w-[140px]'
                     >
-                      <option value="thisWeek">This Week</option>
-                      <option value="lastWeek">Last Week</option>
-                      <option value="thisMonth">Current Month</option>
-                      <option value="lastMonth">Previous Month</option>
-                      <option value="allTime">All Records</option>
+                      <option value='thisWeek'>This Week</option>
+                      <option value='lastWeek'>Last Week</option>
+                      <option value='thisMonth'>Current Month</option>
+                      <option value='lastMonth'>Previous Month</option>
+                      <option value='allTime'>All Records</option>
                     </select>
-                    <div className="absolute inset-y-0 right-2 flex items-center pr-1 pointer-events-none text-[#ecd0b9]/50">
-                      <svg className="h-3 w-3 fill-current" viewBox="0 0 20 20">
-                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    <div className='absolute inset-y-0 right-2 flex items-center pr-1 pointer-events-none text-[#ecd0b9]/50'>
+                      <svg className='h-3 w-3 fill-current' viewBox='0 0 20 20'>
+                        <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
                       </svg>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
 
             {/* Chart canvas area precisely replicating the screenshot */}
-            <div className="p-4 md:p-6 bg-[#11171d]">
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[800px] select-none">
-                  <svg viewBox="0 0 1000 240" className="w-full h-auto font-sans">
-                    
+            <div className='p-3 md:p-6 bg-[#11171d]'>
+              <div className='w-full overflow-x-auto'>
+                <div className='min-w-[500px] md:min-w-[800px] select-none'>
+                  <svg viewBox='0 0 1000 240' className='w-full h-auto font-sans'>
                     {/* Grid Ticks on the Left & horizontal guidance lines */}
                     {Array.from({ length: 11 }).map((_, idx) => {
-                      const maxMinsValue = printChartData.length > 0 ? Math.max(...printChartData.map(d => d.mins)) : 0;
+                      const maxMinsValue =
+                        printChartData.length > 0
+                          ? Math.max(...printChartData.map((d) => d.mins))
+                          : 0;
                       const maxHoursVal = maxMinsValue / 60;
                       const chartMaxHours = Math.max(5.0, Math.ceil(maxHoursVal * 2) / 2);
                       const tickValue = (chartMaxHours / 10) * (10 - idx);
                       const y = 25 + idx * 17.5; // range from 25 to 200 (175px space)
                       return (
                         <g key={idx}>
-                          <line 
-                            x1="70" 
-                            y1={y} 
-                            x2="970" 
-                            y2={y} 
-                            stroke="#1e2933" 
-                            strokeDasharray="2 3"
-                            strokeWidth="0.8"
+                          <line
+                            x1='70'
+                            y1={y}
+                            x2='970'
+                            y2={y}
+                            stroke='#1e2933'
+                            strokeDasharray='2 3'
+                            strokeWidth='0.8'
                           />
-                          <text 
-                            x="58" 
-                            y={y + 3} 
-                            fontSize="8.5" 
-                            fontFamily="monospace" 
-                            fill="#6b7c8c"
-                            textAnchor="end"
-                            fontWeight="600"
+                          <text
+                            x='58'
+                            y={y + 3}
+                            fontSize='8.5'
+                            fontFamily='monospace'
+                            fill='#6b7c8c'
+                            textAnchor='end'
+                            fontWeight='600'
                           >
                             {tickValue === 0.5 ? "0.50h" : `${tickValue.toFixed(1)}h`}
                           </text>
@@ -1156,14 +1254,14 @@ export default function ReportsView({
                     {/* Empty Chart Message overlay */}
                     {printChartData.length === 0 && (
                       <text
-                        x="520"
-                        y="120"
-                        fill="#6b7c8c"
-                        fontSize="13"
-                        fontFamily="sans-serif"
-                        textAnchor="middle"
-                        fontWeight="500"
-                        opacity="0.8"
+                        x='520'
+                        y='120'
+                        fill='#6b7c8c'
+                        fontSize='13'
+                        fontFamily='sans-serif'
+                        textAnchor='middle'
+                        fontWeight='500'
+                        opacity='0.8'
                       >
                         No active tracker records in this range
                       </text>
@@ -1171,37 +1269,42 @@ export default function ReportsView({
 
                     {/* Bar columns plotting each selected range day */}
                     {printChartData.map((item, idx) => {
-                      const maxMinsValue = printChartData.length > 0 ? Math.max(...printChartData.map(d => d.mins)) : 0;
+                      const maxMinsValue =
+                        printChartData.length > 0
+                          ? Math.max(...printChartData.map((d) => d.mins))
+                          : 0;
                       const maxHoursVal = maxMinsValue / 60;
                       const chartMaxHours = Math.max(5.0, Math.ceil(maxHoursVal * 2) / 2);
-                      const barHeight = (item.mins / 60) / chartMaxHours * 175;
+                      const barHeight = (item.mins / 60 / chartMaxHours) * 175;
                       const slotWidth = printChartData.length > 0 ? 900 / printChartData.length : 1; // prevent division by zero / Infinity
                       const barWidth = Math.min(24, Math.max(3, slotWidth * 0.55));
                       const x = 70 + idx * slotWidth + (slotWidth - barWidth) / 2;
                       const y = 200 - barHeight;
 
                       // Calculate label step intervals so angled labels do not overlap
-                      const labelStepInterval = printChartData.length <= 7 
-                        ? 1 
-                        : printChartData.length <= 15 
-                          ? 2 
-                          : printChartData.length <= 22
-                            ? 3
-                            : 4;
-                      const shouldShowLabel = idx % labelStepInterval === 0 || idx === printChartData.length - 1;
+                      const labelStepInterval =
+                        printChartData.length <= 7
+                          ? 1
+                          : printChartData.length <= 15
+                            ? 2
+                            : printChartData.length <= 22
+                              ? 3
+                              : 4;
+                      const shouldShowLabel =
+                        idx % labelStepInterval === 0 || idx === printChartData.length - 1;
 
                       return (
-                        <g key={idx} className="group">
+                        <g key={idx} className='group'>
                           {/* Bar rect */}
                           {barHeight > 0 && (
-                            <rect 
-                              x={x} 
-                              y={y} 
-                              width={barWidth} 
-                              height={barHeight} 
-                              fill="#dda67a" // Warm gold brand accent
-                              rx="1.5"
-                              className="hover:fill-[#ffdda6] transition-all duration-150 cursor-pointer"
+                            <rect
+                              x={x}
+                              y={y}
+                              width={barWidth}
+                              height={barHeight}
+                              fill='#dda67a' // Warm gold brand accent
+                              rx='1.5'
+                              className='hover:fill-[#ffdda6] transition-all duration-150 cursor-pointer'
                             >
                               <title>{`${item.label}: ${formatMinutesHHMM(item.mins)}`}</title>
                             </rect>
@@ -1211,11 +1314,11 @@ export default function ReportsView({
                           {shouldShowLabel && (
                             <g transform={`translate(${x + barWidth / 2}, 215)`}>
                               <text
-                                textAnchor="end"
-                                fontSize="8.5"
-                                fontWeight="600"
-                                fill="#6b7c8c"
-                                transform="rotate(-25)"
+                                textAnchor='end'
+                                fontSize='8.5'
+                                fontWeight='600'
+                                fill='#6b7c8c'
+                                transform='rotate(-25)'
                               >
                                 {item.label}
                               </text>
@@ -1224,101 +1327,107 @@ export default function ReportsView({
                         </g>
                       );
                     })}
-
                   </svg>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* 5. Printable Detailed Log Entries List */}
-        <div className="bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl overflow-hidden shadow-xl shadow-black/5">
-          <div className="p-4 md:p-5 border-b border-[#3e271a]/55 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <h3 className="text-base font-display font-bold text-white">
-              Detailed Sheet Ledger
-            </h3>
-            <span className="text-xs font-mono bg-[#1d1410] border border-[#3e271a] px-3 py-1 rounded-full text-[#ecd0b9]/70 font-bold">
+        <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl overflow-hidden shadow-xl shadow-black/5'>
+          <div className='p-4 md:p-5 border-b border-[#3e271a]/55 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
+            <h3 className='text-base font-display font-bold text-white'>Detailed Sheet Ledger</h3>
+            <span className='text-xs font-mono bg-[#1d1410] border border-[#3e271a] px-3 py-1 rounded-full text-[#ecd0b9]/70 font-bold'>
               Showing {filteredEntries.length} Records
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
+          <div className='overflow-x-auto'>
+            <table className='w-full text-left border-collapse text-xs'>
               <thead>
-                <tr className="border-b border-[#3e271a]/55 bg-[#1a100c]/75 font-semibold text-[#ecd0b9]/75">
-                  <th className="p-4">Date</th>
-                  <th className="p-4">Description</th>
-                  <th className="p-4">Project / client</th>
-                  <th className="p-4">Timeline</th>
-                  <th className="p-4 text-right">Duration</th>
-                  <th className="p-4 text-center print:hidden">Tags</th>
-                  <th className="p-4 text-right print:hidden">Actions</th>
+                <tr className='border-b border-[#3e271a]/55 bg-[#1a100c]/75 font-semibold text-[#ecd0b9]/75'>
+                  <th className='p-2.5 md:p-4'>Date</th>
+                  <th className='p-2.5 md:p-4'>Description</th>
+                  <th className='p-2.5 md:p-4 hidden md:table-cell'>Project / client</th>
+                  <th className='p-2.5 md:p-4 hidden md:table-cell'>Timeline</th>
+                  <th className='p-2.5 md:p-4 text-right'>Duration</th>
+                  <th className='p-2.5 md:p-4 text-center print:hidden hidden lg:table-cell'>
+                    Tags
+                  </th>
+                  <th className='p-2.5 md:p-4 text-right print:hidden'>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#3e271a]/35 text-[#ecd0b9]/85">
+              <tbody className='divide-y divide-[#3e271a]/35 text-[#ecd0b9]/85'>
                 {filteredEntries.map((row) => {
-                  const proj = row.projectId ? projects.find(p => p.id === row.projectId) : null;
+                  const proj = row.projectId ? projects.find((p) => p.id === row.projectId) : null;
                   return (
-                    <tr key={row.id} className="hover:bg-[#342118]/20 transition-all duration-75">
-                      <td className="p-4 whitespace-nowrap font-mono font-medium text-[#ecd0b9]/75">
-                        {formatDateFriendly(new Date(row.date + 'T00:00:00'))}
+                    <tr key={row.id} className='hover:bg-[#342118]/20 transition-all duration-75'>
+                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono font-medium text-[#ecd0b9]/75 text-[10px] md:text-xs'>
+                        {formatDateFriendly(new Date(row.date + "T00:00:00"))}
                       </td>
-                      <td className="p-4 font-semibold text-white max-w-xs md:max-w-md break-words">
-                        {row.description || 'No Description'}
+                      <td className='p-2.5 md:p-4 font-semibold text-white max-w-[120px] md:max-w-xs break-words truncate md:whitespace-normal'>
+                        {row.description || "No Description"}
                       </td>
-                      <td className="p-4 whitespace-nowrap">
+                      <td className='p-2.5 md:p-4 whitespace-nowrap hidden md:table-cell'>
                         {proj ? (
-                          <div className="flex flex-col">
-                            <span className="flex items-center gap-1.5 font-bold" style={{ color: proj.color }}>
-                              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: proj.color }}></span>
+                          <div className='flex flex-col'>
+                            <span
+                              className='flex items-center gap-1.5 font-bold'
+                              style={{ color: proj.color }}
+                            >
+                              <span
+                                className='h-2 w-2 rounded-full'
+                                style={{ backgroundColor: proj.color }}
+                              ></span>
                               {proj.name}
                             </span>
                             {proj.client && (
-                              <span className="text-[10px] text-[#ecd0b9]/45 font-medium pl-3.5">
+                              <span className='text-[10px] text-[#ecd0b9]/45 font-medium pl-3.5'>
                                 Client: {proj.client}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[#ecd0b9]/30">None</span>
+                          <span className='text-[#ecd0b9]/30'>None</span>
                         )}
                       </td>
-                      <td className="p-4 whitespace-nowrap font-mono text-[#ecd0b9]/65">
+                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono text-[#ecd0b9]/65 hidden md:table-cell'>
                         {row.startTime} - {row.endTime}
                       </td>
-                      <td className="p-4 whitespace-nowrap text-right font-mono font-bold text-[#dda67a]">
+                      <td className='p-2.5 md:p-4 whitespace-nowrap text-right font-mono font-bold text-[#dda67a]'>
                         {formatMinutesHHMM(row.durationMinutes)}
                       </td>
-                      <td className="p-4 print:hidden text-center">
-                        <div className="flex flex-wrap justify-center gap-1 max-w-[120px]">
+                      <td className='p-2.5 md:p-4 print:hidden text-center hidden lg:table-cell'>
+                        <div className='flex flex-wrap justify-center gap-1 max-w-[120px]'>
                           {row.tags.map((tag, tIdx) => (
-                            <span 
-                              key={tIdx} 
-                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-[#1d1410] border border-[#3e271a]/65 text-[#ecd0b9]/75"
+                            <span
+                              key={tIdx}
+                              className='px-2 py-0.5 rounded text-[10px] font-medium bg-[#1d1410] border border-[#3e271a]/65 text-[#ecd0b9]/75'
                             >
                               {tag}
                             </span>
                           ))}
-                          {row.tags.length === 0 && <span className="text-[#ecd0b9]/30 text-[10px]">-</span>}
+                          {row.tags.length === 0 && (
+                            <span className='text-[#ecd0b9]/30 text-[10px]'>-</span>
+                          )}
                         </div>
                       </td>
-                      <td className="p-4 text-right whitespace-nowrap print:hidden">
-                        <div className="flex justify-end gap-1">
+                      <td className='p-2.5 md:p-4 text-right whitespace-nowrap print:hidden'>
+                        <div className='flex justify-end gap-1'>
                           <button
                             onClick={() => onDuplicateEntry(row)}
-                            className="p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-[#dda67a] cursor-pointer transition"
-                            title="Duplicate record"
+                            className='p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-[#dda67a] cursor-pointer transition'
+                            title='Duplicate record'
                           >
-                            <Copy className="h-4 w-4" />
+                            <Copy className='h-4 w-4' />
                           </button>
                           <button
                             onClick={() => onDeleteEntry(row.id)}
-                            className="p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-red-400 cursor-pointer transition"
-                            title="Delete record"
+                            className='p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-red-400 cursor-pointer transition'
+                            title='Delete record'
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className='h-4 w-4' />
                           </button>
                         </div>
                       </td>
@@ -1328,8 +1437,9 @@ export default function ReportsView({
 
                 {filteredEntries.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="p-8 text-center text-[#ecd0b9]/45 font-mono">
-                      No records match active criteria. Set date parameters or track inside the Calendar dashboard.
+                    <td colSpan={7} className='p-8 text-center text-[#ecd0b9]/45 font-mono'>
+                      No records match active criteria. Set date parameters or track inside the
+                      Calendar dashboard.
                     </td>
                   </tr>
                 )}
@@ -1337,89 +1447,105 @@ export default function ReportsView({
             </table>
           </div>
         </div>
-
       </section>
 
       {/* ==================== PRINT REPORT TEMPLATE (PDF ONLY) ==================== */}
-      <div id="print-pdf-report" className="hidden print:block bg-white text-stone-900 font-sans p-6 min-h-screen text-xs">
-        
+      <div
+        id='print-pdf-report'
+        className='hidden print:block bg-white text-stone-900 font-sans p-6 min-h-screen text-xs'
+      >
         {/* PDF Header Section */}
-        <header className="flex justify-between items-start border-b border-stone-200 pb-5">
+        <header className='flex justify-between items-start border-b border-stone-200 pb-5'>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-stone-950 font-display">
+            <h1 className='text-2xl font-bold tracking-tight text-stone-950 font-display'>
               Summary report
             </h1>
-            <p className="text-xs text-stone-500 font-medium font-mono mt-1">
+            <p className='text-xs text-stone-500 font-medium font-mono mt-1'>
               Ref range: {printDateRangeStr}
             </p>
           </div>
-          
-          <div className="flex items-center gap-2 border border-stone-200 bg-stone-50 p-2.5 rounded-xl">
-            <BrandLogo size={24} className="brightness-90 select-none pointer-events-none" />
-            <div className="text-right">
-              <span className="text-[10px] uppercase font-mono tracking-wider font-extrabold text-stone-700 leading-none block">Tyme Workspace</span>
-              <span className="text-[8px] font-mono text-stone-400 block mt-0.5">dczabala2@gmail.com</span>
+
+          <div className='flex items-center gap-2 border border-stone-200 bg-stone-50 p-2.5 rounded-xl'>
+            <BrandLogo size={24} className='brightness-90 select-none pointer-events-none' />
+            <div className='text-right'>
+              <span className='text-[10px] uppercase font-mono tracking-wider font-extrabold text-stone-700 leading-none block'>
+                Tyme Workspace
+              </span>
+              <span className='text-[8px] font-mono text-stone-400 block mt-0.5'>
+                dczabala2@gmail.com
+              </span>
             </div>
           </div>
         </header>
 
         {/* Global Summary Metrics Cards */}
-        <section className="grid grid-cols-3 gap-4 py-4 my-2">
-          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center">
-            <span className="text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider">Total Duration</span>
-            <div className="text-lg font-bold font-mono text-stone-900 mt-1">
+        <section className='grid grid-cols-3 gap-4 py-4 my-2'>
+          <div className='bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center'>
+            <span className='text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider'>
+              Total Duration
+            </span>
+            <div className='text-lg font-bold font-mono text-stone-900 mt-1'>
               {formatMinutesHHMM(totalMinutes)}
             </div>
           </div>
 
-          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center">
-            <span className="text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider">Billable Duration</span>
-            <div className="text-lg font-bold font-mono text-[#a66e46] mt-1">
+          <div className='bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center'>
+            <span className='text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider'>
+              Billable Duration
+            </span>
+            <div className='text-lg font-bold font-mono text-[#a66e46] mt-1'>
               {formatMinutesHHMM(totalMinutes)}
             </div>
           </div>
 
-          <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center">
-            <span className="text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider">Total Amount billed</span>
-            <div className="text-lg font-bold font-mono text-stone-900 mt-1">
-              ${((totalMinutes / 60) * hourlyRate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span className="text-[10px] text-stone-500 font-sans font-normal">USD</span>
+          <div className='bg-stone-50 border border-stone-200 p-4 rounded-xl flex flex-col justify-center'>
+            <span className='text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider'>
+              Total Amount billed
+            </span>
+            <div className='text-lg font-bold font-mono text-stone-900 mt-1'>
+              $
+              {((totalMinutes / 60) * hourlyRate).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}{" "}
+              <span className='text-[10px] text-stone-500 font-sans font-normal'>USD</span>
             </div>
           </div>
         </section>
 
         {/* Vertical SVG Active Hours Bar Chart (Perfect Vector scaling) */}
-        <section className="border border-stone-200 rounded-2xl p-5 bg-stone-50/30 my-4">
-          <h2 className="text-[10px] font-bold font-mono uppercase tracking-wider text-stone-500 mb-4">
+        <section className='border border-stone-200 rounded-2xl p-5 bg-stone-50/30 my-4'>
+          <h2 className='text-[10px] font-bold font-mono uppercase tracking-wider text-stone-500 mb-4'>
             Logged Hours Timeline
           </h2>
-          
+
           {printChartData.length > 0 ? (
-            <div className="w-full">
-              <svg viewBox="0 0 800 240" className="w-full h-auto">
+            <div className='w-full'>
+              <svg viewBox='0 0 800 240' className='w-full h-auto'>
                 {/* Horizontal Guide Lines */}
                 {Array.from({ length: 6 }).map((_, idx) => {
-                  const maxMinsValue = Math.max(...printChartData.map(d => d.mins), 60);
+                  const maxMinsValue = Math.max(...printChartData.map((d) => d.mins), 60);
                   const maxHoursVal = Math.max(1, Math.ceil(maxMinsValue / 60));
                   const tickVal = (maxHoursVal / 5) * (5 - idx);
                   const y = 20 + idx * 36; // 20 to 200 space (height 180)
                   return (
                     <g key={idx}>
-                      <line 
-                        x1="54" 
-                        y1={y} 
-                        x2="780" 
-                        y2={y} 
-                        stroke="#e5e5e4" 
-                        strokeDasharray="3 3"
-                        strokeWidth="0.8"
+                      <line
+                        x1='54'
+                        y1={y}
+                        x2='780'
+                        y2={y}
+                        stroke='#e5e5e4'
+                        strokeDasharray='3 3'
+                        strokeWidth='0.8'
                       />
-                      <text 
-                        x="12" 
-                        y={y + 3} 
-                        fontSize="9" 
-                        fontFamily="monospace" 
-                        fill="#6b6a69"
-                        textAnchor="start"
+                      <text
+                        x='12'
+                        y={y + 3}
+                        fontSize='9'
+                        fontFamily='monospace'
+                        fill='#6b6a69'
+                        textAnchor='start'
                       >
                         {tickVal.toFixed(1)}h
                       </text>
@@ -1429,42 +1555,35 @@ export default function ReportsView({
 
                 {/* Vertical column bars represent log dates */}
                 {printChartData.map((item, idx) => {
-                  const maxMinsValue = Math.max(...printChartData.map(d => d.mins), 60);
+                  const maxMinsValue = Math.max(...printChartData.map((d) => d.mins), 60);
                   const maxHoursVal = Math.max(1, Math.ceil(maxMinsValue / 60));
-                  const barH = (item.mins / 60) / maxHoursVal * 180;
-                  
+                  const barH = (item.mins / 60 / maxHoursVal) * 180;
+
                   const count = printChartData.length;
                   const availableW = 726; // X bounds 54 to 780
                   const slotW = availableW / count;
                   const gapRatio = 0.65;
                   const barW = Math.max(3, slotW * gapRatio);
-                  const x = 54 + idx * slotW + (slotW - barW)/2;
+                  const x = 54 + idx * slotW + (slotW - barW) / 2;
                   const y = 200 - barH;
 
                   return (
-                    <g key={idx} className="group">
+                    <g key={idx} className='group'>
                       {/* Render bar shape */}
                       {barH > 0 && (
-                        <rect 
-                          x={x} 
-                          y={y} 
-                          width={barW} 
-                          height={barH} 
-                          fill="#a66e46" 
-                          rx="1.5"
-                        />
+                        <rect x={x} y={y} width={barW} height={barH} fill='#a66e46' rx='1.5' />
                       )}
 
                       {/* Tick or Label beneath column */}
                       {(count <= 15 || idx % Math.ceil(count / 15) === 0) && (
                         <text
                           x={x + barW / 2}
-                          y="215"
-                          textAnchor="end"
-                          fontSize="7.5"
-                          fontFamily="sans-serif"
-                          fontWeight="bold"
-                          fill="#44403c"
+                          y='215'
+                          textAnchor='end'
+                          fontSize='7.5'
+                          fontFamily='sans-serif'
+                          fontWeight='bold'
+                          fill='#44403c'
                           transform={`rotate(-40, ${x + barW / 2}, 215)`}
                         >
                           {item.label}
@@ -1476,189 +1595,239 @@ export default function ReportsView({
               </svg>
             </div>
           ) : (
-            <div className="p-8 text-center text-stone-400 italic">No timeline entries generated.</div>
+            <div className='p-8 text-center text-stone-400 italic'>
+              No timeline entries generated.
+            </div>
           )}
         </section>
 
         {/* Ring Donut Allocations side-by-side splits */}
-        <section className="grid grid-cols-2 gap-6 my-4">
-          
+        <section className='grid grid-cols-2 gap-6 my-4'>
           {/* Project Ring Breakdowns */}
-          <div className="border border-stone-200 rounded-2xl p-4 bg-stone-50/10 flex flex-col justify-between">
-            <h3 className="text-[10px] font-bold font-mono tracking-wider uppercase text-stone-500 mb-3 pb-1 border-b border-stone-100">
+          <div className='border border-stone-200 rounded-2xl p-4 bg-stone-50/10 flex flex-col justify-between'>
+            <h3 className='text-[10px] font-bold font-mono tracking-wider uppercase text-stone-500 mb-3 pb-1 border-b border-stone-100'>
               Project Allocations
             </h3>
-            <div className="flex items-center gap-4">
-              <div className="relative shrink-0 w-28 h-28 flex items-center justify-center">
+            <div className='flex items-center gap-4'>
+              <div className='relative shrink-0 w-28 h-28 flex items-center justify-center'>
                 {printProjectDonutSegments.length > 0 ? (
                   <>
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                    <svg className='w-full h-full transform -rotate-90' viewBox='0 0 200 200'>
                       {printProjectDonutSegments.map((seg, sIdx) => (
                         <path
                           key={sIdx}
                           d={seg.pathData}
-                          fill="none"
+                          fill='none'
                           stroke={seg.color}
-                          strokeWidth="22"
+                          strokeWidth='22'
                         />
                       ))}
                     </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[8px] font-mono leading-none text-stone-400 font-bold uppercase tracking-widest">Total</span>
-                      <span className="text-xs font-bold font-mono text-stone-800 mt-0.5">
+                    <div className='absolute inset-0 flex flex-col items-center justify-center'>
+                      <span className='text-[8px] font-mono leading-none text-stone-400 font-bold uppercase tracking-widest'>
+                        Total
+                      </span>
+                      <span className='text-xs font-bold font-mono text-stone-800 mt-0.5'>
                         {formatMinutesHHMM(totalMinutes)}
                       </span>
                     </div>
                   </>
                 ) : (
-                  <div className="text-[8px] font-mono uppercase text-stone-400">Empty</div>
+                  <div className='text-[8px] font-mono uppercase text-stone-400'>Empty</div>
                 )}
               </div>
 
               {/* Project Legend list right side */}
-              <div className="flex-1 space-y-1.5 text-[10px] max-h-28 overflow-hidden pr-0.5">
+              <div className='flex-1 space-y-1.5 text-[10px] max-h-28 overflow-hidden pr-0.5'>
                 {printProjectDonutSegments.slice(0, 5).map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-stone-700">
-                    <span className="flex items-center gap-1.5 truncate font-medium">
-                      <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="truncate max-w-[100px]">{item.name}</span>
+                  <div key={idx} className='flex items-center justify-between text-stone-700'>
+                    <span className='flex items-center gap-1.5 truncate font-medium'>
+                      <span
+                        className='h-1.5 w-1.5 rounded-full shrink-0'
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className='truncate max-w-[100px]'>{item.name}</span>
                     </span>
-                    <span className="font-mono text-stone-900 font-bold pl-2 whitespace-nowrap">
+                    <span className='font-mono text-stone-900 font-bold pl-2 whitespace-nowrap'>
                       {formatMinutesHHMM(item.mins)} ({item.percentage}%)
                     </span>
                   </div>
                 ))}
-                {printProjectDonutSegments.length === 0 && <span className="text-stone-400 italic font-mono text-[9px]">No items</span>}
+                {printProjectDonutSegments.length === 0 && (
+                  <span className='text-stone-400 italic font-mono text-[9px]'>No items</span>
+                )}
               </div>
             </div>
           </div>
 
           {/* Description Ring Breakdowns */}
-          <div className="border border-stone-200 rounded-2xl p-4 bg-stone-50/10 flex flex-col justify-between">
-            <h3 className="text-[10px] font-bold font-mono tracking-wider uppercase text-stone-500 mb-3 pb-1 border-b border-stone-100">
+          <div className='border border-stone-200 rounded-2xl p-4 bg-stone-50/10 flex flex-col justify-between'>
+            <h3 className='text-[10px] font-bold font-mono tracking-wider uppercase text-stone-500 mb-3 pb-1 border-b border-stone-100'>
               Description Allocations
             </h3>
-            <div className="flex items-center gap-4">
-              <div className="relative shrink-0 w-28 h-28 flex items-center justify-center">
+            <div className='flex items-center gap-4'>
+              <div className='relative shrink-0 w-28 h-28 flex items-center justify-center'>
                 {printDescDonutSegments.length > 0 ? (
                   <>
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
+                    <svg className='w-full h-full transform -rotate-90' viewBox='0 0 200 200'>
                       {printDescDonutSegments.map((seg, sIdx) => (
                         <path
                           key={sIdx}
                           d={seg.pathData}
-                          fill="none"
+                          fill='none'
                           stroke={seg.color}
-                          strokeWidth="22"
+                          strokeWidth='22'
                         />
                       ))}
                     </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[8px] font-mono leading-none text-stone-400 font-bold uppercase tracking-widest">Total</span>
-                      <span className="text-xs font-bold font-mono text-stone-800 mt-0.5">
+                    <div className='absolute inset-0 flex flex-col items-center justify-center'>
+                      <span className='text-[8px] font-mono leading-none text-stone-400 font-bold uppercase tracking-widest'>
+                        Total
+                      </span>
+                      <span className='text-xs font-bold font-mono text-stone-800 mt-0.5'>
                         {formatMinutesHHMM(totalMinutes)}
                       </span>
                     </div>
                   </>
                 ) : (
-                  <div className="text-[8px] font-mono uppercase text-stone-400">Empty</div>
+                  <div className='text-[8px] font-mono uppercase text-stone-400'>Empty</div>
                 )}
               </div>
 
               {/* Description Legend list right side */}
-              <div className="flex-1 space-y-1.5 text-[10px] max-h-28 overflow-hidden pr-0.5">
+              <div className='flex-1 space-y-1.5 text-[10px] max-h-28 overflow-hidden pr-0.5'>
                 {printDescDonutSegments.slice(0, 5).map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-stone-700">
-                    <span className="flex items-center gap-1.5 truncate font-medium">
-                      <span className="h-1.5 w-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="truncate max-w-[100px]">{item.name}</span>
+                  <div key={idx} className='flex items-center justify-between text-stone-700'>
+                    <span className='flex items-center gap-1.5 truncate font-medium'>
+                      <span
+                        className='h-1.5 w-1.5 rounded-full shrink-0'
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className='truncate max-w-[100px]'>{item.name}</span>
                     </span>
-                    <span className="font-mono text-stone-900 font-bold pl-2 whitespace-nowrap">
+                    <span className='font-mono text-stone-900 font-bold pl-2 whitespace-nowrap'>
                       {formatMinutesHHMM(item.mins)} ({item.percentage}%)
                     </span>
                   </div>
                 ))}
-                {printDescDonutSegments.length === 0 && <span className="text-stone-400 italic font-mono text-[9px]">No items</span>}
+                {printDescDonutSegments.length === 0 && (
+                  <span className='text-stone-400 italic font-mono text-[9px]'>No items</span>
+                )}
               </div>
             </div>
           </div>
-
         </section>
 
         {/* Detailed Sheet Ledger layout */}
-        <section className="mt-6 border-t border-stone-200 pt-5">
-          <h3 className="text-xs font-bold uppercase font-mono tracking-wider text-stone-600 mb-4 pb-1.5 border-b border-stone-100">
+        <section className='mt-6 border-t border-stone-200 pt-5'>
+          <h3 className='text-xs font-bold uppercase font-mono tracking-wider text-stone-600 mb-4 pb-1.5 border-b border-stone-100'>
             Detailed Sheet Ledger
           </h3>
-          
-          <div className="space-y-4">
+
+          <div className='space-y-4'>
             {detailedLedgerGroups.map((group, gIdx) => {
               const projAmount = (group.totalMins / 60) * hourlyRate;
               return (
-                <div key={gIdx} className="border border-stone-200 rounded-xl overflow-hidden shadow-sm page-break-inside-avoid bg-white">
-                  
+                <div
+                  key={gIdx}
+                  className='border border-stone-200 rounded-xl overflow-hidden shadow-sm page-break-inside-avoid bg-white'
+                >
                   {/* Project Headline band */}
-                  <div className="bg-stone-100/90 px-4 py-2.5 flex justify-between items-center border-b border-stone-200">
+                  <div className='bg-stone-100/90 px-4 py-2.5 flex justify-between items-center border-b border-stone-200'>
                     <div>
-                      <span className="text-xs font-bold text-stone-900 flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: group.project?.color || '#a66e46' }} />
-                        {group.project?.name || 'Unassigned Workspace tasks'}
-                        {group.project?.client && <span className="text-stone-500 font-normal ml-1">({group.project.client})</span>}
+                      <span className='text-xs font-bold text-stone-900 flex items-center gap-2'>
+                        <span
+                          className='h-2 w-2 rounded-full shrink-0'
+                          style={{ backgroundColor: group.project?.color || "#a66e46" }}
+                        />
+                        {group.project?.name || "Unassigned Workspace tasks"}
+                        {group.project?.client && (
+                          <span className='text-stone-500 font-normal ml-1'>
+                            ({group.project.client})
+                          </span>
+                        )}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-xs font-bold font-mono">
-                      <span className="text-stone-600">{formatMinutesHHMM(group.totalMins)}</span>
-                      <span className="text-[#a66e46]">${projAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+                    <div className='flex items-center gap-4 text-xs font-bold font-mono'>
+                      <span className='text-stone-600'>{formatMinutesHHMM(group.totalMins)}</span>
+                      <span className='text-[#a66e46]'>
+                        $
+                        {projAmount.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}{" "}
+                        USD
+                      </span>
                     </div>
                   </div>
 
                   {/* Tasks nested checklist under Project */}
-                  <div className="divide-y divide-stone-100 text-[11px] leading-relaxed">
-                    {(Object.values(group.descriptions) as { mins: number; description: string; tags: string[] }[]).map((item, dIdx) => {
+                  <div className='divide-y divide-stone-100 text-[11px] leading-relaxed'>
+                    {(
+                      Object.values(group.descriptions) as {
+                        mins: number;
+                        description: string;
+                        tags: string[];
+                      }[]
+                    ).map((item, dIdx) => {
                       const itemAmount = (item.mins / 60) * hourlyRate;
                       return (
-                        <div key={dIdx} className="px-4 py-2 flex justify-between items-center hover:bg-stone-50/50">
-                          <div className="space-y-0.5 max-w-[70%]">
-                            <p className="font-semibold text-stone-800 break-words">{item.description}</p>
+                        <div
+                          key={dIdx}
+                          className='px-4 py-2 flex justify-between items-center hover:bg-stone-50/50'
+                        >
+                          <div className='space-y-0.5 max-w-[70%]'>
+                            <p className='font-semibold text-stone-800 break-words'>
+                              {item.description}
+                            </p>
                             {item.tags.length > 0 && (
-                              <div className="flex gap-1">
+                              <div className='flex gap-1'>
                                 {item.tags.map((t, tIdx) => (
-                                  <span key={tIdx} className="px-1 border border-stone-200 bg-stone-100 rounded text-[8px] text-stone-500 font-medium">
+                                  <span
+                                    key={tIdx}
+                                    className='px-1 border border-stone-200 bg-stone-100 rounded text-[8px] text-stone-500 font-medium'
+                                  >
                                     {t}
                                   </span>
                                 ))}
                               </div>
                             )}
                           </div>
-                          
-                          <div className="flex items-center gap-4 font-mono font-medium text-stone-600">
+
+                          <div className='flex items-center gap-4 font-mono font-medium text-stone-600'>
                             <span>{formatMinutesHHMM(item.mins)}</span>
-                            <span className="text-stone-900 font-bold">${itemAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD</span>
+                            <span className='text-stone-900 font-bold'>
+                              $
+                              {itemAmount.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              USD
+                            </span>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-
                 </div>
               );
             })}
 
             {detailedLedgerGroups.length === 0 && (
-              <div className="p-8 text-center text-stone-400 italic">No workspace time records logged.</div>
+              <div className='p-8 text-center text-stone-400 italic'>
+                No workspace time records logged.
+              </div>
             )}
           </div>
         </section>
 
         {/* PDF Doc Workspace Footer */}
-        <footer className="mt-8 pt-5 border-t border-stone-200 flex justify-between items-center text-[9px] font-mono text-stone-400">
+        <footer className='mt-8 pt-5 border-t border-stone-200 flex justify-between items-center text-[9px] font-mono text-stone-400'>
           <span>Dczii's workspace</span>
           <span>Created with Tyme</span>
           <span>Approved Invoice Copy</span>
         </footer>
-
       </div>
-
     </div>
   );
 }

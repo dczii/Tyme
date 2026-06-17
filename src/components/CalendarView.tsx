@@ -654,8 +654,11 @@ export default function CalendarView({
                 title='Click to select week'
               >
                 <Calendar className='h-4 w-4 text-[#dda67a] shrink-0' />
-                <span className='font-mono tracking-wide'>
+                <span className='font-mono tracking-wide hidden md:inline'>
                   {formatDateMMDDYYYY(weekDays[0])} - {formatDateMMDDYYYY(weekDays[6])}
+                </span>
+                <span className='font-mono tracking-wide md:hidden'>
+                  {weekDays[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {weekDays[6].toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                 </span>
               </button>
 
@@ -684,10 +687,10 @@ export default function CalendarView({
             {showRangePicker && (
               <div
                 id='date-range-picker-popover'
-                className='absolute right-0 top-11 mt-1 rounded-2xl border border-[#3d2416] bg-[#110a08] shadow-2xl p-0 overflow-hidden z-50 flex flex-row divide-x divide-[#3d2416]/50 min-w-[620px]'
+                className='fixed inset-x-4 top-20 md:absolute md:inset-x-auto md:right-0 md:top-11 mt-1 rounded-2xl border border-[#3d2416] bg-[#110a08] shadow-2xl p-0 overflow-hidden z-50 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#3d2416]/50 w-[calc(100vw-2rem)] md:min-w-[620px] md:w-auto'
               >
                 {/* Left Sidebar Presets */}
-                <div className='w-36 shrink-0 bg-[#0c0604]/90 p-2.5 flex flex-col gap-1'>
+                <div className='w-full md:w-36 shrink-0 bg-[#0c0604]/90 p-2.5 flex flex-row md:flex-col gap-1'>
                   {[
                     { id: "thisWeek", label: "This week", action: selectThisWeek },
                     { id: "lastWeek", label: "Last week", action: selectLastWeek },
@@ -722,9 +725,11 @@ export default function CalendarView({
                 </div>
 
                 {/* Right Dual Calendar Month Grids */}
-                <div className='p-4 flex flex-row gap-6 bg-[#130d0a]/90'>
+                <div className='p-4 flex flex-col md:flex-row gap-6 bg-[#130d0a]/90'>
                   {renderCalendarMonth(pickerYear, pickerMonth1, true)}
-                  {renderCalendarMonth(pickerYear2, pickerMonth2, false)}
+                  <div className='hidden md:block'>
+                    {renderCalendarMonth(pickerYear2, pickerMonth2, false)}
+                  </div>
                 </div>
               </div>
             )}
@@ -751,7 +756,7 @@ export default function CalendarView({
             />
           </div>
 
-          <div className='flex flex-wrap items-center gap-2 border-t lg:border-t-0 pt-3 lg:pt-0 border-[#3d2516]/40'>
+          <div className='flex flex-wrap items-center gap-2 justify-between w-full lg:w-auto border-t lg:border-t-0 pt-3 lg:pt-0 border-[#3d2516]/40'>
             {/* Project Pill - Static default project */}
             <div className='relative'>
               <div className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-[#3d2516]/60 bg-[#2d1a10]/40 text-[#ecd0b9] font-medium select-none'>
@@ -760,7 +765,7 @@ export default function CalendarView({
               </div>
 
               {showProjDropdown && (
-                <div className='absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 p-2 z-50'>
+                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-64 rounded-xl shadow-xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 p-2 z-50'>
                   <p className='text-[10px] font-mono dark:text-slate-500 text-slate-400 uppercase tracking-wide px-2 py-1'>
                     Projects
                   </p>
@@ -877,7 +882,7 @@ export default function CalendarView({
               </button>
 
               {showTagDropdown && (
-                <div className='absolute right-0 mt-2 w-56 rounded-xl shadow-xl bg-[#170e0a]/95 backdrop-blur-xl border border-[#3d2516]/50 p-2 z-50'>
+                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-56 rounded-xl shadow-xl bg-[#170e0a]/95 backdrop-blur-xl border border-[#3d2516]/50 p-2 z-50'>
                   <p className='text-[10px] font-mono text-[#ecd0b9]/60 uppercase tracking-wide px-2 py-1'>
                     Tags
                   </p>
@@ -939,7 +944,7 @@ export default function CalendarView({
 
             {/* Stopwatch Log Display */}
             {isTracking ? (
-              <div className='flex items-center gap-3 px-3 mx-1 font-mono font-bold text-rose-500 text-sm select-none tracking-wider'>
+              <div className='flex items-center gap-3 px-3 mx-1 font-mono font-bold text-rose-500 text-base md:text-sm select-none tracking-wider'>
                 <span className='relative flex h-2 w-2'>
                   <span className='animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75'></span>
                   <span className='relative inline-flex rounded-full h-2 w-2 bg-rose-500'></span>
@@ -960,7 +965,7 @@ export default function CalendarView({
             {isTracking ? (
               <button
                 onClick={handleStopTimer}
-                className='px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-rose-500/15'
+                className='px-5 py-3 md:py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-rose-500/15'
               >
                 <Square className='h-3 w-3 fill-current' />
                 <span>Stop</span>
@@ -968,7 +973,7 @@ export default function CalendarView({
             ) : (
               <button
                 onClick={handleStartTimer}
-                className='px-5 py-2.5 bg-[#a66e46] hover:bg-[#8e5a34] text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#4a2b16]/30 transition duration-150'
+                className='px-5 py-3 md:py-2.5 bg-[#a66e46] hover:bg-[#8e5a34] text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#4a2b16]/30 transition duration-150'
               >
                 <Play className='h-3 w-3 fill-current' />
                 <span>Start</span>
@@ -979,13 +984,13 @@ export default function CalendarView({
       </section>
 
       {/* 3. The 7-Day Weekly Calendar Vertical Grid */}
-      <div className='flex-1 p-4 md:p-6 overflow-y-auto min-w-[700px] bg-[#1a110a]/10'>
+      <div className='flex-1 p-4 md:p-6 overflow-y-auto overflow-x-auto min-w-0 md:min-w-[700px] bg-[#1a110a]/10'>
         <div
           id='calendar-week-grid'
           className='border border-[#3c2518]/45 rounded-3xl overflow-hidden bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
         >
           {/* Calendar Headers columns */}
-          <div className='grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-[#3c2518]/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
+          <div className='grid grid-cols-[44px_repeat(7,1fr)] md:grid-cols-[60px_repeat(7,1fr)] border-b border-[#3c2518]/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
             {/* Hour marker blank header */}
             <div className='border-r border-[#3c2518]/45 flex items-center justify-center text-[10px] font-mono text-[#ecd0b9]/55 font-bold uppercase'>
               TIME
@@ -1004,13 +1009,13 @@ export default function CalendarView({
                     ${isToday ? "bg-[#a66e46]/10" : ""}`}
                 >
                   <p
-                    className={`text-[11px] font-bold tracking-wider uppercase ${isToday ? "text-[#dda67a] font-extrabold" : "text-[#ecd0b9]/55"}`}
+                    className={`text-[9px] md:text-[11px] font-bold tracking-wider uppercase ${isToday ? "text-[#dda67a] font-extrabold" : "text-[#ecd0b9]/55"}`}
                   >
                     {dateObj.toLocaleDateString("en-US", { weekday: "short" })}
                   </p>
 
                   <p
-                    className={`h-8 w-8 rounded-full font-display font-semibold text-sm flex items-center justify-center mt-1
+                    className={`h-6 w-6 text-xs md:h-8 md:w-8 md:text-sm rounded-full font-display font-semibold flex items-center justify-center mt-1
                     ${
                       isToday
                         ? "bg-[#a66e46] text-[#fff6f0] shadow-md shadow-[#4a2b16]/40"
@@ -1022,7 +1027,7 @@ export default function CalendarView({
 
                   {/* Daily Log total hours */}
                   <div
-                    className={`mt-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wide
+                    className={`mt-1.5 px-2.5 py-0.5 rounded-full text-[8px] md:text-[10px] font-mono font-bold tracking-wide
                     ${
                       totalMins > 0
                         ? totalMins >= 480
@@ -1037,7 +1042,7 @@ export default function CalendarView({
                   {/* Highlighting under-logged hours for workdays */}
                   {idx < 5 && totalMins > 0 && totalMins < 480 && (
                     <span className='text-[9px] font-mono text-[#ecd0b9]/45 leading-none'>
-                      under target (8h)
+                      <span className='hidden md:inline'>under target (8h)</span>
                     </span>
                   )}
                 </div>
@@ -1058,7 +1063,7 @@ export default function CalendarView({
                 style={{ top: `${idx * ROW_HEIGHT}px`, height: `${ROW_HEIGHT}px` }}
               >
                 {/* Visual Hour Indicator Column */}
-                <div className='w-[60px] h-full border-r border-white/30 dark:border-slate-800/30 shrink-0 flex items-start justify-center pt-1.5'>
+                <div className='w-[44px] md:w-[60px] h-full border-r border-white/30 dark:border-slate-800/30 shrink-0 flex items-start justify-center pt-1.5'>
                   <span className='text-[10px] font-mono dark:text-slate-500 text-slate-400 font-semibold select-none'>
                     {String(hour).padStart(2, "0")}:00
                   </span>
@@ -1079,7 +1084,7 @@ export default function CalendarView({
             ))}
 
             {/* Logged blocks stacked absolutely on the scheduler framework */}
-            <div className='absolute left-[60px] right-0 top-0 bottom-0 pointer-events-none grid grid-cols-7 h-full'>
+            <div className='absolute left-[44px] md:left-[60px] right-0 top-0 bottom-0 pointer-events-none grid grid-cols-7 h-full'>
               {formattedWeekDays.map((dayString, dIndex) => {
                 const dayEntries = getDailyEntries(dayString);
 
@@ -1100,7 +1105,7 @@ export default function CalendarView({
                         <div
                           key={entry.id}
                           onClick={() => setEditingEntry(entry)}
-                          className='absolute left-1 right-1 rounded-xl p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden cursor-pointer
+                          className='absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden cursor-pointer
                             bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg hover:scale-[1.01]'
                           style={{
                             ...pos,
@@ -1127,7 +1132,7 @@ export default function CalendarView({
                             )}
 
                             {/* Description */}
-                            <p className='text-xs font-semibold leading-tight max-h-[44px] overflow-hidden text-ellipsis dark:text-[#fcdbbd] text-slate-800 break-words group-hover:text-[#dda67a] transition-colors'>
+                            <p className='text-[10px] md:text-xs font-semibold leading-tight max-h-[44px] overflow-hidden text-ellipsis dark:text-[#fcdbbd] text-slate-800 break-words group-hover:text-[#dda67a] transition-colors'>
                               {entry.description || "No Description"}
                             </p>
                           </div>
@@ -1170,7 +1175,7 @@ export default function CalendarView({
           }}
           className='fixed inset-0 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in'
         >
-          <div className='bg-[#140d09] rounded-2xl w-full max-w-[620px] p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl'>
+          <div className='bg-[#140d09] rounded-2xl w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl'>
             <h3 className='text-base font-display font-bold text-white flex items-center gap-2 mb-4'>
               <Sparkles className='h-5 w-5 text-[#dda67a]' />
               <span>Modify Time Entry</span>
@@ -1325,13 +1330,13 @@ export default function CalendarView({
             </div>
 
             {/* Footer buttons */}
-            <div className='flex items-center justify-between gap-3 mt-6 border-t border-[#3e271a]/60 pt-4'>
+            <div className='flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6 border-t border-[#3e271a]/60 pt-4'>
               <button
                 onClick={() => {
                   onDeleteEntry(editingEntry.id);
                   setEditingEntry(null);
                 }}
-                className='py-2.5 px-4 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 text-xs font-semibold flex items-center gap-1 cursor-pointer transition'
+                className='py-2.5 px-4 rounded-xl border border-red-500/20 text-red-500 hover:bg-red-500/10 text-xs font-semibold flex items-center justify-center gap-1 cursor-pointer transition w-full sm:w-auto'
               >
                 <Trash2 className='h-4 w-4' />
                 <span>Delete</span>
@@ -1370,7 +1375,7 @@ export default function CalendarView({
           }}
           className='fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50 animate-fade-in animate-duration-200'
         >
-          <div className='bg-[#1a110a] rounded-xl border border-[#3e271a] w-full max-w-[620px] shadow-2xl overflow-hidden flex flex-col text-white'>
+          <div className='bg-[#1a110a] rounded-xl border border-[#3e271a] w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-white'>
             {/* Header */}
             <div className='px-6 py-4 border-b border-[#3e271a]/60 flex items-center justify-between'>
               <h3 className='text-lg font-medium text-white tracking-tight'>Add time entry</h3>
@@ -1560,7 +1565,7 @@ export default function CalendarView({
               </div>
 
               {/* Footer CTA */}
-              <div className='flex gap-6 items-center justify-end mt-8 pt-4 border-t border-[#3e271a]/40'>
+              <div className='flex flex-col-reverse sm:flex-row gap-6 items-center justify-end mt-8 pt-4 border-t border-[#3e271a]/40'>
                 <button
                   type='button'
                   onClick={() => {
