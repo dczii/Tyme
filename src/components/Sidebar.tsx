@@ -36,7 +36,7 @@ export default function Sidebar({
   user,
   onLogout
 }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = React.useState(true);
 
   const navItems = [
     { id: 'calendar' as PageView, label: 'Calendar', icon: Clock },
