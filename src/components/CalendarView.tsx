@@ -1699,13 +1699,12 @@ export default function CalendarView({
                 <label className='text-xs font-semibold text-[#ecd0b9]/60 block mb-1'>
                   Description / Task Name
                 </label>
-                <input
-                  type='text'
+                <textarea
                   value={editingEntry.description}
                   onChange={(e) =>
                     setEditingEntry({ ...editingEntry, description: e.target.value })
                   }
-                  className='w-full text-sm p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] focus:ring-2 focus:ring-[#dda67a]/40 outline-none'
+                  className='w-full text-sm p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] focus:ring-2 focus:ring-[#dda67a]/40 outline-none h-20 resize-y'
                 />
               </div>
 
