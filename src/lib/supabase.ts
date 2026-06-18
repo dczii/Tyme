@@ -261,11 +261,28 @@ export const saveUserProfileToFS = async (
     if (profile.logoStyle !== undefined) dbProfile.logo_style = profile.logoStyle;
     if (profile.hourlyRate !== undefined) dbProfile.hourly_rate = profile.hourlyRate;
 
-    const { error } = await supabase
+    // Check if the profile already exists.
+    // We cannot use simple upsert for partial updates because PostgreSQL enforces NOT NULL constraints
+    // (like email and name) on the INSERT portion of the upsert statement.
+    const { data, error: fetchError } = await supabase
       .from('profiles')
-      .upsert(dbProfile, { onConflict: 'id' });
+      .select('id')
+      .eq('id', userId);
 
-    if (error) throw error;
+    if (fetchError) throw fetchError;
+
+    if (data && data.length > 0) {
+      const { error } = await supabase
+        .from('profiles')
+        .update(dbProfile)
+        .eq('id', userId);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from('profiles')
+        .insert(dbProfile);
+      if (error) throw error;
+    }
   } catch (err) {
     handleSupabaseError(err, OperationType.WRITE, 'profiles');
   }
