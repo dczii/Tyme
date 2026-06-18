@@ -21,13 +21,13 @@ import {
   deleteEntryFromFS,
   fetchGoogleContacts,
   GoogleContact
-} from './lib/firebase';
-import { User } from 'firebase/auth';
+} from './lib/supabase';
+import { User } from '@supabase/supabase-js';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<PageView>('calendar');
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [firebaseUser, setFirebaseUser] = useState<User | null>(null);
+  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
 
   // Core visual settings
@@ -47,12 +47,12 @@ export default function App() {
 
   // 1. Initialize Auth on mount
   useEffect(() => {
-    const unsubscribeAuth = initAuth((user, token) => {
-      setFirebaseUser(user);
+    const unsubscribeAuth = initAuth((user, providerToken) => {
+      setSupabaseUser(user);
       setUser({
-        name: user.displayName || 'Tyme User',
+        name: user.user_metadata?.full_name || user.user_metadata?.name || 'Tyme User',
         email: user.email || '',
-        picture: user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.email || 'tyme')}`
+        picture: user.user_metadata?.avatar_url || user.user_metadata?.picture || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.email || 'tyme')}`
       });
       setAuthLoading(false);
 
@@ -61,7 +61,7 @@ export default function App() {
         setContacts(results);
       });
     }, () => {
-      setFirebaseUser(null);
+      setSupabaseUser(null);
       setUser(null);
       setAuthLoading(false);
     });
@@ -71,11 +71,11 @@ export default function App() {
     };
   }, []);
 
-  // 2. Realtime state subscriptions when firebaseUser is authenticated
+  // 2. Realtime state subscriptions when supabaseUser is authenticated
   useEffect(() => {
-    if (!firebaseUser) return;
+    if (!supabaseUser) return;
 
-    const uid = firebaseUser.uid;
+    const uid = supabaseUser.id;
 
     // A. Subscribe to user profile settings
     const unsubProfile = subscribeToUserProfile(uid, (data) => {
@@ -86,9 +86,9 @@ export default function App() {
 
     // Seed/Save initial profile if not in DB yet
     saveUserProfileToFS(uid, {
-      name: firebaseUser.displayName || 'Tyme User',
-      email: firebaseUser.email || '',
-      picture: firebaseUser.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(firebaseUser.email || 'tyme')}`
+      name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || 'Tyme User',
+      email: supabaseUser.email || '',
+      picture: supabaseUser.user_metadata?.avatar_url || supabaseUser.user_metadata?.picture || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(supabaseUser.email || 'tyme')}`
     });
 
     // B. Subscribe to Projects
@@ -112,7 +112,7 @@ export default function App() {
       unsubTags();
       unsubEntries();
     };
-  }, [firebaseUser]);
+  }, [supabaseUser]);
 
   const handleLogin = (profile: UserProfile) => {
     // This is called when the direct signIn completes successfully inside LoginScreen
@@ -123,7 +123,7 @@ export default function App() {
     setAuthLoading(true);
     await logoutUser();
     setUser(null);
-    setFirebaseUser(null);
+    setSupabaseUser(null);
     setProjects([]);
     setTags([]);
     setEntries([]);
@@ -133,26 +133,26 @@ export default function App() {
 
   const saveLogoStyle = async (style: 'classic' | 'minimalist' | 'hourglass') => {
     setLogoStyle(style);
-    if (firebaseUser) {
-      await saveUserProfileToFS(firebaseUser.uid, { logoStyle: style });
+    if (supabaseUser) {
+      await saveUserProfileToFS(supabaseUser.id, { logoStyle: style });
     }
   };
 
   const saveTargetHours = async (hours: number) => {
     setWorkdayTargetHours(hours);
-    if (firebaseUser) {
-      await saveUserProfileToFS(firebaseUser.uid, { workdayTargetHours: hours });
+    if (supabaseUser) {
+      await saveUserProfileToFS(supabaseUser.id, { workdayTargetHours: hours });
     }
   };
 
   const saveHourlyRate = async (rate: number) => {
     setHourlyRate(rate);
-    if (firebaseUser) {
-      await saveUserProfileToFS(firebaseUser.uid, { hourlyRate: rate });
+    if (supabaseUser) {
+      await saveUserProfileToFS(supabaseUser.id, { hourlyRate: rate });
     }
   };
 
-  // --- Core CRUD Handlers synced to Cloud Firestore ---
+  // --- Core CRUD Handlers synced to Supabase ---
 
   // Add new time entry
   const handleAddEntry = async (entryData: Omit<TimeEntry, 'id'>) => {
@@ -160,25 +160,25 @@ export default function App() {
       ...entryData,
       id: `entry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`
     };
-    if (firebaseUser) {
-      await saveEntryToFS(firebaseUser.uid, newEntry);
+    if (supabaseUser) {
+      await saveEntryToFS(supabaseUser.id, newEntry);
     }
   };
 
   // Update existing time entry
   const handleUpdateEntry = async (updated: TimeEntry) => {
-    if (firebaseUser) {
-      await saveEntryToFS(firebaseUser.uid, updated);
+    if (supabaseUser) {
+      await saveEntryToFS(supabaseUser.id, updated);
     }
   };
 
   // Delete time entry
   const handleDeleteEntry = async (id: string) => {
-    if (firebaseUser) {
+    if (supabaseUser) {
       const entryToDelete = entries.find(e => e.id === id);
       const description = entryToDelete?.description || 'Task';
       try {
-        await deleteEntryFromFS(firebaseUser.uid, id);
+        await deleteEntryFromFS(supabaseUser.id, id);
         toast.success("Task deleted successfully", {
           description: `"${description}" has been removed.`,
           duration: 3000
@@ -191,7 +191,7 @@ export default function App() {
 
   // Edit the singular workspace project
   const handleUpdateSingleProject = async (name: string, client?: string, color?: string) => {
-    if (!firebaseUser) return;
+    if (!supabaseUser) return;
     
     const activeProj = projects[0] || {
       id: 'proj-1',
@@ -207,7 +207,7 @@ export default function App() {
       color: color || activeProj.color
     };
 
-    await saveProjectToFS(firebaseUser.uid, updatedProj);
+    await saveProjectToFS(supabaseUser.id, updatedProj);
   };
 
   // Add new Tag
@@ -216,15 +216,15 @@ export default function App() {
       id: `tag-${Date.now()}`,
       name
     };
-    if (firebaseUser) {
-      saveTagToFS(firebaseUser.uid, newTag);
+    if (supabaseUser) {
+      saveTagToFS(supabaseUser.id, newTag);
     }
     return newTag;
   };
 
   // Delete Tag
   const handleDeleteTag = async (id: string) => {
-    if (!firebaseUser) return;
+    if (!supabaseUser) return;
     const tagToDelete = tags.find(t => t.id === id);
     if (tagToDelete) {
       // Clean entries of matching tag references
@@ -233,10 +233,10 @@ export default function App() {
         tags: e.tags.filter(t => t !== tagToDelete.name)
       }));
       for (const entry of nextEntries) {
-        await saveEntryToFS(firebaseUser.uid, entry);
+        await saveEntryToFS(supabaseUser.id, entry);
       }
     }
-    await deleteTagFromFS(firebaseUser.uid, id);
+    await deleteTagFromFS(supabaseUser.id, id);
   };
 
   // Global loading curtain during session check

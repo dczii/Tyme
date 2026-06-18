@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Shield, AlertCircle, Sparkles, Info } from 'lucide-react';
 import { UserProfile } from '../types';
-import { googleSignIn } from '../lib/firebase';
+import { googleSignIn } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface LoginScreenProps {
@@ -18,23 +18,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
     setIsLoading(true);
 
     try {
-      const result = await googleSignIn();
-      if (result) {
-        onLoginSuccess({
-          name: result.user.displayName || 'Tyme User',
-          email: result.user.email || '',
-          picture: result.user.photoURL || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(result.user.email || 'tyme')}`
-        });
-      }
+      await googleSignIn();
+      // Supabase uses redirect-based OAuth — the browser will redirect to Google.
+      // When the user returns, onAuthStateChange in App.tsx handles the session.
     } catch (err: any) {
       console.error('Google Sign-in error:', err);
-      // Friendly, clean error handling
-      if (err?.code === 'auth/popup-blocked') {
-        setError('Popup blocked! Please allow popups for this site to log in using Google OAuth.');
-      } else {
-        setError(err?.message || 'Failed to authenticate via Google OAuth. Please try again.');
-      }
-    } finally {
+      setError(err?.message || 'Failed to authenticate via Google OAuth. Please try again.');
       setIsLoading(false);
     }
   };
