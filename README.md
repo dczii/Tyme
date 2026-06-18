@@ -7,10 +7,9 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 
 [![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)](https://vite.dev/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://react.dev/)
-[![Firebase](https://img.shields.io/badge/firebase-%23039BE5.svg?style=flat&logo=firebase)](https://firebase.google.com/)
+[![Supabase](https://img.shields.io/badge/supabase-%2300C389.svg?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind_css&logoColor=white)](https://tailwindcss.com/)
 
-[**View App in Google AI Studio**](https://ai.studio/apps/2f5fed5d-b280-4d1c-aa74-fc396cd58da3)
 </div>
 
 ---
@@ -22,7 +21,7 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 - **📄 Export to PDF**: Download elegant and structured PDF summaries of your tracked work built using `jsPDF`.
 - **🔌 Google Contacts Integration**: Connect your account using Google OAuth to automatically synchronize client references from Google People API into your settings.
 - **⚙️ Customization**: Configure your daily workday target hours and choose between three custom branding logo styles (*Classic*, *Minimalist*, and *Hourglass*).
-- **🔒 Secure Sync**: Instant, real-time database synchronization via Cloud Firestore with strict access control and identity validation.
+- **🔒 Secure Sync**: Instant, real-time database synchronization via Supabase PostgreSQL with Row Level Security (RLS) policies.
 - **🆕 Fresh Workspace**: Starts completely clean without pre-populated mock projects, tags, or time entries, enabling immediate production tracking.
 
 ---
@@ -32,7 +31,7 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 - **Core Framework**: [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool**: [Vite 6](https://vite.dev/) (fast HMR, lightweight builder)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (modern CSS utility layout)
-- **Backend / Sync**: [Firebase SDK v12](https://firebase.google.com/) (Auth, Firestore DB)
+- **Backend / Sync**: [Supabase](https://supabase.com/) (Auth, PostgreSQL, Realtime)
 - **Animations**: [Framer Motion (`motion`)](https://www.framer.com/motion/) (smooth transitions)
 - **Toasts**: [Sonner](https://sonner.dev/) (rich toast alerts)
 - **PDF Engine**: [jsPDF](https://github.com/parallax/jsPDF)
@@ -53,14 +52,14 @@ Tyme/
 │   │   ├── SettingsView.tsx      # Workday goals, active projects, tags & Google Contacts
 │   │   └── Sidebar.tsx           # Premium navigation sidebar & branding selections
 │   ├── lib/
-│   │   └── firebase.ts           # Firestore schema queries, security logging & People API contact fetch
+│   │   └── supabase.ts           # Supabase client, auth, realtime subscriptions & People API contact fetch
 │   ├── App.tsx                   # Central router & state container
 │   ├── index.css                 # Global theme variables, animations & fonts
 │   ├── types.ts                  # TypeScript definitions for Projects, Tags, and Entries
 │   └── utils.ts                  # Date formatting, math, and duration helpers
-├── firestore.rules               # Strict Firestore database security rules
+├── scripts/
+│   └── migrate-firebase-to-supabase.ts  # One-time data migration script
 ├── security_spec.md              # Documentation of workspace security invariants
-├── firebase-applet-config.json   # Configured Firebase web credentials
 └── package.json                  # Dependencies and execution scripts
 ```
 
@@ -72,28 +71,16 @@ Tyme/
 - **Node.js** (v18+)
 - **NPM**
 
-### Environment Variables (`.env.local`)
-Create a `.env.local` file in the root directory to specify local keys. See `.env.example` for details:
+### Environment Variables (`.env`)
+Create a `.env` file in the root directory. See `.env.example` for details:
 
 ```bash
-# Required for Gemini AI API calls (automatically injected in AI Studio)
+# Required for Gemini AI API calls
 GEMINI_API_KEY="your_api_key_here"
 
-# The applet URL (automatically set during deployment)
-APP_URL="your_applet_url_here"
-```
-
-### Firebase Web Config (`firebase-applet-config.json`)
-The application requires the standard web configuration object to authenticate client calls. This is initialized under:
-```json
-{
-  "projectId": "...",
-  "appId": "...",
-  "apiKey": "...",
-  "authDomain": "...",
-  "storageBucket": "...",
-  "messagingSenderId": "..."
-}
+# Supabase configuration (get from Supabase Dashboard → Settings → API)
+VITE_SUPABASE_URL="https://your-project.supabase.co"
+VITE_SUPABASE_ANON_KEY="your-anon-key"
 ```
 
 ---
@@ -131,3 +118,35 @@ Runs the TypeScript compiler (`tsc --noEmit`) to verify types and catch potentia
 npm run clean
 ```
 Removes generated assets and compiled files (`dist/`, `server.js`) to ensure a fresh build.
+
+---
+
+## 🔄 Data Migration (Firebase → Supabase)
+
+If you have existing data in Firestore that needs to be migrated:
+
+### Prerequisites
+1. Install `firebase-admin` temporarily:
+   ```bash
+   npm install firebase-admin
+   ```
+2. Download your Firebase service account key from **Firebase Console → Project Settings → Service Accounts → Generate New Private Key** and save as `scripts/firebase-service-account.json`
+3. Set your Supabase **service role key** (not anon key):
+   ```bash
+   export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+   ```
+
+### Run Migration
+```bash
+# Dry run (preview what will be migrated, no data written)
+npx tsx scripts/migrate-firebase-to-supabase.ts
+
+# Execute migration
+npx tsx scripts/migrate-firebase-to-supabase.ts --execute
+```
+
+### Cleanup
+```bash
+npm uninstall firebase-admin
+rm scripts/firebase-service-account.json
+```
