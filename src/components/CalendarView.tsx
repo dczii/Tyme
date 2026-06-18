@@ -368,13 +368,65 @@ export default function CalendarView({
   };
 
   // Track state for the Top Real-time Timer
-  const [isTracking, setIsTracking] = useState<boolean>(false);
-  const [timerDesc, setTimerDesc] = useState<string>("");
-  const [timerProjId, setTimerProjId] = useState<string>(() => projects[0]?.id || "");
-  const [timerTags, setTimerTags] = useState<string[]>([]);
-  const [timerStartTime, setTimerStartTime] = useState<Date | null>(null);
+  const [isTracking, setIsTracking] = useState<boolean>(() => {
+    return localStorage.getItem("tyme_timer_is_tracking") === "true";
+  });
+  const [timerDesc, setTimerDesc] = useState<string>(() => {
+    return localStorage.getItem("tyme_timer_desc") || "";
+  });
+  const [timerProjId, setTimerProjId] = useState<string>(() => {
+    const stored = localStorage.getItem("tyme_timer_proj_id");
+    if (stored !== null) return stored;
+    return projects[0]?.id || "";
+  });
+  const [timerTags, setTimerTags] = useState<string[]>(() => {
+    try {
+      const stored = localStorage.getItem("tyme_timer_tags");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [timerStartTime, setTimerStartTime] = useState<Date | null>(() => {
+    const stored = localStorage.getItem("tyme_timer_start_time");
+    if (!stored) return null;
+    const date = new Date(stored);
+    return isNaN(date.getTime()) ? null : date;
+  });
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
   const [timerIntervalId, setTimerIntervalId] = useState<any | null>(null);
+
+  // Sync Timer State to localStorage
+  useEffect(() => {
+    localStorage.setItem("tyme_timer_is_tracking", String(isTracking));
+  }, [isTracking]);
+
+  useEffect(() => {
+    localStorage.setItem("tyme_timer_desc", timerDesc);
+  }, [timerDesc]);
+
+  useEffect(() => {
+    localStorage.setItem("tyme_timer_proj_id", timerProjId);
+  }, [timerProjId]);
+
+  useEffect(() => {
+    localStorage.setItem("tyme_timer_tags", JSON.stringify(timerTags));
+  }, [timerTags]);
+
+  useEffect(() => {
+    if (timerStartTime) {
+      localStorage.setItem("tyme_timer_start_time", timerStartTime.toISOString());
+    } else {
+      localStorage.removeItem("tyme_timer_start_time");
+    }
+  }, [timerStartTime]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("tyme_timer_proj_id");
+    if (!timerProjId && !stored && projects.length > 0) {
+      setTimerProjId(projects[0].id);
+    }
+  }, [projects, timerProjId]);
 
   // States for manual fast-entry or full edit dialog
   const [editingEntry, setEditingEntry] = useState<TimeEntry | null>(null);
@@ -493,16 +545,22 @@ export default function CalendarView({
   // Run stopwatch interval when tracking is true
   useEffect(() => {
     if (isTracking && timerStartTime) {
-      const interval = setInterval(() => {
+      const updateSeconds = () => {
         const secs = Math.floor((new Date().getTime() - timerStartTime.getTime()) / 1000);
-        setElapsedSeconds(secs);
-      }, 1000);
+        setElapsedSeconds(Math.max(0, secs));
+      };
+      updateSeconds();
+      const interval = setInterval(updateSeconds, 1000);
       return () => clearInterval(interval);
     }
   }, [isTracking, timerStartTime]);
 
   // Handle live stopwatch start/stop
   const handleStartTimer = () => {
+    if (!timerDesc.trim()) {
+      toast.error("Please enter task details before starting the timer.");
+      return;
+    }
     setIsTracking(true);
     setTimerStartTime(new Date());
     setElapsedSeconds(0);

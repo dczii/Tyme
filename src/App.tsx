@@ -128,6 +128,14 @@ export default function App() {
     setTags([]);
     setEntries([]);
     setContacts([]);
+    
+    // Clear persisted timer state
+    localStorage.removeItem("tyme_timer_is_tracking");
+    localStorage.removeItem("tyme_timer_desc");
+    localStorage.removeItem("tyme_timer_proj_id");
+    localStorage.removeItem("tyme_timer_tags");
+    localStorage.removeItem("tyme_timer_start_time");
+
     setAuthLoading(false);
   };
 
