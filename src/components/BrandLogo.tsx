@@ -3,34 +3,29 @@ import React from 'react';
 interface BrandLogoProps {
   className?: string; // Tailwind overrides
   size?: number;      // Height/Width size for 1:1 ratio
+  showBackground?: boolean;
 }
 
-export default function BrandLogo({ className = "", size = 44 }: BrandLogoProps) {
+export default function BrandLogo({ className = "", size = 44, showBackground = true }: BrandLogoProps) {
   return (
     <svg 
-      viewBox="0 0 300 300" 
+      viewBox="0 0 100 100" 
       width={size} 
       height={size}
       className={className}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g transform="translate(150,150)">
-        <circle cx="0" cy="0" r="90" fill="none" stroke="#2a1b12" strokeWidth="8"/>
-        <circle cx="0" cy="0" r="90"
-          fill="none"
-          stroke="#dda67a"
-          strokeWidth="8"
-          strokeLinecap="round"
-          strokeDasharray="452 565"
-          transform="rotate(-90)"
-        />
-        <circle cx="0" cy="0" r="72" fill="none" stroke="#1e1109" strokeWidth="1"/>
-        <circle cx="0" cy="0" r="58" fill="#140d0a" stroke="#3e271a" strokeWidth="1.5"/>
-        <line x1="-20" y1="-12" x2="20" y2="-12" stroke="#dda67a" strokeWidth="1.8" strokeLinecap="round"/>
-        <line x1="0" y1="-10" x2="0" y2="28" stroke="#dda67a" strokeWidth="0.8" strokeLinecap="round" opacity={0.5}/>
-        <circle cx="-85" cy="-28" r="6" fill="#dda67a"/>
-        <circle cx="-85" cy="-28" r="3" fill="#ffdda6"/>
-      </g>
+      <title>Tyme logo</title>
+      {showBackground && <rect x="0" y="0" width="100" height="100" rx="20" fill="#1A0F0A"/>}
+
+      <rect x="17" y="9" width="66" height="9.5" rx="4.75" fill="#5C3D28"/>
+      <rect x="25" y="21.5" width="50" height="8.4" rx="4.2" fill="#4A2C1A"/>
+      <rect x="33" y="33" width="34" height="7.4" rx="3.7" fill="#3D2314"/>
+      <rect x="41" y="43.5" width="18" height="6.3" rx="3.15" fill="#3D2314"/>
+      <rect x="41" y="50.2" width="18" height="6.3" rx="3.15" fill="#E8651A" opacity={0.5}/>
+      <rect x="33" y="59.6" width="34" height="7.4" rx="3.7" fill="#E8651A" opacity={0.72}/>
+      <rect x="25" y="70.1" width="50" height="8.4" rx="4.2" fill="#E8651A" opacity={0.86}/>
+      <rect x="17" y="81.5" width="66" height="9.5" rx="4.75" fill="#E8651A"/>
     </svg>
   );
 }

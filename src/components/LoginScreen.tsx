@@ -3,6 +3,7 @@ import { Shield, AlertCircle, Sparkles, Info } from 'lucide-react';
 import { UserProfile } from '../types';
 import { googleSignIn } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
+import BrandLogo from './BrandLogo';
 
 interface LoginScreenProps {
   onLoginSuccess: (profile: UserProfile) => void;
@@ -45,8 +46,8 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
         {/* Corporate branding header */}
         <div className="mt-8 mb-8 text-center flex flex-col items-center">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-[#a66e46] to-[#4f2f18] flex items-center justify-center text-[#fdf4ee] shadow-xl shadow-[#4a2b16]/60 mb-4 scale-102">
-            <Shield className="h-7 w-7 text-[#ffdda6]" strokeWidth={1.5} />
+          <div className="h-14 w-14 rounded-2xl bg-[#201410] border border-[#3d2416]/55 flex items-center justify-center p-2.5 shadow-xl shadow-[#4a2b16]/60 mb-4 scale-102">
+            <BrandLogo size={36} showBackground={false} className="brightness-125 select-none pointer-events-none" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
             {mode === 'signin' ? 'Welcome to Tyme' : 'Create your Account'}

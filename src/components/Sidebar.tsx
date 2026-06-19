@@ -157,7 +157,7 @@ export default function Sidebar({
               {logoStyle === 'minimalist' && (
                 <>
                   <div className="h-10 w-10 flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105">
-                    <BrandLogo size={24} className="brightness-110 select-none pointer-events-none" />
+                    <BrandLogo size={24} showBackground={false} className="brightness-110 select-none pointer-events-none" />
                   </div>
                   <AnimatePresence>
                     {!isCollapsed && (
