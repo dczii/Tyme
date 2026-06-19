@@ -285,26 +285,40 @@ export default function ReportsView({
     const logoX = pageWidth - margin - 85;
     const logoY = posY - 7;
 
-    // Draw outer dark cocoa rounded button/icon
-    doc.setFillColor(66, 49, 36); // #423124 (Dark Brown)
+    // Draw outer dark cocoa rounded background
+    doc.setFillColor(26, 15, 10); // #1A0F0A
     doc.roundedRect(logoX, logoY, 20, 20, 4, 4, "F");
 
-    // Inner beige/gold circle
-    doc.setDrawColor(221, 166, 122); // #dda67a
-    doc.setLineWidth(1.5);
-    doc.circle(logoX + 10, logoY + 10, 5.5, "D");
+    // Draw the 8 horizontal bars of the new hourglass logo
+    doc.setFillColor(92, 61, 40); // Bar 1: #5C3D28
+    doc.roundedRect(logoX + 3.4, logoY + 1.8, 13.2, 1.9, 0.9, 0.9, "F");
 
-    // Elegant clock/arrow hand
-    doc.setDrawColor(255, 255, 255);
-    doc.setLineWidth(1.2);
-    doc.line(logoX + 10, logoY + 10, logoX + 10, logoY + 6.5);
-    doc.line(logoX + 10, logoY + 10, logoX + 13.5, logoY + 10);
+    doc.setFillColor(74, 44, 26); // Bar 2: #4A2C1A
+    doc.roundedRect(logoX + 5.0, logoY + 4.3, 10.0, 1.7, 0.8, 0.8, "F");
 
-    // Text label "tyme" using beautiful deep chocolate shade
+    doc.setFillColor(61, 35, 20); // Bar 3: #3D2314
+    doc.roundedRect(logoX + 6.6, logoY + 6.6, 6.8, 1.5, 0.7, 0.7, "F");
+
+    doc.setFillColor(61, 35, 20); // Bar 4: #3D2314
+    doc.roundedRect(logoX + 8.2, logoY + 8.7, 3.6, 1.3, 0.6, 0.6, "F");
+
+    doc.setFillColor(129, 58, 18); // Bar 5: #E8651A (opacity 0.5 blended)
+    doc.roundedRect(logoX + 8.2, logoY + 10.0, 3.6, 1.3, 0.6, 0.6, "F");
+
+    doc.setFillColor(174, 77, 22); // Bar 6: #E8651A (opacity 0.72 blended)
+    doc.roundedRect(logoX + 6.6, logoY + 11.9, 6.8, 1.5, 0.7, 0.7, "F");
+
+    doc.setFillColor(203, 89, 24); // Bar 7: #E8651A (opacity 0.86 blended)
+    doc.roundedRect(logoX + 5.0, logoY + 14.0, 10.0, 1.7, 0.8, 0.8, "F");
+
+    doc.setFillColor(232, 101, 26); // Bar 8: #E8651A
+    doc.roundedRect(logoX + 3.4, logoY + 16.3, 13.2, 1.9, 0.9, 0.9, "F");
+
+    // Text label "Tyme" using beautiful deep chocolate shade
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(16.5);
     doc.setTextColor(66, 49, 36);
-    doc.text("tyme", logoX + 25, logoY + 15);
+    doc.text("Tyme", logoX + 25, logoY + 15);
 
     // Subtitle (Date range)
     posY += 18;
@@ -1457,10 +1471,10 @@ export default function ReportsView({
           </div>
 
           <div className='flex items-center gap-2 border border-stone-200 bg-stone-50 p-2.5 rounded-xl'>
-            <BrandLogo size={24} className='brightness-90 select-none pointer-events-none' />
+            <BrandLogo size={24} showBackground={false} className='brightness-90 select-none pointer-events-none' />
             <div className='text-right'>
               <span className='text-[10px] uppercase font-mono tracking-wider font-extrabold text-stone-700 leading-none block'>
-                Tyme Workspace
+                Tyme
               </span>
               <span className='text-[8px] font-mono text-stone-400 block mt-0.5'>
                 dczabala2@gmail.com
