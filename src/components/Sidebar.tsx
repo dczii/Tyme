@@ -130,7 +130,7 @@ export default function Sidebar({
             >
               {logoStyle === 'classic' && (
                 <>
-                  <div className="h-10 w-12 rounded-xl bg-[#201410] border border-[#3d2416]/55 flex items-center justify-center p-1 shadow-md shadow-black/30 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
+                  <div className="h-10 w-10 rounded-xl bg-[#201410] border border-[#3d2416]/55 flex items-center justify-center p-1 shadow-md shadow-black/30 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
                     <BrandLogo size={22} className="brightness-125 select-none pointer-events-none" />
                   </div>
                   <AnimatePresence>
@@ -156,7 +156,7 @@ export default function Sidebar({
 
               {logoStyle === 'minimalist' && (
                 <>
-                  <div className="h-10 w-12 flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105">
+                  <div className="h-10 w-10 flex items-center justify-center shrink-0 transition-transform duration-200 hover:scale-105">
                     <BrandLogo size={24} className="brightness-110 select-none pointer-events-none" />
                   </div>
                   <AnimatePresence>
@@ -182,7 +182,7 @@ export default function Sidebar({
 
               {logoStyle === 'hourglass' && (
                 <>
-                  <div className="h-10 w-12 rounded-xl bg-gradient-to-tr from-[#2d1b11] via-[#1a110a] to-[#0d0705] border border-[#dda67a]/20 flex items-center justify-center p-1 shadow shadow-[#dda67a]/10 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-[#2d1b11] via-[#1a110a] to-[#0d0705] border border-[#dda67a]/20 flex items-center justify-center p-1 shadow shadow-[#dda67a]/10 shrink-0 transition-transform duration-200 hover:scale-105 overflow-hidden">
                     <BrandLogo size={22} className="brightness-125 select-none pointer-events-none" />
                   </div>
                   <AnimatePresence>
