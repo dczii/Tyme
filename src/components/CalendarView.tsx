@@ -95,13 +95,13 @@ export default function CalendarView({
   theme,
 }: CalendarViewProps) {
   const [currentWeekMonday, setCurrentWeekMonday] = useState<Date>(() => {
-    // Reference date 2026-06-15
-    return getMonday(new Date("2026-06-15"));
+    // Default to the week containing today's date
+    return getMonday(new Date());
   });
 
   const [activeDayIndex, setActiveDayIndex] = useState<number>(() => {
     const todayStr = formatDateYYYYMMDD(new Date());
-    const monday = getMonday(new Date("2026-06-15"));
+    const monday = getMonday(new Date());
     const days = getWeekDays(monday);
     const idx = days.findIndex((d) => formatDateYYYYMMDD(d) === todayStr);
     return idx !== -1 ? idx : 0;
@@ -109,8 +109,8 @@ export default function CalendarView({
 
   // Range Picker states and references
   const [showRangePicker, setShowRangePicker] = useState<boolean>(false);
-  const [pickerYear, setPickerYear] = useState<number>(2026);
-  const [pickerMonth1, setPickerMonth1] = useState<number>(5); // 0-indexed: 5 = June
+  const [pickerYear, setPickerYear] = useState<number>(() => new Date().getFullYear());
+  const [pickerMonth1, setPickerMonth1] = useState<number>(() => new Date().getMonth());
   const rangePickerRef = useRef<HTMLDivElement>(null);
 
   const [rangeStart, setRangeStart] = useState<Date | null>(null);
@@ -187,22 +187,26 @@ export default function CalendarView({
   };
 
   const selectTodayWeek = () => {
-    setCurrentWeekMonday(getMonday(new Date("2026-06-15")));
+    setCurrentWeekMonday(getMonday(new Date()));
     setShowRangePicker(false);
   };
 
   const selectYesterdayWeek = () => {
-    setCurrentWeekMonday(getMonday(new Date("2026-06-15")));
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    setCurrentWeekMonday(getMonday(yesterday));
     setShowRangePicker(false);
   };
 
   const selectThisWeek = () => {
-    setCurrentWeekMonday(getMonday(new Date("2026-06-15")));
+    setCurrentWeekMonday(getMonday(new Date()));
     setShowRangePicker(false);
   };
 
   const selectLastWeek = () => {
-    setCurrentWeekMonday(getMonday(new Date("2026-06-08")));
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+    setCurrentWeekMonday(getMonday(lastWeek));
     setShowRangePicker(false);
   };
 
@@ -609,7 +613,7 @@ export default function CalendarView({
 
   const jumpToToday = () => {
     const today = new Date();
-    const monday = getMonday(new Date("2026-06-15"));
+    const monday = getMonday(today);
     setCurrentWeekMonday(monday);
     const days = getWeekDays(monday);
     const todayStr = formatDateYYYYMMDD(today);
@@ -979,12 +983,14 @@ export default function CalendarView({
                     { id: "thisWeek", label: "This week", action: selectThisWeek },
                     { id: "lastWeek", label: "Last week", action: selectLastWeek },
                   ].map((preset) => {
+                    const lastWeekRef = new Date();
+                    lastWeekRef.setDate(lastWeekRef.getDate() - 7);
                     const isCurrentWeek =
                       currentWeekMonday.toDateString() ===
-                      getMonday(new Date("2026-06-15")).toDateString();
+                      getMonday(new Date()).toDateString();
                     const isLastWeek =
                       currentWeekMonday.toDateString() ===
-                      getMonday(new Date("2026-06-08")).toDateString();
+                      getMonday(lastWeekRef).toDateString();
 
                     let isActive = false;
                     if (preset.id === "thisWeek" && isCurrentWeek) isActive = true;

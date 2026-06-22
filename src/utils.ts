@@ -56,6 +56,39 @@ export function padZero(num: number): string {
   return String(num).padStart(2, '0');
 }
 
+// Resolve a report date preset to an inclusive "YYYY-MM-DD" range, relative to today
+export function getPresetDateRange(
+  preset: 'thisWeek' | 'lastWeek' | 'thisMonth' | 'lastMonth' | 'allTime'
+): { minDateStr: string; maxDateStr: string } {
+  const today = new Date();
+
+  if (preset === 'thisWeek') {
+    const monday = getMonday(today);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    return { minDateStr: formatDateYYYYMMDD(monday), maxDateStr: formatDateYYYYMMDD(sunday) };
+  }
+  if (preset === 'lastWeek') {
+    const monday = getMonday(today);
+    monday.setDate(monday.getDate() - 7);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    return { minDateStr: formatDateYYYYMMDD(monday), maxDateStr: formatDateYYYYMMDD(sunday) };
+  }
+  if (preset === 'thisMonth') {
+    const first = new Date(today.getFullYear(), today.getMonth(), 1);
+    const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return { minDateStr: formatDateYYYYMMDD(first), maxDateStr: formatDateYYYYMMDD(last) };
+  }
+  if (preset === 'lastMonth') {
+    const first = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const last = new Date(today.getFullYear(), today.getMonth(), 0);
+    return { minDateStr: formatDateYYYYMMDD(first), maxDateStr: formatDateYYYYMMDD(last) };
+  }
+  // allTime
+  return { minDateStr: '2000-01-01', maxDateStr: '2100-12-31' };
+}
+
 // Format Date object to "YYYY-MM-DD"
 export function formatDateYYYYMMDD(d: Date): string {
   return `${d.getFullYear()}-${padZero(d.getMonth() + 1)}-${padZero(d.getDate())}`;

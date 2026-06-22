@@ -24,6 +24,7 @@ import {
   exportToCSV,
   formatDateFriendly,
   calculateDurationMinutes,
+  getPresetDateRange,
 } from "../utils";
 import BrandLogo from "./BrandLogo";
 import { jsPDF } from "jspdf";
@@ -71,39 +72,8 @@ export default function ReportsView({
 
   // 1. Filter Logic
   const filteredEntries = useMemo(() => {
-    // Determine start and end ranges based on presets
-    let minDateStr = "";
-    let maxDateStr = "";
-
-    const parseYYYYMMDD = (d: Date) => {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      return `${y}-${m}-${day}`;
-    };
-
-    const refDate = new Date("2026-06-15"); // Reference calendar date
-
-    if (datePreset === "thisWeek") {
-      // Mon Jun 15 - Sun Jun 21, 2026
-      minDateStr = "2026-06-15";
-      maxDateStr = "2026-06-21";
-    } else if (datePreset === "lastWeek") {
-      // Prior week: Mon Jun 8 - Sun Jun 14, 2026
-      minDateStr = "2026-06-08";
-      maxDateStr = "2026-06-14";
-    } else if (datePreset === "thisMonth") {
-      // June 1 to June 30, 2026
-      minDateStr = "2026-06-01";
-      maxDateStr = "2026-06-30";
-    } else if (datePreset === "lastMonth") {
-      // May 1 to May 31, 2026
-      minDateStr = "2026-05-01";
-      maxDateStr = "2026-05-31";
-    } else if (datePreset === "allTime") {
-      minDateStr = "2000-01-01";
-      maxDateStr = "2100-12-31";
-    }
+    // Determine start and end ranges based on presets (relative to today)
+    const { minDateStr, maxDateStr } = getPresetDateRange(datePreset);
 
     return entries
       .filter((entry) => {
@@ -787,23 +757,13 @@ export default function ReportsView({
     let minDateStr = "";
     let maxDateStr = "";
 
-    if (datePreset === "thisWeek") {
-      minDateStr = "2026-06-15";
-      maxDateStr = "2026-06-21";
-    } else if (datePreset === "lastWeek") {
-      minDateStr = "2026-06-08";
-      maxDateStr = "2026-06-14";
-    } else if (datePreset === "thisMonth") {
-      minDateStr = "2026-06-01";
-      maxDateStr = "2026-06-30";
-    } else if (datePreset === "lastMonth") {
-      minDateStr = "2026-05-01";
-      maxDateStr = "2026-05-31";
-    } else {
+    if (datePreset === "allTime") {
       if (filteredEntries.length === 0) return [];
       const dateSorted = [...filteredEntries].sort((a, b) => a.date.localeCompare(b.date));
       minDateStr = dateSorted[0].date;
       maxDateStr = dateSorted[dateSorted.length - 1].date;
+    } else {
+      ({ minDateStr, maxDateStr } = getPresetDateRange(datePreset));
     }
 
     const start = new Date(minDateStr + "T00:00:00");
@@ -848,35 +808,25 @@ export default function ReportsView({
 
   // 3. Formatted Printable Date Range string
   const printDateRangeStr = useMemo(() => {
-    let minDateStr = "";
-    let maxDateStr = "";
+    // Convert a "YYYY-MM-DD" string to "MM/DD/YYYY"
+    const toMMDDYYYY = (d: Date) => {
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${m}/${day}/${d.getFullYear()}`;
+    };
 
-    if (datePreset === "thisWeek") {
-      minDateStr = "06/15/2026";
-      maxDateStr = "06/21/2026";
-    } else if (datePreset === "lastWeek") {
-      minDateStr = "06/08/2026";
-      maxDateStr = "06/14/2026";
-    } else if (datePreset === "thisMonth") {
-      minDateStr = "06/01/2026";
-      maxDateStr = "06/30/2026";
-    } else if (datePreset === "lastMonth") {
-      minDateStr = "05/01/2026";
-      maxDateStr = "05/31/2026";
-    } else {
+    if (datePreset === "allTime") {
       if (filteredEntries.length === 0) return "All Records";
       const sorted = [...filteredEntries].sort((a, b) => a.date.localeCompare(b.date));
       const minD = new Date(sorted[0].date + "T00:00:00");
       const maxD = new Date(sorted[sorted.length - 1].date + "T00:00:00");
-
-      const formatD = (d: Date) => {
-        const m = String(d.getMonth() + 1).padStart(2, "0");
-        const day = String(d.getDate()).padStart(2, "0");
-        return `${m}/${day}/${d.getFullYear()}`;
-      };
-      return `${formatD(minD)} - ${formatD(maxD)}`;
+      return `${toMMDDYYYY(minD)} - ${toMMDDYYYY(maxD)}`;
     }
-    return `${minDateStr} - ${maxDateStr}`;
+
+    const { minDateStr, maxDateStr } = getPresetDateRange(datePreset);
+    const minD = new Date(minDateStr + "T00:00:00");
+    const maxD = new Date(maxDateStr + "T00:00:00");
+    return `${toMMDDYYYY(minD)} - ${toMMDDYYYY(maxD)}`;
   }, [datePreset, filteredEntries]);
 
   // 4. Description groupings for donut charts and summary listing
