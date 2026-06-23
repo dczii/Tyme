@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import CalendarView from './components/CalendarView';
 import ReportsView from './components/ReportsView';
@@ -25,7 +26,15 @@ import {
 import { User } from '@supabase/supabase-js';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<PageView>('calendar');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Derive the active page from the URL so the sidebar highlight stays in sync
+  const currentView: PageView =
+    location.pathname.startsWith('/reports') ? 'reports'
+    : location.pathname.startsWith('/settings') ? 'settings'
+    : 'calendar';
+
   const [user, setUser] = useState<UserProfile | null>(null);
   const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -275,9 +284,9 @@ export default function App() {
       <div className="absolute -bottom-24 left-1/3 w-96 h-96 rounded-full blur-[100px] pointer-events-none bg-[#2e1d13]/35 animate-pulse duration-6000"></div>
 
       {/* Sidebar navigation */}
-      <Sidebar 
+      <Sidebar
         currentView={currentView}
-        onViewChange={setCurrentView}
+        onViewChange={(view) => navigate(`/${view}`)}
         theme={theme}
         onThemeToggle={() => {}}
         logoStyle={logoStyle}
@@ -289,49 +298,63 @@ export default function App() {
 
       {/* Main page stage element */}
       <main className="flex-1 flex flex-col min-w-0 h-screen relative">
-        {currentView === 'calendar' && (
-          <CalendarView 
-            entries={entries}
-            projects={projects}
-            tags={tags}
-            onAddEntry={handleAddEntry}
-            onUpdateEntry={handleUpdateEntry}
-            onDeleteEntry={handleDeleteEntry}
-            onAddProject={(name, color, client) => ({ id: 'proj-dummy', name, color, client })} // Singular project locked
-            onAddTag={handleAddTag}
-            theme={theme}
+        <Routes>
+          <Route
+            path="/calendar"
+            element={
+              <CalendarView
+                entries={entries}
+                projects={projects}
+                tags={tags}
+                onAddEntry={handleAddEntry}
+                onUpdateEntry={handleUpdateEntry}
+                onDeleteEntry={handleDeleteEntry}
+                onAddProject={(name, color, client) => ({ id: 'proj-dummy', name, color, client })} // Singular project locked
+                onAddTag={handleAddTag}
+                theme={theme}
+              />
+            }
           />
-        )}
 
-        {currentView === 'reports' && (
-          <ReportsView 
-            entries={entries}
-            projects={projects}
-            tags={tags}
-            onDeleteEntry={handleDeleteEntry}
-            onDuplicateEntry={handleAddEntry}
-            hourlyRate={hourlyRate}
+          <Route
+            path="/reports"
+            element={
+              <ReportsView
+                entries={entries}
+                projects={projects}
+                tags={tags}
+                onDeleteEntry={handleDeleteEntry}
+                onDuplicateEntry={handleAddEntry}
+                hourlyRate={hourlyRate}
+              />
+            }
           />
-        )}
 
-        {currentView === 'settings' && (
-          <SettingsView 
-            projects={projects}
-            tags={tags}
-            onUpdateSingleProject={handleUpdateSingleProject}
-            onAddTag={handleAddTag}
-            onDeleteTag={handleDeleteTag}
-            workdayTargetHours={workdayTargetHours}
-            onUpdateTargetHours={saveTargetHours}
-            hourlyRate={hourlyRate}
-            onUpdateHourlyRate={saveHourlyRate}
-            logoStyle={logoStyle}
-            onLogoStyleChange={saveLogoStyle}
-            user={user}
-            onLogout={handleLogout}
-            contacts={contacts}
+          <Route
+            path="/settings"
+            element={
+              <SettingsView
+                projects={projects}
+                tags={tags}
+                onUpdateSingleProject={handleUpdateSingleProject}
+                onAddTag={handleAddTag}
+                onDeleteTag={handleDeleteTag}
+                workdayTargetHours={workdayTargetHours}
+                onUpdateTargetHours={saveTargetHours}
+                hourlyRate={hourlyRate}
+                onUpdateHourlyRate={saveHourlyRate}
+                logoStyle={logoStyle}
+                onLogoStyleChange={saveLogoStyle}
+                user={user}
+                onLogout={handleLogout}
+                contacts={contacts}
+              />
+            }
           />
-        )}
+
+          {/* Default + unknown routes land on the calendar */}
+          <Route path="*" element={<Navigate to="/calendar" replace />} />
+        </Routes>
       </main>
       <Toaster position="bottom-right" theme="dark" richColors />
     </div>
