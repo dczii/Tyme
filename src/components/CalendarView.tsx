@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ChevronLeft,
@@ -373,17 +375,21 @@ export default function CalendarView({
 
   // Track state for the Top Real-time Timer
   const [isTracking, setIsTracking] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
     return localStorage.getItem("tyme_timer_is_tracking") === "true";
   });
   const [timerDesc, setTimerDesc] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
     return localStorage.getItem("tyme_timer_desc") || "";
   });
   const [timerProjId, setTimerProjId] = useState<string>(() => {
+    if (typeof window === "undefined") return projects[0]?.id || "";
     const stored = localStorage.getItem("tyme_timer_proj_id");
     if (stored !== null) return stored;
     return projects[0]?.id || "";
   });
   const [timerTags, setTimerTags] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
     try {
       const stored = localStorage.getItem("tyme_timer_tags");
       return stored ? JSON.parse(stored) : [];
@@ -392,6 +398,7 @@ export default function CalendarView({
     }
   });
   const [timerStartTime, setTimerStartTime] = useState<Date | null>(() => {
+    if (typeof window === "undefined") return null;
     const stored = localStorage.getItem("tyme_timer_start_time");
     if (!stored) return null;
     const date = new Date(stored);

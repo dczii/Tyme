@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Shield, AlertCircle, Sparkles, Info } from 'lucide-react';
 import { UserProfile } from '../types';

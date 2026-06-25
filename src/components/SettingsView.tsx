@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from "react";
 import { FolderPlus, Sliders, HelpCircle, Shield, Coins } from "lucide-react";
 import { Project, Tag, UserProfile } from "../types";
