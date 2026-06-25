@@ -77,7 +77,7 @@ Tyme/
 ## ⚙️ Environment Configuration
 
 ### Prerequisites
-- **Node.js** (v18+)
+- **Node.js** (v18.18+, v20+ recommended — required by Next.js 15)
 - **NPM**
 
 ### Environment Variables (`.env`)
@@ -125,6 +125,18 @@ Runs the TypeScript compiler (`tsc --noEmit`) to verify types and catch potentia
 npm run clean
 ```
 Removes generated build output (`.next/`, `dist/`) to ensure a fresh build.
+
+---
+
+## ▲ Deployment
+
+The app is a standard Next.js App Router project and deploys to [Vercel](https://vercel.com/) with zero configuration (it already ships `@vercel/analytics`):
+
+1. Import the repository into Vercel.
+2. Add the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables in **Project Settings → Environment Variables**.
+3. In the Supabase Dashboard, add your deployment URL to **Authentication → URL Configuration** so the Google OAuth redirect resolves correctly.
+
+Vercel runs `npm run build` and serves the output automatically. Any Node.js host that supports `next build` / `next start` works as well.
 
 ---
 
