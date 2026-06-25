@@ -1,6 +1,6 @@
 {
   "name": "Tyme",
-  "description": "A professional SaaS-style time tracking application inspired by Clockify, supporting a weekly calendar view, report filtering, aggregate metrics, and data export.",
+  "description": "Free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, filter reports by project, tag and date, and export branded PDF and CSV summaries.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

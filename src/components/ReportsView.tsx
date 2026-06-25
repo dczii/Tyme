@@ -182,7 +182,6 @@ export default function ReportsView({
       doc.setFontSize(8.5);
       doc.setTextColor(110, 110, 110);
       const footerY = pageHeight - 30;
-      doc.text("Dczii's workspace", margin, footerY);
       doc.text("Created with Tyme", pageWidth / 2, footerY, { align: "center" });
       doc.text(String(num), pageWidth - margin, footerY, { align: "right" });
     };
@@ -1780,7 +1779,6 @@ export default function ReportsView({
 
         {/* PDF Doc Workspace Footer */}
         <footer className='mt-8 pt-5 border-t border-stone-200 flex justify-between items-center text-[9px] font-mono text-stone-400'>
-          <span>Dczii's workspace</span>
           <span>Created with Tyme</span>
           <span>Approved Invoice Copy</span>
         </footer>
