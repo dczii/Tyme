@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { 
-  Clock, 
+import {
+  Clock,
   FileBarChart2, 
   Settings, 
   ChevronLeft, 

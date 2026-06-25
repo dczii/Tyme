@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 
 // Use standard types matching App.tsx UserProfile

@@ -5,7 +5,7 @@
 
 A professional, SaaS-style time-tracking application inspired by Clockify. Built with high-performance real-time data sync, rich interactive reports, and beautiful aesthetic designs.
 
-[![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=flat&logo=vite&logoColor=white)](https://vite.dev/)
+[![Next.js](https://img.shields.io/badge/next.js-%23000000.svg?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://react.dev/)
 [![Supabase](https://img.shields.io/badge/supabase-%2300C389.svg?style=flat&logo=supabase&logoColor=white)](https://supabase.com/)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=flat&logo=tailwind_css&logoColor=white)](https://tailwindcss.com/)
@@ -28,9 +28,8 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 
 ## 🛠️ Technology Stack
 
-- **Core Framework**: [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite 6](https://vite.dev/) (fast HMR, lightweight builder)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (modern CSS utility layout)
+- **Core Framework**: [Next.js 15 (App Router)](https://nextjs.org/) with [React 19](https://react.dev/) & [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) (via `@tailwindcss/postcss`)
 - **Backend / Sync**: [Supabase](https://supabase.com/) (Auth, PostgreSQL, Realtime)
 - **Animations**: [Framer Motion (`motion`)](https://www.framer.com/motion/) (smooth transitions)
 - **Toasts**: [Sonner](https://sonner.dev/) (rich toast alerts)
@@ -43,6 +42,16 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 ```text
 Tyme/
 ├── src/
+│   ├── app/                          # Next.js App Router
+│   │   ├── layout.tsx                # Root layout: <html>/<body>, Analytics, TymeProvider
+│   │   ├── page.tsx                  # Redirects "/" → "/calendar"
+│   │   ├── providers.tsx             # Client Context: session, synced data & CRUD handlers
+│   │   ├── globals.css               # Global theme variables, animations & fonts
+│   │   └── (app)/                    # Authenticated route group
+│   │       ├── layout.tsx            # Auth gate, sidebar & background shell
+│   │       ├── calendar/page.tsx     # Calendar route
+│   │       ├── reports/page.tsx      # Reports route
+│   │       └── settings/page.tsx     # Settings route
 │   ├── components/
 │   │   ├── BrandLogo.tsx         # Logo rendering for Classic, Minimalist, Hourglass styles
 │   │   ├── CalendarView.tsx      # Time entry logger, weekly calendar timeline & forms
@@ -53,12 +62,12 @@ Tyme/
 │   │   └── Sidebar.tsx           # Premium navigation sidebar & branding selections
 │   ├── lib/
 │   │   └── supabase.ts           # Supabase client, auth, realtime subscriptions & People API contact fetch
-│   ├── App.tsx                   # Central router & state container
-│   ├── index.css                 # Global theme variables, animations & fonts
 │   ├── types.ts                  # TypeScript definitions for Projects, Tags, and Entries
 │   └── utils.ts                  # Date formatting, math, and duration helpers
 ├── scripts/
 │   └── migrate-firebase-to-supabase.ts  # One-time data migration script
+├── next.config.ts                # Next.js configuration
+├── postcss.config.mjs            # Tailwind v4 via @tailwindcss/postcss
 ├── security_spec.md              # Documentation of workspace security invariants
 └── package.json                  # Dependencies and execution scripts
 ```
@@ -68,19 +77,17 @@ Tyme/
 ## ⚙️ Environment Configuration
 
 ### Prerequisites
-- **Node.js** (v18+)
+- **Node.js** (v18.18+, v20+ recommended — required by Next.js 15)
 - **NPM**
 
 ### Environment Variables (`.env`)
 Create a `.env` file in the root directory. See `.env.example` for details:
 
 ```bash
-# Required for Gemini AI API calls
-GEMINI_API_KEY="your_api_key_here"
-
 # Supabase configuration (get from Supabase Dashboard → Settings → API)
-VITE_SUPABASE_URL="https://your-project.supabase.co"
-VITE_SUPABASE_ANON_KEY="your-anon-key"
+# The NEXT_PUBLIC_ prefix exposes these to the browser for the client SDK.
+NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
 ```
 
 ---
@@ -99,13 +106,13 @@ Starts the local development server on port **3000** with host **0.0.0.0** enabl
 ```bash
 npm run build
 ```
-Compiles and builds the production-ready assets into the `dist/` directory.
+Creates an optimized production build in the `.next/` directory.
 
-### Preview
+### Production Server
 ```bash
-npm run preview
+npm run start
 ```
-Statically previews the local production build in `dist/` to verify performance and visual behavior before deployment.
+Serves the production build on port **3000**. Run `npm run build` first.
 
 ### Type Check & Lint
 ```bash
@@ -117,7 +124,19 @@ Runs the TypeScript compiler (`tsc --noEmit`) to verify types and catch potentia
 ```bash
 npm run clean
 ```
-Removes generated assets and compiled files (`dist/`, `server.js`) to ensure a fresh build.
+Removes generated build output (`.next/`, `dist/`) to ensure a fresh build.
+
+---
+
+## ▲ Deployment
+
+The app is a standard Next.js App Router project and deploys to [Vercel](https://vercel.com/) with zero configuration (it already ships `@vercel/analytics`):
+
+1. Import the repository into Vercel.
+2. Add the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables in **Project Settings → Environment Variables**.
+3. In the Supabase Dashboard, add your deployment URL to **Authentication → URL Configuration** so the Google OAuth redirect resolves correctly.
+
+Vercel runs `npm run build` and serves the output automatically. Any Node.js host that supports `next build` / `next start` works as well.
 
 ---
 
