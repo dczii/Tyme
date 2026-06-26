@@ -78,12 +78,16 @@ export const initAuth = (
   };
 };
 
-// Trigger Google OAuth (redirect-based)
+// Trigger Google OAuth (redirect-based).
+// Returns the user straight into the app at /calendar after consent — used by both
+// the public landing page button and the in-app LoginScreen. The matching
+// `${origin}/calendar` URL must be present in Supabase Auth → URL Configuration →
+// Redirect URLs (alongside the bare origin) or the callback will be rejected.
 export const googleSignIn = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin,
+      redirectTo: `${window.location.origin}/calendar`,
       scopes: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/contacts.readonly',
     },
   });

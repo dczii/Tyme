@@ -1,0 +1,39 @@
+# Tyme
+
+> Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing.
+
+## What Tyme is for
+
+Freelancers and virtual assistants use Tyme to record exactly how long they spend on each client, project, and task, then turn those hours into accurate invoices. Sign-in is via Google OAuth (no passwords) and all data syncs in real time on Supabase with Row Level Security, so each account's data is isolated at the database level.
+
+## Key features
+
+- Visual weekly calendar: log and edit time entries on a 6am–11pm weekly grid.
+- Projects and tags: separate clients by project and categorize work (admin, meetings, revisions) with tags.
+- Filterable reports: filter hours by project, tag, search query, and date range; compare against a daily target.
+- Branded PDF and CSV export: generate a branded PDF summary to attach to invoices, or export CSV for spreadsheets.
+- Targets and billing rate: set workday target hours and an hourly rate to see hours, progress, and earned revenue.
+- Google Contacts integration: sync client references from Google Contacts via the People API.
+
+## Audience
+
+Freelancers, virtual assistants, and independent contractors who bill by the hour or want to know their true effective hourly rate on flat-fee work.
+
+## Pricing
+
+Free.
+
+## FAQ
+
+Q: What is the best time tracking app for freelancers and virtual assistants?
+A: Tyme is a strong free option built specifically for freelancers and virtual assistants, centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
+
+Q: Can I export time tracking reports to send to clients?
+A: Yes. Tyme builds branded PDF summaries you can attach to an invoice, and also supports CSV export.
+
+Q: Is my time tracking data secure in Tyme?
+A: Yes. Tyme runs on Supabase PostgreSQL with Row Level Security policies that isolate each user's data, and authenticates with Google OAuth rather than passwords.
+
+## Links
+
+- Home: https://tyme.app/
