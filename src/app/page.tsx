@@ -1,34 +1,15 @@
-import React from 'react';
 import Link from 'next/link';
-import {
-  CalendarClock,
-  Tags,
-  FileBarChart2,
-  FileDown,
-  Target,
-  ShieldCheck,
-  LogIn,
-  MousePointerClick,
-  ArrowRight,
-} from 'lucide-react';
+import { LogIn, MousePointerClick, FileDown } from 'lucide-react';
 import BrandLogo from '@/components/BrandLogo';
 import Reveal from '@/components/landing/Reveal';
 import SignInButton from '@/components/landing/SignInButton';
 import LogoIntroAnimation from '@/components/landing/LogoIntroAnimation';
 import { IntroProvider } from '@/components/landing/IntroContext';
-import CalendarPreview from '@/components/landing/CalendarPreview';
-import HeroVideoBackground from '@/components/landing/HeroVideoBackground';
-import { productFeatures, faqItems } from '@/lib/seo';
-
-// Map the icon name stored in seo.ts to the actual lucide component.
-const featureIcons: Record<string, React.ComponentType<{ className?: string }>> = {
-  CalendarClock,
-  Tags,
-  FileBarChart2,
-  FileDown,
-  Target,
-  ShieldCheck,
-};
+import AppShowcase from '@/components/landing/scroll/AppShowcase';
+import StatementSequence from '@/components/landing/scroll/StatementSequence';
+import FeatureShowcase from '@/components/landing/scroll/FeatureShowcase';
+import FaqShowcase from '@/components/landing/scroll/FaqShowcase';
+import SmoothScrollProvider from '@/components/landing/scroll/SmoothScrollProvider';
 
 // The three "how it works" steps rendered in the how-it-works section.
 const steps = [
@@ -64,6 +45,7 @@ export default function Home() {
 
   return (
     <IntroProvider>
+    <SmoothScrollProvider>
     <div className="relative min-h-screen overflow-hidden bg-[#0c0806] text-slate-200 font-sans">
       <LogoIntroAnimation />
       {/* Ambient espresso-theme glow (decorative). The two blobs breathe with a
@@ -107,97 +89,30 @@ export default function Home() {
       </header>
 
       <main className="relative z-10">
-        {/* ===== Hero (section 1) =====
-            Full-bleed looping video background (HeroVideoBackground) sits behind a
-            constrained content column. The headline, sub-copy and CTAs reveal in a
-            staggered ease-out cascade via <Reveal delay>, above the infinitely
-            animating calendar preview. */}
-        <SectionComment label="HERO (section 1) — video bg + headline, CTAs, looping calendar preview" />
-        <section className="relative isolate overflow-hidden px-5 pt-16 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-          {/* Looping ambient video backdrop — falls back to the espresso gradient
-              until a clip is supplied, and is skipped entirely for reduced motion. */}
-          <HeroVideoBackground />
+        {/* ===== Hero (section 1) — calendar showcase =====
+            The product itself is the hero: a browser-framed screenshot of the Tyme
+            weekly calendar that plays an on-load entrance once the intro splash
+            finishes — the heading staggers up, the frame straightens out of a 3D
+            tilt, parallax accent cards float in, and the colored time-entry blocks
+            stagger in. The heading copy and calendar grid are plain markup, so they
+            stay in the initial HTML for SEO. */}
+        <SectionComment label="HERO (section 1) — calendar showcase, GSAP on-load entrance + Google sign-in CTA" />
+        <AppShowcase />
 
-          <div className="mx-auto max-w-6xl">
-            <div className="mx-auto max-w-3xl text-center">
-              <Reveal>
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#5e3820]/40 bg-[#2d1b11]/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-[#dda67a]">
-                  Free • Built for freelancers &amp; virtual assistants
-                </span>
-              </Reveal>
-              <Reveal delay={0.07}>
-                <h1 className="mt-6 text-balance text-4xl font-bold leading-[1.1] tracking-tight text-white sm:text-6xl">
-                  Track every billable hour on a{' '}
-                  <span className="text-[#dda67a]">visual weekly calendar</span>.
-                </h1>
-              </Reveal>
-              <Reveal delay={0.14}>
-                <p className="mx-auto mt-6 max-w-2xl text-pretty text-lg leading-relaxed text-[#ecd0b9]/75">
-                  Tyme lets you log time by dropping entries onto a weekly grid, filter reports by
-                  project, tag and date, and export branded PDF summaries your clients can trust.
-                </p>
-              </Reveal>
-              <Reveal delay={0.21}>
-                <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                  <SignInButton variant="hero" />
-                  <a
-                    href="#features"
-                    className="group inline-flex min-h-[56px] items-center justify-center gap-2 rounded-2xl border border-[#3e271a] bg-[#140d0a]/60 px-7 text-base font-semibold text-[#ecd0b9] transition duration-150 ease-out hover:border-[#5e3820] hover:bg-[#1a110c] active:scale-[0.97]"
-                  >
-                    Explore features
-                    <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
-                  </a>
-                </div>
-              </Reveal>
-              <Reveal delay={0.28}>
-                <p className="mt-5 font-mono text-xs text-[#ecd0b9]/40">
-                  No credit card. No passwords — just your Google account.
-                </p>
-              </Reveal>
-            </div>
-
-            {/* App preview: animated weekly-calendar mock whose time-entry blocks
-                pulse in an infinite, staggered wave (see CalendarPreview). */}
-            <Reveal delay={0.18} className="mt-14 sm:mt-20">
-              <CalendarPreview />
-            </Reveal>
-          </div>
-        </section>
+        {/* ===== Statement sequence =====
+            The product story in big editorial beats; each rises out of a clipping
+            mask as it scrolls into view (GSAP). Sits below the calendar showcase. */}
+        <SectionComment label="STATEMENTS — scrolling story beats (GSAP word-mask reveal)" />
+        <StatementSequence />
 
         {/* ===== Features (section 2) =====
-            Cards reveal in a per-row stagger; each card lifts on hover and its
-            icon scales up — all transform/opacity only, so it stays GPU-cheap. */}
-        <SectionComment label="FEATURES (section 2) — feature cards with hover + reveal animation" />
-        <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24">
-          <Reveal className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Everything you need to bill with confidence
-            </h2>
-            <p className="mt-4 text-lg text-[#ecd0b9]/70">
-              Purpose-built for the way freelancers and virtual assistants actually work.
-            </p>
-          </Reveal>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {productFeatures.map((feature, index) => {
-              const Icon = featureIcons[feature.icon] ?? CalendarClock;
-              return (
-                <Reveal key={feature.title} delay={(index % 3) * 0.06}>
-                  <article className="group h-full rounded-2xl border border-[#3e271a] bg-[#140d0a]/60 p-6 transition duration-150 ease-out hover:-translate-y-1 hover:border-[#5e3820] hover:bg-[#1a110c]/80 hover:duration-200">
-                    {/* Icon springs up slightly when its card is hovered */}
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#5e3820]/40 bg-[#2d1b11]/60 text-[#dda67a] transition-transform duration-200 ease-out group-hover:-translate-y-0.5 group-hover:scale-110">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="mt-5 text-lg font-semibold text-white">{feature.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-[#ecd0b9]/65">
-                      {feature.description}
-                    </p>
-                  </article>
-                </Reveal>
-              );
-            })}
-          </div>
-        </section>
+            "Everything you need to bill with confidence", animated like wero's
+            *What this means for merchants* beat: on desktop the heading pins while
+            the feature cards are dealt onto one spot, one at a time, as you scroll
+            (GSAP ScrollTrigger). Lays out as a plain responsive grid under reduced
+            motion, below lg, or with no JS — so every card stays crawlable. */}
+        <SectionComment label="FEATURES (section 2) — pinned heading + scroll-dealt feature cards (GSAP), wero-style" />
+        <FeatureShowcase />
 
         {/* ===== How it works =====
             Three numbered steps (sign in → log time → export) that reveal with a
@@ -236,27 +151,13 @@ export default function Home() {
         </section>
 
         {/* ===== FAQ =====
-            Visible Q&A list rendered from the same faqItems array that feeds the
-            FAQPage JSON-LD in layout.tsx, so the structured data and on-page copy
-            stay in sync (required for FAQ rich results + AI answer engines / GEO). */}
-        <SectionComment label="FAQ — visible Q&A mirrored by FAQPage JSON-LD (SEO + GEO)" />
-        <section id="faq" className="mx-auto max-w-3xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24">
-          <Reveal className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Frequently asked questions
-            </h2>
-          </Reveal>
-          <dl className="mt-10 space-y-4">
-            {faqItems.map((item, index) => (
-              <Reveal key={item.question} delay={(index % 3) * 0.05}>
-                <div className="rounded-2xl border border-[#3e271a] bg-[#140d0a]/60 p-6">
-                  <dt className="text-base font-semibold text-white">{item.question}</dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-[#ecd0b9]/70">{item.answer}</dd>
-                </div>
-              </Reveal>
-            ))}
-          </dl>
-        </section>
+            Restyled after wero's FAQ — giant questions, one accent keyword each, a
+            floating accent illustration, revealed word-by-word on scroll. Still the
+            same faqItems array that feeds the FAQPage JSON-LD in layout.tsx, and the
+            answers stay rendered beneath every question, so the structured data and
+            on-page copy stay in sync (FAQ rich results + AI answer engines / GEO). */}
+        <SectionComment label="FAQ — wero-style giant questions + accent keyword, mirrored by FAQPage JSON-LD (SEO + GEO)" />
+        <FaqShowcase />
 
         {/* ===== Final CTA =====
             Closing conversion band with a glow accent and a repeat of the Google
@@ -310,6 +211,7 @@ export default function Home() {
         </div>
       </footer>
     </div>
+    </SmoothScrollProvider>
     </IntroProvider>
   );
 }
