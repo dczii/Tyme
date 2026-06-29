@@ -1,12 +1,23 @@
 import type { Metadata, Viewport } from 'next';
+import { Geist, Inter, JetBrains_Mono } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import { TymeProvider } from './providers';
 import { SITE_URL, structuredData } from '@/lib/seo';
 import './globals.css';
 
+// Self-hosted via next/font (no render-blocking Google Fonts <link>/@import).
+// Geist drives display/headings; Inter the body; JetBrains Mono numerals + labels.
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: 'Tyme — Time Tracking App for Freelancers & Virtual Assistants',
+  title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
   description:
     'Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, filter reports by project and tag, and export branded PDF summaries.',
   applicationName: 'Tyme',
@@ -32,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Tyme',
-    title: 'Tyme — Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
     description:
       'Track billable hours on a visual weekly calendar, filter reports by project, tag and date, and export branded PDF summaries. Free time tracking built for freelancers and VAs.',
     url: '/',
@@ -41,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tyme — Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
     description:
       'Free time tracking for freelancers and virtual assistants. Visual weekly calendar, filterable reports, and branded PDF exports.',
     images: ['/og-image.png'],
@@ -60,7 +71,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${geist.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+    >
       <body className="bg-[#0c0806] text-slate-200 font-sans antialiased">
         <TymeProvider>{children}</TymeProvider>
         <Analytics />

@@ -55,7 +55,6 @@ export default function AppShowcase() {
   const sectionRef = useRef<HTMLElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
-  const cueRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -65,7 +64,6 @@ export default function AppShowcase() {
 
     const heading = headingRef.current;
     const frame = frameRef.current;
-    const cue = cueRef.current;
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
     const entries = entryRefs.current.filter(Boolean) as HTMLDivElement[];
 
@@ -76,7 +74,6 @@ export default function AppShowcase() {
       gsap.set(frame, { rotateX: 24, y: 90, scale: 0.92, opacity: 0, transformOrigin: "50% 0%" });
       gsap.set(cards, { opacity: 0, y: 60 });
       gsap.set(entries, { opacity: 0, scaleY: 0.55, transformOrigin: "50% 0%" });
-      if (cue) gsap.set(cue, { opacity: 0 });
 
       if (!introDone) return;
 
@@ -114,10 +111,6 @@ export default function AppShowcase() {
           "-=0.7",
         );
       }
-
-      // 5) Scroll cue fades in at the very end. (The CTA rides the heading
-      //    stagger above, since it lives inside the heading group.)
-      if (cue) tl.to(cue, { opacity: 1, duration: 0.6 }, "-=0.4");
     }, sectionRef);
 
     return () => ctx.revert();
@@ -129,10 +122,7 @@ export default function AppShowcase() {
       className='relative mx-auto flex min-h-[88vh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8 sm:py-24'
     >
       <div ref={headingRef} className='mx-auto mb-12 max-w-2xl text-center sm:mb-16'>
-        <span className='inline-flex items-center gap-2 rounded-full border border-[#5e3820]/40 bg-[#2d1b11]/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-[#dda67a]'>
-          Your whole week, in view
-        </span>
-        <h1 className='mt-6 text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl'>
+        <h1 className='text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl'>
           Every hour, exactly where you logged it
         </h1>
         <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/70'>
@@ -163,7 +153,7 @@ export default function AppShowcase() {
             <span className='h-3 w-3 rounded-full bg-[#5e3820]/50' />
             <span className='h-3 w-3 rounded-full bg-[#5e3820]/30' />
             <span className='ml-4 flex-1 truncate rounded-md bg-[#0c0806]/70 px-3 py-1 text-center font-mono text-[11px] text-[#ecd0b9]/40'>
-              app.tyme — calendar
+              app.tyme / calendar
             </span>
           </div>
 
@@ -204,7 +194,7 @@ export default function AppShowcase() {
                   <p className='font-mono text-[10px] uppercase tracking-widest text-[#ecd0b9]/40'>
                     This week
                   </p>
-                  <p className='text-sm font-semibold text-white'>Jun 23 – 29</p>
+                  <p className='text-sm font-semibold text-white'>Jun 23-29</p>
                 </div>
                 <div className='rounded-lg border border-[#3e271a]/60 bg-[#140d0a] px-3 py-1.5 text-right'>
                   <p className='font-mono text-[10px] uppercase tracking-widest text-[#ecd0b9]/40'>
@@ -323,16 +313,6 @@ export default function AppShowcase() {
           <span className='text-sm font-medium text-white'>Client call</span>
           <span className='font-mono text-xs text-[#ecd0b9]/50'>1:30</span>
         </div>
-      </div>
-
-      {/* Subtle scroll cue (mirrors the old hero). Hidden until the entrance ends. */}
-      <div
-        ref={cueRef}
-        aria-hidden='true'
-        className='pointer-events-none mx-auto mt-10 flex flex-col items-center gap-2 text-[#ecd0b9]/40 motion-safe:animate-bounce [animation-duration:2.4s]'
-      >
-        <span className='font-mono text-[10px] uppercase tracking-widest'>Scroll</span>
-        <span className='h-8 w-px bg-gradient-to-b from-[#dda67a]/60 to-transparent' />
       </div>
     </section>
   );

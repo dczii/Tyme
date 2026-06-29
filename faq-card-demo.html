@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FaqCard — Pinned Circle Scrub (GSAP ScrollTrigger)</title>
+
+<!-- Official GSAP CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --ink: #f4f4f6;
+    --muted: #8a8a96;
+    --card: #111114;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --accent: #6d5efc;       /* circle start color */
+    --accent-2: #c084fc;     /* circle end color   */
+    --radius: 28px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { margin: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Spacers so there is room to scroll INTO and OUT OF the pin ---- */
+  .spacer {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+
+  /* ---- Section that holds the card. ScrollTrigger injects .pin-spacer
+         around .faq-card automatically — we do NOT write it ourselves. ---- */
+  .faq-section {
+    display: grid;
+    place-items: center;
+    padding: 8vh 24px;
+  }
+
+  /* ====================  THE CARD  ==================== */
+  .faq-card {
+    position: relative;
+    width: min(720px, 92vw);
+    height: 440px;
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    /* CRUCIAL: keeps the scaling .circles clipped inside the card */
+    overflow: hidden;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.04) inset,
+      0 40px 80px -40px rgba(0, 0, 0, 0.8);
+  }
+
+  /* The animated circle. Sits behind the content, centered, scales massively. */
+  .circles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;       /* center it on its own origin */
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, var(--accent-2), var(--accent));
+    will-change: transform;
+    z-index: 1;
+  }
+
+  /* Content sits above the circle */
+  .faq-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    padding: 44px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .faq-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 18px;
+  }
+
+  .faq-question {
+    font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+    line-height: 1.15;
+    font-weight: 600;
+    margin: 0;
+    max-width: 18ch;
+  }
+
+  /* The answer starts hidden and is revealed as the circle fills the card */
+  .faq-answer {
+    margin: 26px 0 0;
+    max-width: 46ch;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.92);
+    opacity: 0;                 /* GSAP drives this */
+    transform: translateY(14px);
+  }
+
+  .faq-hint {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .faq-hint::after {
+    content: "";
+    width: 18px; height: 18px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    margin-top: -6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq-answer { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="spacer">Scroll down ↓</div>
+
+  <section class="faq-section">
+    <!-- The card is the ScrollTrigger trigger + pin target -->
+    <article class="faq-card" id="faqCard">
+      <!-- the element that scales up to fill the card -->
+      <div class="circles" aria-hidden="true"></div>
+
+      <div class="faq-content">
+        <p class="faq-eyebrow">Frequently asked</p>
+        <h2 class="faq-question">How does the pinned scroll animation actually work?</h2>
+        <p class="faq-answer">
+          ScrollTrigger pins the card in the viewport and converts your vertical
+          scroll into animation progress. As you keep scrolling, the circle scales
+          to fill the card and the answer fades in — then the card releases and the
+          page continues. No fixed positioning, no manual math.
+        </p>
+      </div>
+
+      <span class="faq-hint">Keep scrolling</span>
+    </article>
+  </section>
+
+  <div class="spacer">…and the page continues normally</div>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Respect reduced-motion: skip the scrub entirely.
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reduce) {
+    const card = document.querySelector("#faqCard");
+    const circle = card.querySelector(".circles");
+    const answer = card.querySelector(".faq-answer");
+    const hint   = card.querySelector(".faq-hint");
+
+    // Scale needed for a 120px circle to cover a 720x440 card (with margin).
+    // diagonal / circleSize ≈ enough to overfill; 8–9x covers it, we go bigger.
+    const COVER_SCALE = 9;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: card,
+        start: "center center",   // pin when the card is centered
+        end: "+=100%",            // scrub over one viewport-height of scroll
+        pin: true,                // ScrollTrigger generates .pin-spacer
+        scrub: 1,                 // smooth, 1s catch-up
+        anticipatePin: 1,
+        // markers: true,         // uncomment to debug start/end
+      },
+    });
+
+    tl
+      // 1) circle balloons to fill the card
+      .to(circle, { scale: COVER_SCALE, ease: "power2.inOut" }, 0)
+      // 2) the "keep scrolling" hint fades out as it fills
+      .to(hint, { opacity: 0, duration: 0.25, ease: "power1.out" }, 0)
+      // 3) once the card is mostly covered, reveal the answer
+      .to(answer, { opacity: 1, y: 0, ease: "power2.out" }, 0.45);
+  }
+</script>
+</body>
+</html>

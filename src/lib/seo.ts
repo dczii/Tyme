@@ -24,7 +24,7 @@ export const productFeatures: ProductFeature[] = [
     icon: 'CalendarClock',
     title: 'Visual weekly calendar',
     description:
-      'Log and edit billable time by placing entries on a 6am–11pm weekly grid. No stopwatch required.',
+      'Log and edit billable time by placing entries on a 6am to 11pm weekly grid. No stopwatch required.',
     feature: 'Interactive weekly calendar for logging and editing time entries',
   },
   {
@@ -59,7 +59,7 @@ export const productFeatures: ProductFeature[] = [
     icon: 'ShieldCheck',
     title: 'Secure Google sign-in & sync',
     description:
-      'Sign in with Google — no passwords. Data syncs in real time on Supabase with Row Level Security.',
+      'Sign in with Google, no passwords. Data syncs in real time on Supabase with Row Level Security.',
     feature: 'Google OAuth sign-in with real-time Supabase sync and Row Level Security',
   },
 ];
