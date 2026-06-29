@@ -80,6 +80,33 @@ export default function FeatureShowcase() {
       }
     });
 
+    // Below lg: the cards are a normal responsive grid, so instead of the pinned
+    // card-deal each card's reveal is SCRUBBED to the scroll position (like desktop) —
+    // it rises + fades as the card travels up through the viewport, tied 1:1 to the
+    // scrollbar rather than firing once on view. ScrollTrigger listens to native touch
+    // scroll, so this scrubs on mobile without Lenis driving touch. Only opacity/
+    // transform are touched, on top of fully-visible content (no clearProps here — the
+    // scrub must hold the card at its tweened value, and the end state is the natural
+    // CSS state anyway), so nothing is ever left invisible if JS never runs.
+    mm.add('(max-width: 1023px)', () => {
+      const cards = cardRefs.current.filter(Boolean) as HTMLElement[];
+      if (cards.length === 0) return;
+
+      cards.forEach((card) => {
+        gsap.from(card, {
+          opacity: 0,
+          y: 50,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 92%', // begins as the card's top enters the lower viewport
+            end: 'top 55%', // fully revealed by the time it reaches mid-screen
+            scrub: true, // tie the reveal to the scrollbar, not a one-shot play
+          },
+        });
+      });
+    });
+
     return () => mm.revert();
   }, [n, reduce]);
 

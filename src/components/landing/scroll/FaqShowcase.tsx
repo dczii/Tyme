@@ -206,12 +206,16 @@ export default function FaqShowcase() {
       }
     }, sectionRef);
 
-    // Responsive scenes. matchMedia tears each scene down (and reverts its sets) when
-    // the breakpoint stops matching, so resizing swaps cleanly between gallery ⇄ swipe.
+    // Responsive scenes. matchMedia tears the scene down (and reverts its sets) when the
+    // query stops matching, so resizing recalculates the gallery cleanly.
     const mm = gsap.matchMedia();
 
-    // Desktop: the pinned horizontal-scrolling gallery.
-    mm.add('(min-width: 1024px)', () => {
+    // The pinned horizontal-scrolling gallery — now at EVERY size, including mobile, so
+    // vertical scroll pins the section and drives the cards past one by one instead of
+    // the reader having to swipe the row horizontally by hand. (Reduced-motion / no-JS
+    // still fall back to the native swipe carousel, since the whole effect bails above
+    // when `reduce` is set and never runs without JS.)
+    mm.add('(min-width: 0px)', () => {
       const track = scrollerRef.current;
       if (!track) return;
 
@@ -299,28 +303,6 @@ export default function FaqShowcase() {
       });
     });
 
-    // Below lg: the scatter-in entrance for the native swipe carousel. Cards fly in
-    // from alternating off-screen sides, rotated, and settle into their row.
-    mm.add('(max-width: 1023px)', () => {
-      const offX = () => (typeof window !== 'undefined' ? window.innerWidth : 1200) * 0.55;
-
-      gsap.from(cards, {
-        x: (i: number) => (i % 2 ? 1 : -1) * offX(),
-        y: (i: number) => (i % 2 ? -1 : 1) * 60,
-        rotateZ: (i: number) => (i % 2 ? 1 : -1) * 14,
-        scale: 0.86,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.12,
-        ease: 'power4.out',
-        transformOrigin: 'center center',
-        // Hand the transform back to CSS when done so the inline transform gsap leaves
-        // behind doesn't override the card's hover/focus lift.
-        clearProps: 'transform,transformOrigin',
-        scrollTrigger: { trigger: sectionRef.current, start: 'top 72%', once: true },
-      });
-    });
-
     return () => {
       ctx.revert();
       mm.revert();
@@ -403,7 +385,7 @@ export default function FaqShowcase() {
           On desktop this wrapper is pinned full-viewport while the track below scrolls
           horizontally; on smaller screens it's a normal block and the track is a native
           swipe carousel. The marquee above and the tentacle behind stay outside the pin. */}
-      <div ref={pinRef} className="relative z-[1] lg:flex lg:min-h-screen lg:flex-col lg:justify-center">
+      <div ref={pinRef} className="relative z-[1] flex min-h-screen flex-col justify-center">
         <div className="mx-auto w-full max-w-6xl px-5 sm:px-8">
           {/* ── Header: eyebrow + heading + (mobile) swipe hint / controls ── */}
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
@@ -418,9 +400,10 @@ export default function FaqShowcase() {
               </p>
             </div>
 
-            {/* Swipe hint + prev/next for the native carousel. Hidden on lg, where the
-                gallery is scroll-driven and pinned instead. */}
-            <div className="flex items-center gap-4 lg:hidden">
+            {/* Swipe hint + prev/next for the native carousel. The gallery is now pinned
+                and scroll-driven at every size, so these only surface in the reduced-
+                motion fallback, where the track stays a manual swipe carousel. */}
+            <div className="hidden items-center gap-4 motion-reduce:flex">
             <span className="hidden select-none items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-[#ecd0b9]/40 sm:flex">
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
               swipe
