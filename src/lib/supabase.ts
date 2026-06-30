@@ -98,6 +98,41 @@ export const googleSignIn = async () => {
   // Note: This redirects the browser. The function won't return in the normal flow.
 };
 
+// Register with email/password. The full name is stored in user_metadata.full_name,
+// which providers.tsx already reads to seed the `profiles` row — so no extra wiring
+// is needed downstream. When email confirmation is enabled in the Supabase dashboard
+// (Auth → Providers → Email → "Confirm email"), `data.session` comes back null and the
+// user must click the link in their inbox before a session exists.
+export const signUpWithEmail = async (fullName: string, email: string, password: string) => {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName, name: fullName },
+      // Where the email-confirmation link lands (when confirmation is enabled).
+      // Mirrors googleSignIn's redirectTo so links work in any environment rather
+      // than falling back to the dashboard Site URL.
+      emailRedirectTo: `${window.location.origin}/login`,
+    },
+  });
+  if (error) {
+    console.error('Email sign-up failed:', error);
+    throw error;
+  }
+  return data; // data.session is null when email confirmation is required
+};
+
+// Sign in with an existing email/password. On success this fires onAuthStateChange,
+// which TymeProvider already listens to — the rest of the app takes over from there.
+export const signInWithEmail = async (email: string, password: string) => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    console.error('Email sign-in failed:', error);
+    throw error;
+  }
+  return data;
+};
+
 // Sign out
 export const logoutUser = async () => {
   await supabase.auth.signOut();

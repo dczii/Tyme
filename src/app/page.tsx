@@ -3,6 +3,7 @@ import { LogIn, MousePointerClick, FileDown } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import Reveal from "@/components/landing/Reveal";
 import SignInButton from "@/components/landing/SignInButton";
+import AppNavButton from "@/components/landing/AppNavButton";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
 import AppShowcase from "@/components/landing/scroll/AppShowcase";
@@ -88,8 +89,8 @@ export default function Home() {
                   FAQ
                 </a>
               </nav>
-              {/* Sign in with Google — top right */}
-              <SignInButton variant='header' />
+              {/* Login / Go To App — top right */}
+              <AppNavButton variant='header' />
             </div>
           </header>
 
