@@ -385,13 +385,10 @@ export default function ReportsView({
           doc.rect(bX, bY, barWidth, barHeight, "F");
         }
 
-        const showLabel = barCount <= 12 || idx % Math.ceil(barCount / 12) === 0;
-        if (showLabel) {
-          doc.setFont("Helvetica", "normal");
-          doc.setFontSize(7.5);
-          doc.setTextColor(120, 120, 120);
-          doc.text(item.label, bX + barWidth / 2, chartY + chartHeight + 11, { angle: -35 });
-        }
+        doc.setFont("Helvetica", "normal");
+        doc.setFontSize(7.5);
+        doc.setTextColor(120, 120, 120);
+        doc.text(item.label, bX + barWidth / 2, chartY + chartHeight + 11, { angle: -35 });
       });
     }
 
@@ -433,14 +430,9 @@ export default function ReportsView({
         doc.setFont("Helvetica", "bold");
         doc.setFontSize(9);
         doc.setTextColor(24, 24, 27);
-        doc.text(formatMinutesHHMM(segment.mins), pageWidth - margin - 50, projY + 9, {
+        doc.text(formatMinutesHHMM(segment.mins), pageWidth - margin, projY + 9, {
           align: "right",
         });
-
-        // Percent
-        doc.setFont("Helvetica", "normal");
-        doc.setTextColor(110, 110, 110);
-        doc.text(`${segment.percentage}%`, pageWidth - margin, projY + 9, { align: "right" });
 
         projY += 16;
       });
@@ -516,8 +508,7 @@ export default function ReportsView({
 
         const bulletX = currentIsFirstPageOfDesc ? margin + 124 : margin + 4;
         const textX = currentIsFirstPageOfDesc ? margin + 134 : margin + 16;
-        const durX = pageWidth - margin - 50;
-        const pctX = pageWidth - margin;
+        const durX = pageWidth - margin;
 
         // Bullet
         doc.circle(bulletX, descY + 5.5, 3, "F");
@@ -535,10 +526,6 @@ export default function ReportsView({
         doc.setFontSize(9);
         doc.setTextColor(24, 24, 27);
         doc.text(formatMinutesHHMM(segment.mins), durX, descY + 9, { align: "right" });
-
-        doc.setFont("Helvetica", "normal");
-        doc.setTextColor(110, 110, 110);
-        doc.text(`${segment.percentage}%`, pctX, descY + 9, { align: "right" });
 
         descY += rowHeight;
       });
@@ -561,122 +548,6 @@ export default function ReportsView({
       doc.setFontSize(9.5);
       doc.setTextColor(140, 140, 140);
       doc.text("No active descriptions", margin, posY);
-      posY += 20;
-    }
-
-    // -- DETAILED SHEET LEDGER SECTION --
-    posY += 15;
-
-    if (posY + 40 > pageHeight - 60) {
-      drawPageFooter(pageNum);
-      doc.addPage();
-      pageNum += 1;
-      posY = 50;
-    }
-
-    // Ledger Header Row
-    doc.setFont("Helvetica", "normal");
-    doc.setFontSize(9.5);
-    doc.setTextColor(110, 110, 110);
-    doc.text("Project / Description", margin, posY);
-    doc.text("Duration", pageWidth - margin - 100, posY, { align: "right" });
-    doc.text("Amount", pageWidth - margin, posY, { align: "right" });
-
-    posY += 5;
-    doc.setDrawColor(200, 200, 200);
-    doc.setLineWidth(1);
-    doc.line(margin, posY, pageWidth - margin, posY);
-    posY += 18;
-
-    if (detailedLedgerGroups.length > 0) {
-      detailedLedgerGroups.forEach((group) => {
-        if (posY + 30 > pageHeight - 60) {
-          drawPageFooter(pageNum);
-          doc.addPage();
-          pageNum += 1;
-          posY = 50;
-        }
-
-        const projName = group.project?.name || "Unassigned Workspace tasks";
-        const clientLabel = group.project?.client ? ` - ${group.project.client}` : "";
-        const fullProjTitle = `${projName}${clientLabel}`;
-        const groupMins = group.totalMins;
-        const groupAmount = (groupMins / 60) * hourlyRate;
-
-        // Write Project Group Header Row (Bold)
-        doc.setFont("Helvetica", "bold");
-        doc.setFontSize(10);
-        doc.setTextColor(24, 24, 27);
-        doc.text(fullProjTitle, margin, posY);
-
-        doc.text(formatMinutesHHMM(groupMins), pageWidth - margin - 100, posY, { align: "right" });
-
-        const formattedGrpAmt = `${groupAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
-        doc.text(formattedGrpAmt, pageWidth - margin, posY, { align: "right" });
-
-        posY += 6;
-        doc.setDrawColor(220, 220, 220);
-        doc.setLineWidth(0.75);
-        doc.line(margin, posY, pageWidth - margin, posY);
-        posY += 15;
-
-        // Write indented individual ledger tasks
-        const tasks = Object.values(group.descriptions) as {
-          mins: number;
-          description: string;
-          tags: string[];
-        }[];
-        tasks.forEach((task) => {
-          const taskText = task.description || "No description";
-          const wrappedLines = doc.splitTextToSize(taskText, contentWidth - 140) as string[];
-          const blockHeight = Math.max(14, wrappedLines.length * 11) + 6;
-
-          if (posY + blockHeight > pageHeight - 60) {
-            drawPageFooter(pageNum);
-            doc.addPage();
-            pageNum += 1;
-            posY = 50;
-
-            doc.setFont("Helvetica", "normal");
-            doc.setFontSize(8.5);
-            doc.setTextColor(110, 110, 110);
-            doc.text(`${fullProjTitle} (continued)`, margin, posY);
-            posY += 15;
-          }
-
-          doc.setFont("Helvetica", "normal");
-          doc.setFontSize(9);
-          doc.setTextColor(60, 60, 60);
-          wrappedLines.forEach((line, lIdx) => {
-            doc.text(line, margin + 15, posY + 8 + lIdx * 11);
-          });
-
-          // Duration
-          doc.text(formatMinutesHHMM(task.mins), pageWidth - margin - 100, posY + 8, {
-            align: "right",
-          });
-
-          // Amount
-          const taskAmount = (task.mins / 60) * hourlyRate;
-          const formattedTaskAmt = `${taskAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD`;
-          doc.text(formattedTaskAmt, pageWidth - margin, posY + 8, { align: "right" });
-
-          posY += blockHeight;
-
-          // Tiny separator
-          doc.setDrawColor(240, 240, 240);
-          doc.setLineWidth(0.5);
-          doc.line(margin + 15, posY, pageWidth - margin, posY);
-          posY += 6;
-        });
-
-        posY += 8;
-      });
-    } else {
-      doc.setFont("Helvetica", "normal");
-      doc.setFontSize(9.5);
-      doc.setTextColor(150, 150, 150);
-      doc.text("No workspace logs logged.", margin, posY);
       posY += 20;
     }
 
@@ -793,11 +664,7 @@ export default function ReportsView({
         .filter((e) => e.date === dateKey)
         .reduce((sum, e) => sum + getDisplayMinutes(e.durationMinutes), 0);
 
-      const friendlyLabel = dateObj.toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-      });
+      const friendlyLabel = `${mStr}/${dStr}`;
 
       return {
         dateStr: dateKey,
