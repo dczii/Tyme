@@ -10,6 +10,7 @@ import {
   saveUserProfileToFS,
   subscribeToProjects,
   saveProjectToFS,
+  deleteProjectFromFS,
   subscribeToTags,
   saveTagToFS,
   deleteTagFromFS,
@@ -49,7 +50,9 @@ interface TymeContextValue {
   handleAddEntry: (entryData: Omit<TimeEntry, 'id'>) => Promise<void>;
   handleUpdateEntry: (updated: TimeEntry) => Promise<void>;
   handleDeleteEntry: (id: string) => Promise<void>;
-  handleUpdateSingleProject: (name: string, client?: string, color?: string) => Promise<void>;
+  handleAddProject: (name: string, color: string, client?: string) => Project;
+  handleUpdateProject: (id: string, updates: { name?: string; client?: string; color?: string }) => Promise<void>;
+  handleDeleteProject: (id: string) => Promise<void>;
   handleAddTag: (name: string) => Tag;
   handleDeleteTag: (id: string) => Promise<void>;
 }
@@ -234,25 +237,39 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Edit the singular workspace project
-  const handleUpdateSingleProject = async (name: string, client?: string, color?: string) => {
-    if (!supabaseUser) return;
-
-    const activeProj = projects[0] || {
-      id: 'proj-1',
-      name: '',
-      client: '',
-      color: '#dda67a',
-    };
-
-    const updatedProj: Project = {
-      id: activeProj.id,
+  // Add new Project
+  const handleAddProject = (name: string, color: string, client?: string): Project => {
+    const newProject: Project = {
+      id: `proj-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       name,
       client: client || '',
-      color: color || activeProj.color,
+      color,
     };
+    if (supabaseUser) {
+      saveProjectToFS(supabaseUser.id, newProject);
+    }
+    return newProject;
+  };
 
-    await saveProjectToFS(supabaseUser.id, updatedProj);
+  // Update an existing Project
+  const handleUpdateProject = async (
+    id: string,
+    updates: { name?: string; client?: string; color?: string },
+  ) => {
+    if (!supabaseUser) return;
+    const existing = projects.find(p => p.id === id);
+    if (!existing) return;
+    await saveProjectToFS(supabaseUser.id, { ...existing, ...updates });
+  };
+
+  // Delete Project: unassign referencing entries first, then remove the project
+  const handleDeleteProject = async (id: string) => {
+    if (!supabaseUser) return;
+    const affected = entries.filter(e => e.projectId === id);
+    for (const entry of affected) {
+      await saveEntryToFS(supabaseUser.id, { ...entry, projectId: undefined });
+    }
+    await deleteProjectFromFS(supabaseUser.id, id);
   };
 
   // Add new Tag
@@ -303,7 +320,9 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
     handleAddEntry,
     handleUpdateEntry,
     handleDeleteEntry,
-    handleUpdateSingleProject,
+    handleAddProject,
+    handleUpdateProject,
+    handleDeleteProject,
     handleAddTag,
     handleDeleteTag,
   };
