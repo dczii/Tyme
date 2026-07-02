@@ -99,22 +99,31 @@ export function formatDateFriendly(d: Date): string {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
+// Quote a CSV cell and neutralize spreadsheet formula injection: cells starting
+// with = + - @ or tab/CR are executed as formulas by Excel/Sheets, so prefix
+// them with a single quote (OWASP recommendation).
+function csvCell(value: string): string {
+  let v = value.replace(/"/g, '""');
+  if (/^[=+\-@\t\r]/.test(v)) v = `'${v}`;
+  return `"${v}"`;
+}
+
 // Exporter: Generate CSV file content and download
 export function exportToCSV(entries: TimeEntry[], projects: Project[]) {
   const projectMap = new Map(projects.map(p => [p.id, p]));
-  
+
   const headers = ['Date', 'Description', 'Project', 'Client', 'Start Time', 'End Time', 'Duration (Hours)', 'Tags'];
   const rows = entries.map(e => {
     const proj = e.projectId ? projectMap.get(e.projectId) : null;
     return [
       e.date,
-      `"${(e.description || 'No Description').replace(/"/g, '""')}"`,
-      proj ? `"${proj.name}"` : 'None',
-      proj?.client ? `"${proj.client}"` : 'None',
+      csvCell(e.description || 'No Description'),
+      proj ? csvCell(proj.name) : 'None',
+      proj?.client ? csvCell(proj.client) : 'None',
       e.startTime,
       e.endTime,
       (e.durationMinutes / 60).toFixed(2),
-      `"${e.tags.join(', ')}"`
+      csvCell(e.tags.join(', '))
     ];
   });
   

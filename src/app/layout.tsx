@@ -82,7 +82,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <script
             key={index}
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            // Escape "<" so no value in the schema can ever close the script
+            // tag and inject markup (standard JSON-LD hardening).
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
           />
         ))}
       </body>

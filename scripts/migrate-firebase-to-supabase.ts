@@ -33,9 +33,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // --- Configuration ---
 
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://ejaxgpxbziftclwkfmri.supabase.co';
+// Infrastructure identifiers come from the environment only — never hardcode
+// project URLs or database IDs in source control.
+const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const FIREBASE_DATABASE_ID = 'ai-studio-2f5fed5d-b280-4d1c-aa74-fc396cd58da3';
+const FIREBASE_DATABASE_ID = process.env.FIREBASE_DATABASE_ID || '(default)';
 const SERVICE_ACCOUNT_PATH = resolve(__dirname, 'firebase-service-account.json');
 
 const DRY_RUN = !process.argv.includes('--execute');
@@ -71,6 +73,12 @@ function logError(message: string, error?: unknown) {
 // --- Validation ---
 
 function validateConfig() {
+  if (!SUPABASE_URL) {
+    console.error('❌ Missing SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL) environment variable.');
+    console.error('   Set it with: export SUPABASE_URL="https://your-project.supabase.co"');
+    process.exit(1);
+  }
+
   if (!SUPABASE_SERVICE_ROLE_KEY) {
     console.error('❌ Missing SUPABASE_SERVICE_ROLE_KEY environment variable.');
     console.error('   Set it with: export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"');
@@ -108,7 +116,7 @@ async function migrate() {
   const firestore = getFirestore(firebaseApp, FIREBASE_DATABASE_ID);
 
   // Initialize Supabase with service role key (bypasses RLS)
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY!, {
+  const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!, {
     auth: { autoRefreshToken: false, persistSession: false }
   });
 

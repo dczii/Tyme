@@ -135,8 +135,18 @@ The app is a standard Next.js App Router project and deploys to [Vercel](https:/
 1. Import the repository into Vercel.
 2. Add the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables in **Project Settings → Environment Variables**.
 3. In the Supabase Dashboard, add your deployment URL to **Authentication → URL Configuration** so the Google OAuth redirect resolves correctly.
+4. **Required:** apply the database security migration so Row Level Security actually protects user data. Run `supabase/migrations/20260702000000_enable_rls_security.sql` via the Supabase CLI (`supabase db push`) or paste it into **Dashboard → SQL Editor** and execute it. Without it, anyone holding the public anon key can read and write every user's rows.
 
 Vercel runs `npm run build` and serves the output automatically. Any Node.js host that supports `next build` / `next start` works as well.
+
+### 🔐 Security
+
+The browser talks to Supabase directly with the public anon key, so all access
+control lives in the database: owner-only RLS policies plus CHECK-constraint
+data invariants, defined in `supabase/migrations/20260702000000_enable_rls_security.sql`.
+The invariants and attack payload test matrix are documented in
+[`security_spec.md`](./security_spec.md). The app also ships hardened HTTP
+security headers (CSP, HSTS, `frame-ancestors 'none'`, etc.) via `next.config.ts`.
 
 ---
 

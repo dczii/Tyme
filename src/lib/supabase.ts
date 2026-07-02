@@ -285,6 +285,11 @@ export const subscribeToUserProfile = (
   };
 };
 
+// Clamp a numeric setting into its approved range (mirrors the DB CHECK
+// constraints so bad values fail fast client-side instead of erroring on save).
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+
 // Save/update user profile
 export const saveUserProfileToFS = async (
   userId: string,
@@ -293,12 +298,12 @@ export const saveUserProfileToFS = async (
   try {
     // Map camelCase to snake_case
     const dbProfile: Record<string, any> = { id: userId };
-    if (profile.email !== undefined) dbProfile.email = profile.email;
-    if (profile.name !== undefined) dbProfile.name = profile.name;
-    if (profile.picture !== undefined) dbProfile.picture = profile.picture;
-    if (profile.workdayTargetHours !== undefined) dbProfile.workday_target_hours = profile.workdayTargetHours;
+    if (profile.email !== undefined) dbProfile.email = profile.email.slice(0, 320);
+    if (profile.name !== undefined) dbProfile.name = profile.name.slice(0, 200);
+    if (profile.picture !== undefined) dbProfile.picture = profile.picture.slice(0, 2048);
+    if (profile.workdayTargetHours !== undefined) dbProfile.workday_target_hours = clamp(profile.workdayTargetHours, 1, 24);
     if (profile.logoStyle !== undefined) dbProfile.logo_style = profile.logoStyle;
-    if (profile.hourlyRate !== undefined) dbProfile.hourly_rate = profile.hourlyRate;
+    if (profile.hourlyRate !== undefined) dbProfile.hourly_rate = clamp(profile.hourlyRate, 0, 100000);
 
     // Check if the profile already exists.
     // We cannot use simple upsert for partial updates because PostgreSQL enforces NOT NULL constraints
