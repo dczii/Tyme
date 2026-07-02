@@ -7,7 +7,10 @@ export default function SettingsPage() {
   const {
     projects,
     tags,
-    handleUpdateSingleProject,
+    entries,
+    handleAddProject,
+    handleUpdateProject,
+    handleDeleteProject,
     handleAddTag,
     handleDeleteTag,
     workdayTargetHours,
@@ -27,7 +30,10 @@ export default function SettingsPage() {
     <SettingsView
       projects={projects}
       tags={tags}
-      onUpdateSingleProject={handleUpdateSingleProject}
+      entries={entries}
+      onAddProject={handleAddProject}
+      onUpdateProject={handleUpdateProject}
+      onDeleteProject={handleDeleteProject}
       onAddTag={handleAddTag}
       onDeleteTag={handleDeleteTag}
       workdayTargetHours={workdayTargetHours}

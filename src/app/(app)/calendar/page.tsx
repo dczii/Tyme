@@ -11,6 +11,7 @@ export default function CalendarPage() {
     handleAddEntry,
     handleUpdateEntry,
     handleDeleteEntry,
+    handleAddProject,
     handleAddTag,
     theme,
   } = useTyme();
@@ -23,7 +24,7 @@ export default function CalendarPage() {
       onAddEntry={handleAddEntry}
       onUpdateEntry={handleUpdateEntry}
       onDeleteEntry={handleDeleteEntry}
-      onAddProject={(name, color, client) => ({ id: 'proj-dummy', name, color, client })} // Singular project locked
+      onAddProject={handleAddProject}
       onAddTag={handleAddTag}
       theme={theme}
     />

@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { TimeEntry, Project, Tag as TagType } from "../types";
+import { PROJECT_COLORS } from "../constants";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -449,6 +450,9 @@ export default function CalendarView({
   const [editDurationStr, setEditDurationStr] = useState<string>("");
   const [modalSelectedTags, setModalSelectedTags] = useState<string[]>([]);
   const [showModalTagDropdown, setShowModalTagDropdown] = useState<boolean>(false);
+  const [modalProjId, setModalProjId] = useState<string>("");
+  const [showModalProjDropdown, setShowModalProjDropdown] = useState<boolean>(false);
+  const [showModalProjCreator, setShowModalProjCreator] = useState<boolean>(false);
 
   // Drag-and-drop state
   const [draggedEntryId, setDraggedEntryId] = useState<string | null>(null);
@@ -484,7 +488,7 @@ export default function CalendarView({
         }
         if (isCreateModalOpen) {
           setIsCreateModalOpen(false);
-          setShowModalTagDropdown(false);
+          setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
         }
       }
     };
@@ -595,7 +599,7 @@ export default function CalendarView({
 
     onAddEntry({
       description: timerDesc || "Untitled Session",
-      projectId: projects[0]?.id || undefined,
+      projectId: timerProjId || undefined,
       tags: timerTags,
       date: formatDateYYYYMMDD(new Date()), // Log to current system date
       startTime: fmtTime(timerStartTime),
@@ -603,9 +607,8 @@ export default function CalendarView({
       durationMinutes: durationMins,
     });
 
-    // Reset fields
+    // Reset fields (project selection is kept for the next session)
     setTimerDesc("");
-    setTimerProjId(projects[0]?.id || "");
     setTimerTags([]);
     setTimerStartTime(null);
     setElapsedSeconds(0);
@@ -700,6 +703,22 @@ export default function CalendarView({
     setShowProjCreator(false);
   };
 
+  // Quick project insertion from inside the Add Entry modal. Plain click handler
+  // (not a nested <form>) because the modal content already lives inside a form.
+  const handleCreateProjectInModal = () => {
+    if (!newProjName.trim()) return;
+    const created = onAddProject(
+      newProjName.trim(),
+      newProjColor,
+      newProjClient.trim() || undefined,
+    );
+    setModalProjId(created.id);
+    setNewProjName("");
+    setNewProjClient("");
+    setShowModalProjCreator(false);
+    setShowModalProjDropdown(false);
+  };
+
   // Quick tag insertion handler
   const handleCreateTagInline = (e: React.FormEvent) => {
     e.preventDefault();
@@ -720,7 +739,8 @@ export default function CalendarView({
     setNewEntryEndTime(endStr);
     setModalDurationStr("1:00");
     setModalSelectedTags([]);
-    setShowModalTagDropdown(false);
+    setModalProjId(projects[0]?.id || "");
+    setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
     setIsCreateModalOpen(true);
   };
 
@@ -1054,16 +1074,37 @@ export default function CalendarView({
           </div>
 
           <div className='flex flex-wrap items-center gap-2 justify-between w-full lg:w-auto border-t lg:border-t-0 pt-3 lg:pt-0 border-[#3d2516]/40'>
-            {/* Project Pill - Static default project */}
+            {/* Project Pill - selects the project the running timer logs to */}
             <div className='relative'>
-              <div className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-[#3d2516]/60 bg-[#2d1a10]/40 text-[#ecd0b9] font-medium select-none'>
-                <Folder className='h-3.5 w-3.5 text-[#dda67a]' />
-                <span>{projects[0]?.name || "Tyme Project"}</span>
-              </div>
+              <button
+                onClick={() => {
+                  setShowProjDropdown(!showProjDropdown);
+                  setShowTagDropdown(false);
+                }}
+                className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-[#3d2516]/60 bg-[#2d1a10]/40 hover:bg-[#3d2516]/60 backdrop-blur-md cursor-pointer text-[#ecd0b9] font-medium'
+              >
+                {(() => {
+                  const timerProj = projects.find((p) => p.id === timerProjId);
+                  return timerProj ? (
+                    <>
+                      <span
+                        className='h-2 w-2 rounded-full shrink-0'
+                        style={{ backgroundColor: timerProj.color }}
+                      ></span>
+                      <span>{timerProj.name}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Folder className='h-3.5 w-3.5 text-[#dda67a]' />
+                      <span>No Project</span>
+                    </>
+                  );
+                })()}
+              </button>
 
               {showProjDropdown && (
-                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-64 rounded-xl shadow-xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 p-2 z-50'>
-                  <p className='text-[10px] font-mono dark:text-slate-500 text-slate-400 uppercase tracking-wide px-2 py-1'>
+                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-64 rounded-xl shadow-xl bg-[#170e0a]/95 backdrop-blur-xl border border-[#3d2516]/50 p-2 z-50'>
+                  <p className='text-[10px] font-mono text-[#ecd0b9]/60 uppercase tracking-wide px-2 py-1'>
                     Projects
                   </p>
                   <div className='max-h-48 overflow-y-auto space-y-0.5 my-1'>
@@ -1072,7 +1113,8 @@ export default function CalendarView({
                         setTimerProjId("");
                         setShowProjDropdown(false);
                       }}
-                      className='w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs hover:bg-white/50 dark:hover:bg-white/5 dark:text-slate-300 text-slate-700 transition text-left'
+                      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition text-left
+                        ${!timerProjId ? "bg-[#a66e46]/20 text-[#dda67a] font-semibold" : "hover:bg-white/5 text-[#ecd0b9]/75"}`}
                     >
                       <div className='h-2 w-2 rounded-full bg-slate-400'></div>
                       <span>No Project</span>
@@ -1084,20 +1126,22 @@ export default function CalendarView({
                           setTimerProjId(proj.id);
                           setShowProjDropdown(false);
                         }}
-                        className='w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs hover:bg-white/50 dark:hover:bg-white/5 transition text-left'
+                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition text-left
+                          ${timerProjId === proj.id ? "bg-[#a66e46]/20 text-[#dda67a] font-semibold" : "hover:bg-white/5 text-[#ecd0b9]/75"}`}
                       >
-                        <span className='flex items-center gap-2 dark:text-slate-200 text-slate-800 font-medium'>
+                        <span className='flex items-center gap-2 font-medium'>
                           <span
                             className='h-2 w-2 rounded-full'
                             style={{ backgroundColor: proj.color }}
                           ></span>
                           {proj.name}
                         </span>
-                        {proj.client && (
-                          <span className='text-[10px] dark:text-slate-500 text-slate-400'>
-                            ({proj.client})
-                          </span>
-                        )}
+                        <span className='flex items-center gap-1.5'>
+                          {proj.client && (
+                            <span className='text-[10px] text-[#ecd0b9]/40'>({proj.client})</span>
+                          )}
+                          {timerProjId === proj.id && <Check className='h-3 w-3 text-[#dda67a]' />}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1130,7 +1174,7 @@ export default function CalendarView({
                         />
                         <div className='flex justify-between items-center gap-2'>
                           <div className='flex gap-1.5'>
-                            {["#dda67a", "#a66e46", "#8e5a34", "#3e271a", "#f59e0b", "#ef4444"].map(
+                            {PROJECT_COLORS.map(
                               (col) => (
                                 <button
                                   type='button'
@@ -1724,7 +1768,8 @@ export default function CalendarView({
             setNewEntryEndTime("10:00");
             setModalDurationStr("1:00");
             setModalSelectedTags([]);
-            setShowModalTagDropdown(false);
+            setModalProjId(projects[0]?.id || "");
+            setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
             setIsCreateModalOpen(true);
           }}
           className='md:hidden fixed bottom-20 right-6 z-40 h-14 w-14 rounded-full bg-[#a66e46] hover:bg-[#8e5a34] text-white flex items-center justify-center shadow-lg shadow-[#4a2b16]/50 cursor-pointer active:scale-95 transition-all duration-150'
@@ -1957,7 +2002,7 @@ export default function CalendarView({
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setIsCreateModalOpen(false);
-                setShowModalTagDropdown(false);
+                setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
               }
             }}
             className='fixed inset-0 bg-black/85 flex items-center justify-center p-4 z-50'
@@ -1991,11 +2036,10 @@ export default function CalendarView({
                 e.preventDefault();
                 const fd = new FormData(e.currentTarget);
                 const desc = fd.get("description") as string;
-                const projVal = fd.get("projectId") as string;
 
                 onAddEntry({
                   description: desc || "Untitled Task",
-                  projectId: projVal || undefined,
+                  projectId: modalProjId || undefined,
                   tags: modalSelectedTags,
                   date: newEntryDate,
                   startTime: newEntryStartTime,
@@ -2004,7 +2048,7 @@ export default function CalendarView({
                 });
 
                 setIsCreateModalOpen(false);
-                setShowModalTagDropdown(false);
+                setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
               }}
               className='p-6 space-y-5'
             >
@@ -2078,19 +2122,153 @@ export default function CalendarView({
               </div>
 
               {/* Project field */}
-              <div className='flex flex-col sm:flex-row sm:items-center gap-4'>
-                <label className='text-sm font-semibold text-[#ecd0b9]/75 sm:w-[120px] shrink-0'>
+              <div className='flex flex-col sm:flex-row sm:items-start gap-4'>
+                <label className='text-sm font-semibold text-[#ecd0b9]/75 sm:w-[120px] pt-1.5 shrink-0'>
                   Project
                 </label>
                 <div className='relative flex-1'>
-                  <input type='hidden' name='projectId' value={projects[0]?.id || ""} />
-                  <div className='w-full bg-[#1c120c] border border-[#3e271a] rounded p-3 text-sm text-[#ecd0b9] font-medium flex items-center gap-2 select-none'>
-                    <span
-                      className='h-2.5 w-2.5 rounded-full'
-                      style={{ backgroundColor: projects[0]?.color || "#a66e46" }}
-                    />
-                    <span>{projects[0]?.name || "Tyme Project"}</span>
-                  </div>
+                  {/* Select Dropdown Box Trigger */}
+                  <button
+                    type='button'
+                    onClick={() => {
+                      setShowModalProjDropdown(!showModalProjDropdown);
+                      setShowModalTagDropdown(false);
+                    }}
+                    className='w-full text-left bg-[#1c120c] border border-[#3e271a] rounded p-3 pr-10 text-sm text-white focus:border-[#dda67a] flex items-center justify-between cursor-pointer transition hover:border-[#3e271a]/80'
+                  >
+                    {(() => {
+                      const modalProj = projects.find((p) => p.id === modalProjId);
+                      return modalProj ? (
+                        <span className='flex items-center gap-2 font-medium text-[#ecd0b9]'>
+                          <span
+                            className='h-2.5 w-2.5 rounded-full shrink-0'
+                            style={{ backgroundColor: modalProj.color }}
+                          />
+                          <span>{modalProj.name}</span>
+                          {modalProj.client && (
+                            <span className='text-[11px] text-[#ecd0b9]/40'>
+                              ({modalProj.client})
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className='text-[#ecd0b9]/60'>No Project</span>
+                      );
+                    })()}
+                    <span className='text-[#ecd0b9]/60'>
+                      <svg className='h-4 w-4 fill-current' viewBox='0 0 20 20'>
+                        <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
+                      </svg>
+                    </span>
+                  </button>
+
+                  {/* Dropdown popup project list */}
+                  {showModalProjDropdown && (
+                    <div className='absolute left-0 right-0 mt-1 bg-[#1a110a] border border-[#3e271a] rounded-md shadow-2xl z-50 max-h-60 overflow-y-auto p-2 space-y-1'>
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setModalProjId("");
+                          setShowModalProjDropdown(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs rounded transition flex items-center justify-between cursor-pointer
+                          ${!modalProjId ? "bg-[#2f1d13] text-white font-semibold" : "text-[#ecd0b9]/70 hover:bg-[#2c1a11]/40 hover:text-white"}`}
+                      >
+                        <span className='flex items-center gap-2'>
+                          <span className='h-2 w-2 rounded-full bg-slate-400'></span>
+                          <span>No Project</span>
+                        </span>
+                        {!modalProjId && <Check className='h-3 w-3 text-[#dda67a]' />}
+                      </button>
+                      {projects.map((p) => {
+                        const active = modalProjId === p.id;
+                        return (
+                          <button
+                            type='button'
+                            key={p.id}
+                            onClick={() => {
+                              setModalProjId(p.id);
+                              setShowModalProjDropdown(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 text-xs rounded transition flex items-center justify-between cursor-pointer
+                              ${active ? "bg-[#2f1d13] text-white font-semibold" : "text-[#ecd0b9]/70 hover:bg-[#2c1a11]/40 hover:text-white"}`}
+                          >
+                            <span className='flex items-center gap-2'>
+                              <span
+                                className='h-2 w-2 rounded-full'
+                                style={{ backgroundColor: p.color }}
+                              ></span>
+                              <span>{p.name}</span>
+                              {p.client && (
+                                <span className='text-[10px] text-[#ecd0b9]/40'>({p.client})</span>
+                              )}
+                            </span>
+                            {active && <Check className='h-3 w-3 text-[#dda67a]' />}
+                          </button>
+                        );
+                      })}
+
+                      {/* Inline quick-create */}
+                      <div className='border-t border-[#3e271a]/60 pt-2 mt-1'>
+                        {!showModalProjCreator ? (
+                          <button
+                            type='button'
+                            onClick={() => setShowModalProjCreator(true)}
+                            className='w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-[#dda67a] hover:bg-[#dda67a]/15 rounded font-medium cursor-pointer transition'
+                          >
+                            <Plus className='h-3.5 w-3.5' />
+                            <span>Create Project</span>
+                          </button>
+                        ) : (
+                          <div className='space-y-2 p-1'>
+                            <input
+                              type='text'
+                              placeholder='Project name *'
+                              value={newProjName}
+                              onChange={(e) => setNewProjName(e.target.value)}
+                              className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                            />
+                            <input
+                              type='text'
+                              placeholder='Client (optional)'
+                              value={newProjClient}
+                              onChange={(e) => setNewProjClient(e.target.value)}
+                              className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                            />
+                            <div className='flex justify-between items-center gap-2'>
+                              <div className='flex gap-1.5'>
+                                {PROJECT_COLORS.map((col) => (
+                                  <button
+                                    type='button'
+                                    key={col}
+                                    onClick={() => setNewProjColor(col)}
+                                    className={`h-4.5 w-4.5 rounded-full border cursor-pointer ${newProjColor === col ? "ring-2 ring-[#dda67a]" : "opacity-70"}`}
+                                    style={{ backgroundColor: col }}
+                                  />
+                                ))}
+                              </div>
+                              <div className='flex gap-1'>
+                                <button
+                                  type='button'
+                                  onClick={() => setShowModalProjCreator(false)}
+                                  className='px-2 py-1 text-[10px] rounded bg-[#241610] hover:bg-[#341f17] text-[#ecd0b9] border border-[#3e271a]/50'
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type='button'
+                                  onClick={handleCreateProjectInModal}
+                                  className='px-2 py-1 text-[10px] rounded bg-[#a66e46] text-white font-medium hover:bg-[#8e5a34]'
+                                >
+                                  Save
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -2167,7 +2345,7 @@ export default function CalendarView({
                   type='button'
                   onClick={() => {
                     setIsCreateModalOpen(false);
-                    setShowModalTagDropdown(false);
+                    setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
                   }}
                   className='text-[#dda67a] hover:text-[#ecd0b9] text-sm font-semibold cursor-pointer transition bg-transparent border-none outline-none py-2 px-1'
                 >

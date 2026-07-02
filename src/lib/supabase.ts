@@ -372,6 +372,21 @@ export const saveProjectToFS = async (userId: string, project: Project) => {
   }
 };
 
+// Delete project
+export const deleteProjectFromFS = async (userId: string, projectId: string) => {
+  try {
+    const { error } = await supabase
+      .from('projects')
+      .delete()
+      .eq('id', projectId)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+  } catch (err) {
+    handleSupabaseError(err, OperationType.DELETE, 'projects');
+  }
+};
+
 // Subscribe to tags
 export const subscribeToTags = (userId: string, onUpdate: (tags: Tag[]) => void) => {
   const fetchTags = async (): Promise<Tag[]> => {
