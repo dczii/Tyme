@@ -125,7 +125,7 @@ export default function FeatureShowcase() {
             Everything you need to bill with confidence
           </h2>
           <p className="mt-4 max-w-md text-lg text-[#ecd0b9]/70">
-            Purpose-built for the way freelancers and virtual assistants actually work.
+            Purpose-built for the way independent professionals actually work.
           </p>
 
           {/* Live "01 / 06 — title" indicator, desktop only (tracks the card-deal) */}

@@ -17,17 +17,20 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+  title: 'Tyme - Time Tracking App for Independent Professionals',
   description:
-    'Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, filter reports by project and tag, and export branded PDF summaries.',
+    'Tyme is a free time tracking web app for consultants, contractors, coaches, creatives, and freelancers. Log billable hours on a visual weekly calendar, filter reports by project and tag, and export branded PDF summaries.',
   applicationName: 'Tyme',
   authors: [{ name: 'Tyme' }],
   keywords: [
     'time tracking',
     'time tracking app',
     'time tracker',
+    'consultant time tracking',
+    'contractor time tracking',
     'freelancer time tracking',
     'virtual assistant time tracking',
+    'coach session time tracking',
     'billable hours',
     'timesheet',
     'weekly time log',
@@ -43,18 +46,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Tyme',
-    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App for Independent Professionals',
     description:
-      'Track billable hours on a visual weekly calendar, filter reports by project, tag and date, and export branded PDF summaries. Free time tracking built for freelancers and VAs.',
+      'Track billable hours on a visual weekly calendar, filter reports by project, tag and date, and export branded PDF summaries. Free time tracking built for consultants, contractors, coaches, creatives, and freelancers.',
     url: '/',
     locale: 'en_US',
     images: [{ url: '/og-image.png', alt: 'Tyme time tracking app logo' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App for Independent Professionals',
     description:
-      'Free time tracking for freelancers and virtual assistants. Visual weekly calendar, filterable reports, and branded PDF exports.',
+      'Free time tracking for independent professionals who bill by the hour. Visual weekly calendar, filterable reports, and branded PDF exports.',
     images: ['/og-image.png'],
   },
   icons: {

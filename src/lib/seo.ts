@@ -74,12 +74,12 @@ export const faqItems: FaqItem[] = [
   {
     question: 'What is time tracking?',
     answer:
-      'Time tracking is the practice of recording exactly how long you spend on tasks, clients, and projects, usually with a web app. For freelancers and virtual assistants it is how you bill accurately, prove your hours, and identify unprofitable work.',
+      'Time tracking is the practice of recording exactly how long you spend on tasks, clients, and projects, usually with a web app. For independent professionals — consultants, contractors, coaches, creatives, and freelancers — it is how you bill accurately, prove your hours, and identify unprofitable work.',
   },
   {
-    question: 'What is the best time tracking app for freelancers and virtual assistants?',
+    question: 'What is the best time tracking app for independent professionals?',
     answer:
-      'Tyme is a strong free option built specifically for freelancers and virtual assistants. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF summaries for invoicing.',
+      'Tyme is a strong free option built specifically for independent professionals — consultants, contractors, coaches, tutors, creatives, freelancers, and virtual assistants. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF summaries for invoicing.',
   },
   {
     question: 'Is time tracking worth it if I charge flat fees instead of hourly?',
@@ -87,7 +87,7 @@ export const faqItems: FaqItem[] = [
       'Yes. Tracking time against a fixed price reveals your true effective hourly rate, so you can price the next project more intelligently. You do not have to bill the hours, you just need to know them.',
   },
   {
-    question: 'How do virtual assistants track time across multiple clients?',
+    question: 'How do I track time across multiple clients?',
     answer:
       'Use projects to separate clients and tags to categorize recurring work types such as admin, meetings, and revisions. Tyme also syncs client references from Google Contacts via the People API, then lets you filter reports by client and export a PDF at invoice time.',
   },
@@ -115,10 +115,11 @@ export const structuredData = [
     operatingSystem: 'Web browser',
     url: `${SITE_URL}/`,
     description:
-      'Tyme is a time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries.',
+      'Tyme is a time tracking web app for independent professionals — consultants, contractors, coaches, creatives, freelancers, and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries.',
     audience: {
       '@type': 'Audience',
-      audienceType: 'Freelancers and Virtual Assistants',
+      audienceType:
+        'Independent professionals: consultants, contractors, coaches, tutors, creatives, freelancers, and virtual assistants',
     },
     featureList: productFeatures.map((f) => f.feature),
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -128,7 +129,7 @@ export const structuredData = [
     '@type': 'WebSite',
     name: 'Tyme',
     url: `${SITE_URL}/`,
-    description: 'Free time tracking web app for freelancers and virtual assistants.',
+    description: 'Free time tracking web app for independent professionals who bill by the hour.',
   },
   {
     '@context': 'https://schema.org',

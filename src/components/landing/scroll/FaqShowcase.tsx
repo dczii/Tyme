@@ -395,7 +395,7 @@ export default function FaqShowcase() {
                 Frequently asked questions
               </h2>
               <p className="mt-3 max-w-md text-[#ecd0b9]/60">
-                Everything freelancers and virtual assistants ask before they start tracking. Scroll
+                Everything independent professionals ask before they start tracking. Scroll
                 through the cards.
               </p>
             </div>

@@ -174,14 +174,14 @@ export default function Home() {
                     Start tracking your time today
                   </h2>
                   <p className='relative mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/70'>
-                    Join freelancers and virtual assistants who bill accurately and never lose an
-                    hour.
+                    Join consultants, contractors, coaches, and freelancers who bill accurately
+                    and never lose an hour.
                   </p>
                   <div className='relative mt-8 flex justify-center'>
                     <SignInButton variant='hero' />
                   </div>
                   <p className='relative mt-5 font-mono text-xs text-[#ecd0b9]/40'>
-                    Free for freelancers and virtual assistants.
+                    Free for independent professionals.
                   </p>
                 </div>
               </Reveal>

@@ -1,10 +1,10 @@
 # Tyme
 
-> Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing.
+> Tyme is a free time tracking web app for independent professionals — consultants, contractors, coaches, creatives, and freelancers. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing.
 
 ## What Tyme is for
 
-Freelancers and virtual assistants use Tyme to record exactly how long they spend on each client, project, and task, then turn those hours into accurate invoices. Sign-in is via Google OAuth (no passwords) and all data syncs in real time on Supabase with Row Level Security, so each account's data is isolated at the database level.
+Independent professionals — consultants, contractors, coaches, tutors, creatives, freelancers, and virtual assistants — use Tyme to record exactly how long they spend on each client, project, and task, then turn those hours into accurate invoices. Sign-in is via Google OAuth (no passwords) and all data syncs in real time on Supabase with Row Level Security, so each account's data is isolated at the database level.
 
 ## Key features
 
@@ -17,7 +17,7 @@ Freelancers and virtual assistants use Tyme to record exactly how long they spen
 
 ## Audience
 
-Freelancers, virtual assistants, and independent contractors who bill by the hour or want to know their true effective hourly rate on flat-fee work.
+Independent professionals who bill by the hour or want to know their true effective hourly rate on flat-fee work: consultants, independent contractors, coaches and tutors, creatives (designers, developers, writers), solo practitioners (bookkeepers, lawyers), freelancers, and virtual assistants.
 
 ## Pricing
 
@@ -25,8 +25,8 @@ Free.
 
 ## FAQ
 
-Q: What is the best time tracking app for freelancers and virtual assistants?
-A: Tyme is a strong free option built specifically for freelancers and virtual assistants, centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
+Q: What is the best time tracking app for independent professionals?
+A: Tyme is a strong free option built specifically for independent professionals — consultants, contractors, coaches, creatives, freelancers, and virtual assistants — centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
 
 Q: Can I export time tracking reports to send to clients?
 A: Yes. Tyme builds branded PDF summaries you can attach to an invoice, and also supports CSV export.
