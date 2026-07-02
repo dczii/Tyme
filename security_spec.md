@@ -3,11 +3,11 @@
 This document defines the security invariants, malicious attack payloads, and test
 procedures for verifying high-stakes data access control. Tyme is a client-only
 Next.js app talking directly to Supabase PostgreSQL with the public anon key, so
-**every invariant below must be enforced inside the database** by the Row Level
-Security policies and CHECK constraints in
-`supabase/migrations/20260702000000_enable_rls_security.sql`. Client-side filters
-(`.eq('user_id', ...)`) are convenience only — an attacker can issue arbitrary
-PostgREST queries with the anon key.
+**every invariant below must be enforced inside the database** by Row Level
+Security policies and CHECK constraints, applied via the Supabase Dashboard SQL
+Editor (reference SQL in section 4). Client-side filters (`.eq('user_id', ...)`)
+are convenience only — an attacker can issue arbitrary PostgREST queries with
+the anon key.
 
 ## 1. Data Invariants
 
@@ -103,3 +103,41 @@ anon key plus (where noted) a valid JWT for `user_A`.
 - **Auth**: Supabase Auth (Google OAuth + email/password). Enable email
   confirmation and leaked-password protection in the Supabase dashboard
   (Auth → Providers → Email) so unverified or breached credentials are rejected.
+
+## 4. Reference Policy SQL (apply in Supabase Dashboard → SQL Editor)
+
+Owner-only RLS for `profiles` (keyed by `id`) — repeat the same four policies
+for `projects`, `tags`, and `entries` using `user_id = (select auth.uid())`:
+
+```sql
+alter table public.profiles enable row level security;
+revoke all on public.profiles from anon;
+
+create policy "profiles_select_own" on public.profiles
+  for select to authenticated using (id = (select auth.uid()));
+create policy "profiles_insert_own" on public.profiles
+  for insert to authenticated with check (id = (select auth.uid()));
+create policy "profiles_update_own" on public.profiles
+  for update to authenticated
+  using (id = (select auth.uid())) with check (id = (select auth.uid()));
+create policy "profiles_delete_own" on public.profiles
+  for delete to authenticated using (id = (select auth.uid()));
+```
+
+Data-invariant CHECK constraints (add as `NOT VALID` if legacy rows exist):
+
+```sql
+alter table public.profiles add constraint profiles_target_hours_range
+  check (workday_target_hours >= 1 and workday_target_hours <= 24);
+alter table public.profiles add constraint profiles_hourly_rate_range
+  check (hourly_rate >= 0 and hourly_rate <= 100000);
+alter table public.entries add constraint entries_id_format
+  check (id ~ '^[A-Za-z0-9_-]{1,128}$');
+alter table public.entries add constraint entries_description_bounds
+  check (char_length(btrim(description)) between 1 and 2000);
+alter table public.entries add constraint entries_duration_bounds
+  check (duration_minutes > 0 and duration_minutes <= 1440);
+alter table public.entries add constraint entries_tags_bounds
+  check (coalesce(array_length(tags, 1), 0) <= 50);
+-- equivalent id-format and text-length bounds on projects and tags
+```

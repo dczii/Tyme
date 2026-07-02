@@ -55,7 +55,6 @@ Tyme/
 │   ├── components/
 │   │   ├── BrandLogo.tsx         # Logo rendering for Classic, Minimalist, Hourglass styles
 │   │   ├── CalendarView.tsx      # Time entry logger, weekly calendar timeline & forms
-│   │   ├── GoogleLoginPopup.tsx  # Google Login UI & scopes consent info
 │   │   ├── LoginScreen.tsx       # Auth gate and introduction page
 │   │   ├── ReportsView.tsx       # Search filter metrics, chart aggregates & PDF export
 │   │   ├── SettingsView.tsx      # Workday goals, active projects, tags & Google Contacts
@@ -64,9 +63,7 @@ Tyme/
 │   │   └── supabase.ts           # Supabase client, auth, realtime subscriptions & People API contact fetch
 │   ├── types.ts                  # TypeScript definitions for Projects, Tags, and Entries
 │   └── utils.ts                  # Date formatting, math, and duration helpers
-├── scripts/
-│   └── migrate-firebase-to-supabase.ts  # One-time data migration script
-├── next.config.ts                # Next.js configuration
+├── next.config.ts                # Next.js configuration & security headers
 ├── postcss.config.mjs            # Tailwind v4 via @tailwindcss/postcss
 ├── security_spec.md              # Documentation of workspace security invariants
 └── package.json                  # Dependencies and execution scripts
@@ -135,7 +132,7 @@ The app is a standard Next.js App Router project and deploys to [Vercel](https:/
 1. Import the repository into Vercel.
 2. Add the `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` environment variables in **Project Settings → Environment Variables**.
 3. In the Supabase Dashboard, add your deployment URL to **Authentication → URL Configuration** so the Google OAuth redirect resolves correctly.
-4. **Required:** apply the database security migration so Row Level Security actually protects user data. Run `supabase/migrations/20260702000000_enable_rls_security.sql` via the Supabase CLI (`supabase db push`) or paste it into **Dashboard → SQL Editor** and execute it. Without it, anyone holding the public anon key can read and write every user's rows.
+4. **Required:** enable Row Level Security with owner-only policies on the `profiles`, `projects`, `tags`, and `entries` tables in the Supabase Dashboard. The required policies and data invariants are documented in [`security_spec.md`](./security_spec.md). Without RLS, anyone holding the public anon key can read and write every user's rows.
 
 Vercel runs `npm run build` and serves the output automatically. Any Node.js host that supports `next build` / `next start` works as well.
 
@@ -143,39 +140,7 @@ Vercel runs `npm run build` and serves the output automatically. Any Node.js hos
 
 The browser talks to Supabase directly with the public anon key, so all access
 control lives in the database: owner-only RLS policies plus CHECK-constraint
-data invariants, defined in `supabase/migrations/20260702000000_enable_rls_security.sql`.
-The invariants and attack payload test matrix are documented in
+data invariants, applied via the Supabase Dashboard SQL Editor. The invariants,
+policy SQL, and attack payload test matrix are documented in
 [`security_spec.md`](./security_spec.md). The app also ships hardened HTTP
 security headers (CSP, HSTS, `frame-ancestors 'none'`, etc.) via `next.config.ts`.
-
----
-
-## 🔄 Data Migration (Firebase → Supabase)
-
-If you have existing data in Firestore that needs to be migrated:
-
-### Prerequisites
-1. Install `firebase-admin` temporarily:
-   ```bash
-   npm install firebase-admin
-   ```
-2. Download your Firebase service account key from **Firebase Console → Project Settings → Service Accounts → Generate New Private Key** and save as `scripts/firebase-service-account.json`
-3. Set your Supabase **service role key** (not anon key):
-   ```bash
-   export SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
-   ```
-
-### Run Migration
-```bash
-# Dry run (preview what will be migrated, no data written)
-npx tsx scripts/migrate-firebase-to-supabase.ts
-
-# Execute migration
-npx tsx scripts/migrate-firebase-to-supabase.ts --execute
-```
-
-### Cleanup
-```bash
-npm uninstall firebase-admin
-rm scripts/firebase-service-account.json
-```
