@@ -31,6 +31,7 @@ import {
 import BrandLogo from "./BrandLogo";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
+import { useTyme } from "@/app/providers";
 
 // Predefined filtering options
 type PresetFilterType = "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "allTime";
@@ -52,6 +53,9 @@ export default function ReportsView({
   onDuplicateEntry,
   hourlyRate,
 }: ReportsViewProps) {
+  // Signed-in account — used to brand the PDF header with the user's own email
+  const { user } = useTyme();
+
   // Preset select
   const [datePreset, setDatePreset] = useState<PresetFilterType>("thisMonth");
 
@@ -1295,7 +1299,7 @@ export default function ReportsView({
                 Tyme
               </span>
               <span className='text-[8px] font-mono text-stone-400 block mt-0.5'>
-                dczabala2@gmail.com
+                {user?.email || ''}
               </span>
             </div>
           </div>

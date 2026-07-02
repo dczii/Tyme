@@ -202,11 +202,14 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
 
   // --- Core CRUD Handlers synced to Supabase ---
 
+  // Cryptographically random row IDs (Math.random/Date.now are guessable).
+  const newId = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
+
   // Add new time entry
   const handleAddEntry = async (entryData: Omit<TimeEntry, 'id'>) => {
     const newEntry: TimeEntry = {
       ...entryData,
-      id: `entry-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: newId('entry'),
     };
     if (supabaseUser) {
       await saveEntryToFS(supabaseUser.id, newEntry);
@@ -240,7 +243,7 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
   // Add new Project
   const handleAddProject = (name: string, color: string, client?: string): Project => {
     const newProject: Project = {
-      id: `proj-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      id: newId('proj'),
       name,
       client: client || '',
       color,
@@ -275,7 +278,7 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
   // Add new Tag
   const handleAddTag = (name: string): Tag => {
     const newTag: Tag = {
-      id: `tag-${Date.now()}`,
+      id: newId('tag'),
       name,
     };
     if (supabaseUser) {
