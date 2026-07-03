@@ -1,12 +1,16 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CalendarDays, FileBarChart2, Settings, FileDown, TrendingUp, Clock } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import SignInButton from "../SignInButton";
+import MagneticButton from "../MagneticButton";
 import { useIntro } from "../IntroContext";
+
+gsap.registerPlugin(ScrollTrigger);
 
 // ── Mock data for the "screenshot" — a faithful still of the Tyme weekly calendar ──
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -26,7 +30,7 @@ const ENTRIES: Entry[][] = [
   ],
   [{ top: 22, height: 40, color: "#f59e0b", label: "Deep work" }],
   [
-    { top: 10, height: 22, color: "#8b5cf6", label: "Call · Acme" },
+    { top: 10, height: 22, color: "#8b5cf6", label: "Call · Reyes" },
     { top: 44, height: 16, color: "#10b981", label: "Invoicing" },
   ],
   [{ top: 50, height: 14, color: "#3b82f6", label: "Admin" }],
@@ -53,10 +57,12 @@ export default function AppShowcase() {
   const reduce = useReducedMotion();
   const { introDone } = useIntro();
   const sectionRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [entranceDone, setEntranceDone] = useState(false);
 
   useLayoutEffect(() => {
     // Reduced motion: render the final static state — never leave anything hidden.
@@ -75,9 +81,48 @@ export default function AppShowcase() {
       gsap.set(cards, { opacity: 0, y: 60 });
       gsap.set(entries, { opacity: 0, scaleY: 0.55, transformOrigin: "50% 0%" });
 
+      // Exit hand-off: as the hero scrolls away, the heading (foreground)
+      // accelerates upward while the product stage lags and recedes — a depth
+      // transition that hands the eye to the story bridge below instead of the
+      // section simply sliding off. Scrubbed, transform/opacity only, and
+      // independent of the entrance (it animates the containers, not the same
+      // elements the timeline owns).
+      if (stageRef.current) {
+        gsap.to(stageRef.current, {
+          y: 70,
+          scale: 0.965,
+          opacity: 0.4,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      }
+      if (heading) {
+        gsap.to(heading, {
+          y: -60,
+          opacity: 0.25,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "60% top",
+            scrub: true,
+          },
+        });
+      }
+
       if (!introDone) return;
 
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        // Unlock the pointer-tilt only after the entrance owns its last frame,
+        // so the two never fight over the frame's transform.
+        onComplete: () => setEntranceDone(true),
+      });
 
       // 1) Heading copy staggers up + fades in.
       if (heading) {
@@ -116,6 +161,41 @@ export default function AppShowcase() {
     return () => ctx.revert();
   }, [introDone, reduce]);
 
+  // Pointer tilt: once the entrance has settled, the framed product leans a few
+  // degrees toward the cursor (quickTo, transform-only) — the "screenshot"
+  // answers the hand like a physical object, inviting inspection rather than
+  // decorating. Hover-pointer devices only; touch and reduced motion skip it.
+  useEffect(() => {
+    if (reduce || !entranceDone) return;
+    const stage = stageRef.current;
+    const frame = frameRef.current;
+    if (!stage || !frame) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const rxTo = gsap.quickTo(frame, "rotationX", { duration: 0.6, ease: "power2.out" });
+    const ryTo = gsap.quickTo(frame, "rotationY", { duration: 0.6, ease: "power2.out" });
+
+    const onMove = (e: PointerEvent) => {
+      const r = stage.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      ryTo(px * 6);
+      rxTo(-py * 5);
+    };
+    const onLeave = () => {
+      rxTo(0);
+      ryTo(0);
+    };
+
+    stage.addEventListener("pointermove", onMove);
+    stage.addEventListener("pointerleave", onLeave);
+    return () => {
+      stage.removeEventListener("pointermove", onMove);
+      stage.removeEventListener("pointerleave", onLeave);
+      gsap.set(frame, { rotationX: 0, rotationY: 0 });
+    };
+  }, [reduce, entranceDone]);
+
   return (
     <section
       ref={sectionRef}
@@ -130,13 +210,15 @@ export default function AppShowcase() {
           add up in real time.
         </p>
         <div className='pointer-events-auto mt-9 flex justify-center'>
-          <SignInButton variant='hero' />
+          <MagneticButton>
+            <SignInButton variant='hero' />
+          </MagneticButton>
         </div>
       </div>
 
       {/* Glow + 3D stage. `pb`/`pt` give the tilted frame and the floating accent
           cards room to play without being clipped by the section. */}
-      <div className='relative px-1 pb-10 pt-6 [perspective:1600px]'>
+      <div ref={stageRef} className='relative px-1 pb-10 pt-6 will-change-transform [perspective:1600px]'>
         <div
           aria-hidden='true'
           className='pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#9a6a42]/20 blur-[140px]'
