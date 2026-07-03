@@ -115,6 +115,23 @@ export default function AppShowcase() {
         });
       }
 
+      // The floating accent cards ride the same exit at three different rates
+      // (yPercent composes with the entrance's x/y, so the tweens never clash)
+      // — the speed difference is what sells the hero as layered space rather
+      // than a flat image.
+      cards.forEach((card, i) => {
+        gsap.to(card, {
+          yPercent: 18 + i * 14,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
+      });
+
       if (!introDone) return;
 
       const tl = gsap.timeline({

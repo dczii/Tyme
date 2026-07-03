@@ -73,7 +73,7 @@ export default function SignInButton({ variant = 'header', className = '' }: Sig
       onClick={handleSignIn}
       disabled={isConnecting}
       aria-label="Sign in with Google"
-      className={`group inline-flex items-center justify-center bg-white font-semibold text-[#1f1f1f] border border-slate-200/80 shadow-lg cursor-pointer select-none transition duration-150 ease-out hover:bg-slate-50 active:scale-[0.97] disabled:opacity-85 disabled:cursor-wait ${sizing} ${className}`}
+      className={`group inline-flex items-center justify-center bg-white font-semibold text-[#1f1f1f] border border-slate-200/80 shadow-lg cursor-pointer select-none transition duration-150 ease-out hover:-translate-y-px hover:bg-slate-50 hover:shadow-xl active:translate-y-0 active:scale-[0.97] motion-reduce:hover:translate-y-0 disabled:opacity-85 disabled:cursor-wait ${sizing} ${className}`}
     >
       {isConnecting ? (
         <>

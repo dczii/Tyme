@@ -1,8 +1,9 @@
-import Link from "next/link";
 import BrandLogo from "@/components/BrandLogo";
-import AppNavButton from "@/components/landing/AppNavButton";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
+import { RouteVeilProvider } from "@/components/landing/RouteVeil";
+import SiteHeader, { navLinkClass } from "@/components/landing/SiteHeader";
+import AmbientBackdrop from "@/components/landing/scroll/AmbientBackdrop";
 import AppShowcase from "@/components/landing/scroll/AppShowcase";
 import StoryBridge from "@/components/landing/scroll/StoryBridge";
 import FeatureShowcase from "@/components/landing/scroll/FeatureShowcase";
@@ -10,11 +11,6 @@ import JourneyTimeline from "@/components/landing/scroll/JourneyTimeline";
 import FaqShowcase from "@/components/landing/scroll/FaqShowcase";
 import FinalCta from "@/components/landing/scroll/FinalCta";
 import SmoothScrollProvider from "@/components/landing/scroll/SmoothScrollProvider";
-
-// Nav links get a sliding underline (origin-left scale) — a small, consistent
-// "you are pointing at a destination" cue shared by header and footer.
-const navLinkClass =
-  "relative transition-colors duration-150 ease hover:text-white after:absolute after:inset-x-0 after:-bottom-1 after:h-px after:origin-left after:scale-x-0 after:bg-[#dda67a] after:transition-transform after:duration-200 after:ease-out hover:after:scale-x-100";
 
 /**
  * Emits a REAL HTML comment into the rendered markup. JSX `{/* … *\/}` comments are
@@ -31,48 +27,23 @@ export default function Home() {
 
   return (
     <IntroProvider>
+      <RouteVeilProvider>
       <SmoothScrollProvider>
-        <div className='relative min-h-screen overflow-hidden bg-[#0c0806] text-slate-200 font-sans'>
+        {/* overflow-x-clip (not overflow-hidden) contains the decorative glow
+        blobs without creating a scroll container — overflow-hidden here would
+        silently break the sticky header. */}
+        <div className='relative min-h-screen overflow-x-clip bg-[#0c0806] text-slate-200 font-sans'>
           <LogoIntroAnimation />
-          {/* Ambient espresso-theme glow (decorative). The two blobs breathe with a
-          slow, offset opacity pulse — gated behind motion-safe so reduced-motion
-          users get a static backdrop. */}
-          <div
-            aria-hidden='true'
-            className='pointer-events-none absolute -top-48 -left-40 h-[520px] w-[520px] rounded-full bg-[#4a2b16]/30 blur-[130px] motion-safe:animate-pulse motion-safe:[animation-duration:7s]'
-          />
-          <div
-            aria-hidden='true'
-            className='pointer-events-none absolute top-[40%] -right-48 h-[520px] w-[520px] rounded-full bg-[#9a6a42]/15 blur-[130px] motion-safe:animate-pulse motion-safe:[animation-duration:9s]'
-          />
+          {/* Ambient espresso glow with scroll parallax: the two blobs breathe
+          (CSS pulse) and drift at different rates as the page scrolls, forming
+          the far depth layer behind every section. */}
+          <AmbientBackdrop />
 
           {/* ===== Header =====
-          Sticky, blurred top bar: brand on the left, anchor nav in the middle,
-          and the "Sign in with Google" action pinned top-right. */}
-          <SectionComment label='HEADER - sticky nav + Google sign-in (top right)' />
-          <header className='sticky top-0 z-30 border-b border-[#3e271a]/40 bg-[#0c0806]/70 backdrop-blur-xl'>
-            <div className='mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8'>
-              <Link href='/' className='flex items-center gap-2.5' aria-label='Tyme home'>
-                <span data-header-logo className='flex'>
-                  <BrandLogo size={34} showBackground={false} className='brightness-125' />
-                </span>
-                <span className='text-lg font-bold tracking-tight text-white'>Tyme</span>
-              </Link>
-              <nav className='hidden items-center gap-8 text-sm text-[#ecd0b9]/70 md:flex'>
-                <a href='#features' className={navLinkClass}>
-                  Features
-                </a>
-                <a href='#how-it-works' className={navLinkClass}>
-                  How it works
-                </a>
-                <a href='#faq' className={navLinkClass}>
-                  FAQ
-                </a>
-              </nav>
-              {/* Login / Go To App — top right */}
-              <AppNavButton variant='header' />
-            </div>
-          </header>
+          Sticky top bar: transparent over the hero, elevates (blur + border +
+          shadow) once scrolled. Brand left, anchor nav middle, Login right. */}
+          <SectionComment label='HEADER - sticky nav, elevates on scroll + Google sign-in (top right)' />
+          <SiteHeader />
 
           <main className='relative z-10'>
             {/* ===== Hero (section 1) — calendar showcase =====
@@ -150,6 +121,7 @@ export default function Home() {
           </footer>
         </div>
       </SmoothScrollProvider>
+      </RouteVeilProvider>
     </IntroProvider>
   );
 }

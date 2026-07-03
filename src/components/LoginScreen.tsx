@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { AlertCircle, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { googleSignIn, signInWithEmail, signUpWithEmail } from '../lib/supabase';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { DUR, DIST, EASE_OUT } from '../lib/motion';
 import BrandLogo from './BrandLogo';
 
 interface LoginScreenProps {
@@ -12,6 +13,7 @@ interface LoginScreenProps {
 }
 
 export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
+  const reduce = useReducedMotion();
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -81,8 +83,15 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#4a2b16]/30 animate-pulse duration-[6s]"></div>
       <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#9a6a42]/15 animate-pulse duration-[8s]"></div>
 
-      {/* Glassmorphism Credentials Panel */}
-      <div className="w-full max-w-[430px] bg-[#140d0a]/75 backdrop-blur-2xl border border-[#3e271a] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl relative z-10 flex flex-col items-center">
+      {/* Glassmorphism Credentials Panel. Plays a single soft arrival (rise +
+          fade, shared entrance tokens) — the receiving half of the landing
+          page's route veil, and a gentle settle when shown as the in-app auth
+          gate. Instant under reduced motion. */}
+      <motion.div
+        initial={reduce ? false : { opacity: 0, y: DIST.rise, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: DUR.enter, ease: EASE_OUT }}
+        className="w-full max-w-[430px] bg-[#140d0a]/75 backdrop-blur-2xl border border-[#3e271a] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl relative z-10 flex flex-col items-center">
 
         {/* Workspace Flag */}
         <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-[#2d1b11]/60 border border-[#5e3820]/40 rounded-full text-[10px] font-mono text-[#dda67a] tracking-wider uppercase">
@@ -223,7 +232,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                 className="bg-emerald-950/40 border border-emerald-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-emerald-200 overflow-hidden"
               >
                 <CheckCircle2 className="h-4.5 w-4.5 shrink-0 text-emerald-400 mt-0.5" />
-                <span>Almost there — we sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.</span>
+                <span>Almost there: we sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -262,7 +271,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         <div className="mt-8 text-center text-[10px] text-[#ecd0b9]/25 font-mono tracking-wide uppercase leading-normal max-w-[270px]">
           By continuing, you agree to securely sync your time-tracking workspace.
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

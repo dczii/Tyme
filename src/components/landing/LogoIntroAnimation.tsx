@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion, useAnimation, useReducedMotion } from 'motion/react';
+import { INTRO_SEEN_KEY } from '@/lib/motion';
 import { useIntro } from './IntroContext';
 
 const LOGO_SIZE = 140;
@@ -80,6 +81,23 @@ export default function LogoIntroAnimation() {
     };
 
     const run = async () => {
+      // The cinematic splash earns its ~1.5s exactly once per session. On a
+      // repeat visit (back-button, another tab, round trip through /login)
+      // the brand is already established, so the splash would only be a
+      // delay: dissolve it immediately instead.
+      let seen = false;
+      try {
+        seen = sessionStorage.getItem(INTRO_SEEN_KEY) === '1';
+        sessionStorage.setItem(INTRO_SEEN_KEY, '1');
+      } catch {
+        // Storage unavailable (private mode etc.) — treat as first visit.
+      }
+      if (seen) {
+        await bgControls.start({ opacity: 0, transition: { duration: 0.25 } });
+        finish();
+        return;
+      }
+
       // Reduced motion: no positional fly — just hold briefly, fade the backdrop, done.
       if (reduce) {
         await new Promise((r) => setTimeout(r, 600));

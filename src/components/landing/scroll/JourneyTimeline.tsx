@@ -184,7 +184,7 @@ export default function JourneyTimeline() {
 
                 <div
                   data-jt-card
-                  className='group relative ml-12 w-full overflow-hidden rounded-2xl border border-[#3e271a] bg-[#140d0a]/60 p-6 will-change-transform sm:ml-0 sm:w-[calc(50%-3.5rem)] sm:p-7'
+                  className='group relative ml-12 w-full overflow-hidden rounded-2xl border border-[#3e271a] bg-[#140d0a]/60 p-6 transition-colors duration-200 ease-out will-change-transform hover:border-[#5e3820] sm:ml-0 sm:w-[calc(50%-3.5rem)] sm:p-7'
                 >
                   {/* Cursor spotlight (desktop pointers only, see effect above). */}
                   <span

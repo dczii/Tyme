@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
 import { useTyme } from '@/app/providers';
+import { useVeilNavigate } from './RouteVeil';
 
 interface AppNavButtonProps {
   /** `header` = compact nav button, `hero` = larger primary CTA. */
@@ -17,7 +17,7 @@ interface AppNavButtonProps {
  */
 export default function AppNavButton({ variant = 'header', className = '' }: AppNavButtonProps) {
   const { user, authLoading } = useTyme();
-  const router = useRouter();
+  const navigate = useVeilNavigate();
 
   const signedIn = !authLoading && !!user;
   const label = signedIn ? 'Go To App' : 'Login';
@@ -31,9 +31,9 @@ export default function AppNavButton({ variant = 'header', className = '' }: App
   return (
     <button
       type="button"
-      onClick={() => router.push(destination)}
+      onClick={() => navigate(destination)}
       aria-label={label}
-      className={`group inline-flex items-center justify-center bg-white font-semibold text-[#1f1f1f] border border-slate-200/80 shadow-lg cursor-pointer select-none transition duration-150 ease-out hover:bg-slate-50 active:scale-[0.97] ${sizing} ${className}`}
+      className={`group inline-flex items-center justify-center bg-white font-semibold text-[#1f1f1f] border border-slate-200/80 shadow-lg cursor-pointer select-none transition duration-150 ease-out hover:-translate-y-px hover:bg-slate-50 hover:shadow-xl active:translate-y-0 active:scale-[0.97] motion-reduce:hover:translate-y-0 ${sizing} ${className}`}
     >
       <span>{label}</span>
     </button>
