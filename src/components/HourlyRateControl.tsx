@@ -154,8 +154,8 @@ export default function HourlyRateControl({
         <div
           className={`flex items-center border rounded-xl overflow-hidden transition-all duration-200 ${
             isFocused 
-              ? "border-[#dda67a] bg-[#24150d]/60 shadow-[0_0_8px_rgba(221,166,122,0.15)]" 
-              : "border-[#3d2416]/55 bg-[#24150d]/40"
+              ? "border-accent bg-surface-2/60 shadow-[0_0_8px_rgba(221,166,122,0.15)]" 
+              : "border-border/55 bg-surface-2/40"
           }`}
         >
           {/* Decrement Button */}
@@ -163,7 +163,7 @@ export default function HourlyRateControl({
             type="button"
             onClick={decrement}
             disabled={rate <= 0}
-            className="p-2 text-[#ecd0b9]/60 hover:text-white hover:bg-white/5 active:scale-95 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all animate-none"
+            className="p-2 text-body/60 hover:text-heading hover:bg-white/5 active:scale-95 disabled:opacity-30 disabled:pointer-events-none cursor-pointer transition-all animate-none"
             title="Decrease rate by $5"
           >
             <Minus className="h-3.5 w-3.5" />
@@ -171,7 +171,7 @@ export default function HourlyRateControl({
 
           {/* Dollar prefix & Text Input */}
           <div className="flex items-center px-1">
-            <span className="font-mono text-[#dda67a] font-bold text-xs select-none">$</span>
+            <span className="font-mono text-accent-text font-bold text-xs select-none">$</span>
             <input
               type="text"
               value={localRateStr}
@@ -179,18 +179,18 @@ export default function HourlyRateControl({
               onFocus={() => setIsFocused(true)}
               onBlur={handleInputBlur}
               onKeyDown={handleKeyDown}
-              className="w-12 bg-transparent text-white focus:outline-none font-mono font-bold outline-none text-center text-xs py-1.5"
+              className="w-12 bg-transparent text-heading focus:outline-none font-mono font-bold outline-none text-center text-xs py-1.5"
               placeholder="0"
               title="Enter billing rate per hour"
             />
-            <span className="text-[9px] text-[#ecd0b9]/45 select-none font-sans font-medium">/hr</span>
+            <span className="text-[9px] text-body/45 select-none font-sans font-medium">/hr</span>
           </div>
 
           {/* Increment Button */}
           <button
             type="button"
             onClick={increment}
-            className="p-2 text-[#ecd0b9]/60 hover:text-white hover:bg-white/5 active:scale-95 cursor-pointer transition-all animate-none"
+            className="p-2 text-body/60 hover:text-heading hover:bg-white/5 active:scale-95 cursor-pointer transition-all animate-none"
             title="Increase rate by $5"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -203,19 +203,19 @@ export default function HourlyRateControl({
             <button
               type="button"
               onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-              className={`p-2 rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 hover:bg-[#3d2416]/40 text-[#ecd0b9]/75 hover:text-[#ecd0b9] transition-all flex items-center gap-1 text-[10px] font-semibold cursor-pointer ${
-                isPopoverOpen ? "bg-[#3d2416]/50 text-white" : ""
+              className={`p-2 rounded-xl border border-border/55 bg-surface-2/40 hover:bg-border/40 text-body/75 hover:text-body transition-all flex items-center gap-1 text-[10px] font-semibold cursor-pointer ${
+                isPopoverOpen ? "bg-border/50 text-heading" : ""
               }`}
               title="Quick presets & adjustments"
             >
-              <Coins className="h-3.5 w-3.5 text-[#dda67a]" />
+              <Coins className="h-3.5 w-3.5 text-accent-text" />
               <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isPopoverOpen ? "rotate-180" : ""}`} />
             </button>
 
             {/* Popover overlay */}
             {isPopoverOpen && (
-              <div className="absolute right-0 mt-1.5 z-50 w-48 bg-[#180f0a] border border-[#4a2e1d] rounded-xl shadow-2xl p-3 space-y-2.5">
-                <span className="text-[9px] font-bold uppercase tracking-wider text-[#ecd0b9]/40 font-mono block">
+              <div className="absolute right-0 mt-1.5 z-50 w-48 bg-surface-1 border border-border-strong rounded-xl shadow-2xl p-3 space-y-2.5">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-body/40 font-mono block">
                   Quick Presets
                 </span>
                 
@@ -228,8 +228,8 @@ export default function HourlyRateControl({
                       onClick={() => handleSelectPreset(preset)}
                       className={`py-1 text-[10px] font-mono font-bold rounded-lg border transition-all cursor-pointer ${
                         rate === preset
-                          ? "bg-[#dda67a] text-black border-[#dda67a]"
-                          : "bg-[#281a12]/50 text-[#ecd0b9]/75 border-[#4a2e1d]/50 hover:bg-[#3d2516] hover:text-white"
+                          ? "bg-accent text-black border-accent"
+                          : "bg-surface-3/50 text-body/75 border-border-strong/50 hover:bg-border hover:text-heading"
                       }`}
                     >
                       ${preset}
@@ -237,20 +237,20 @@ export default function HourlyRateControl({
                   ))}
                 </div>
 
-                <div className="border-t border-[#4a2e1d]/40 pt-2 flex items-center justify-between text-[9px] text-[#ecd0b9]/50 font-mono">
+                <div className="border-t border-border-strong/40 pt-2 flex items-center justify-between text-[9px] text-body/50 font-mono">
                   <span>Step changes:</span>
                   <div className="flex gap-1">
                     <button
                       type="button"
                       onClick={() => handleImmediateSave(Math.max(0, rate - 1))}
-                      className="px-1.5 py-0.5 rounded bg-[#281a12] border border-[#4a2e1d]/50 hover:bg-[#3d2516] text-[#dda67a] font-bold"
+                      className="px-1.5 py-0.5 rounded bg-surface-3 border border-border-strong/50 hover:bg-border text-accent-text font-bold"
                     >
                       -$1
                     </button>
                     <button
                       type="button"
                       onClick={() => handleImmediateSave(rate + 1)}
-                      className="px-1.5 py-0.5 rounded bg-[#281a12] border border-[#4a2e1d]/50 hover:bg-[#3d2516] text-[#dda67a] font-bold"
+                      className="px-1.5 py-0.5 rounded bg-surface-3 border border-border-strong/50 hover:bg-border text-accent-text font-bold"
                     >
                       +$1
                     </button>
@@ -264,7 +264,7 @@ export default function HourlyRateControl({
         {/* Auto-save status feedback indicator */}
         <div className="flex items-center text-[10px] font-mono font-medium transition-all duration-300 min-w-[55px]">
           {isSaving && (
-            <span className="flex items-center gap-1 text-[#dda67a] animate-pulse">
+            <span className="flex items-center gap-1 text-accent-text animate-pulse">
               <Loader2 className="h-3 w-3 animate-spin" />
               <span>Saving</span>
             </span>
@@ -280,9 +280,9 @@ export default function HourlyRateControl({
 
       {/* Full version inline presets and sliders (for SettingsView) */}
       {variant === "full" && (
-        <div className="bg-[#1c120c]/60 p-3 rounded-xl border border-[#3e271a]/40">
+        <div className="bg-surface-2/60 p-3 rounded-xl border border-border-strong/40">
           <div className="space-y-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#ecd0b9]/40 font-mono block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-body/40 font-mono block">
               Quick Select Presets
             </span>
             <div className="flex flex-wrap gap-2">
@@ -293,8 +293,8 @@ export default function HourlyRateControl({
                   onClick={() => handleSelectPreset(preset)}
                   className={`px-3 py-1.5 text-xs font-mono font-bold rounded-lg border transition-all cursor-pointer ${
                     rate === preset
-                      ? "bg-[#dda67a] text-black border-[#dda67a] shadow-sm shadow-[#dda67a]/20"
-                      : "bg-[#281a12]/50 text-[#ecd0b9]/75 border-[#4a2e1d]/50 hover:bg-[#3d2516] hover:text-white"
+                      ? "bg-accent text-black border-accent shadow-sm shadow-accent/20"
+                      : "bg-surface-3/50 text-body/75 border-border-strong/50 hover:bg-border hover:text-heading"
                   }`}
                 >
                   ${preset}

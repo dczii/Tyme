@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { FolderPlus, Sliders, HelpCircle, Shield, Coins, Pencil, Trash2, Plus } from "lucide-react";
+import { FolderPlus, Sliders, HelpCircle, Shield, Coins, Pencil, Trash2, Plus, Sun, Moon } from "lucide-react";
 import { Project, Tag, TimeEntry, UserProfile } from "../types";
 import { PROJECT_COLORS } from "../constants";
 import { toast } from "sonner";
@@ -25,6 +25,8 @@ interface SettingsViewProps {
   user: UserProfile;
   onLogout: () => void;
   contacts?: any[];
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }
 
 export default function SettingsView({
@@ -45,7 +47,23 @@ export default function SettingsView({
   user,
   onLogout,
   contacts = [],
+  theme,
+  onToggleTheme,
 }: SettingsViewProps) {
+  const handleToggleTheme = () => {
+    onToggleTheme();
+    // Read the outgoing value; state flips to the opposite on click.
+    toast.success(
+      theme === "dark" ? "Light mode enabled" : "Dark mode enabled",
+      {
+        description:
+          theme === "dark"
+            ? "Switched to the Latte theme."
+            : "Switched to the Espresso theme.",
+        duration: 2500,
+      },
+    );
+  };
   // Project add/edit form state (shared between the "+ Add Project" and inline edit forms)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState<boolean>(false);
@@ -134,7 +152,7 @@ export default function SettingsView({
   const renderProjectForm = (submitLabel: string) => (
     <form
       onSubmit={handleSubmitForm}
-      className='space-y-3 bg-[#1c120c]/60 p-4 rounded-xl border border-[#3e271a]/40'
+      className='space-y-3 bg-surface-2/60 p-4 rounded-xl border border-border-strong/40'
     >
       <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         <input
@@ -144,14 +162,14 @@ export default function SettingsView({
           placeholder='Project name *'
           value={formName}
           onChange={(e) => setFormName(e.target.value)}
-          className='w-full text-xs p-3 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] focus:border-[#dda67a] outline-none transition font-medium font-sans'
+          className='w-full text-xs p-3 rounded-xl border border-border-strong bg-surface-2 text-heading focus:border-accent outline-none transition font-medium font-sans'
         />
         <input
           type='text'
           placeholder='Client (optional)'
           value={formClient}
           onChange={(e) => setFormClient(e.target.value)}
-          className='w-full text-xs p-3 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] focus:border-[#dda67a] outline-none transition font-medium font-sans'
+          className='w-full text-xs p-3 rounded-xl border border-border-strong bg-surface-2 text-heading focus:border-accent outline-none transition font-medium font-sans'
         />
       </div>
       <div className='flex flex-wrap items-center justify-between gap-3'>
@@ -161,7 +179,7 @@ export default function SettingsView({
               type='button'
               key={color}
               onClick={() => setFormColor(color)}
-              className={`h-8 w-8 md:h-5.5 md:w-5.5 rounded-full border border-black/30 cursor-pointer shrink-0 transition relative ${formColor === color ? "scale-110 ring-2 ring-[#dda67a]" : "opacity-70 hover:opacity-100"}`}
+              className={`h-8 w-8 md:h-5.5 md:w-5.5 rounded-full border border-black/30 cursor-pointer shrink-0 transition relative ${formColor === color ? "scale-110 ring-2 ring-accent" : "opacity-70 hover:opacity-100"}`}
               style={{ backgroundColor: color }}
             >
               {formColor === color && (
@@ -174,13 +192,13 @@ export default function SettingsView({
           <button
             type='button'
             onClick={closeForm}
-            className='px-3 py-2 text-xs rounded-lg bg-[#241610] hover:bg-[#341f17] text-[#ecd0b9] border border-[#3e271a]/50 cursor-pointer transition'
+            className='px-3 py-2 text-xs rounded-lg bg-surface-3 hover:bg-surface-3 text-body border border-border-strong/50 cursor-pointer transition'
           >
             Cancel
           </button>
           <button
             type='submit'
-            className='px-4 py-2 text-xs rounded-lg bg-[#a66e46] text-white font-semibold hover:bg-[#8e5a34] cursor-pointer transition'
+            className='px-4 py-2 text-xs rounded-lg bg-accent-strong text-white font-semibold hover:bg-accent-strong-hover cursor-pointer transition'
           >
             {submitLabel}
           </button>
@@ -193,8 +211,8 @@ export default function SettingsView({
     <div className='flex-1 p-4 md:p-6 space-y-6 overflow-y-auto max-w-5xl mx-auto w-full z-10'>
       {/* Page Header */}
       <header className='shrink-0'>
-        <h2 className='text-xl font-display font-semibold text-white'>Preferences & Management</h2>
-        <p className='text-xs text-[#ecd0b9]/75 mt-1'>
+        <h2 className='text-xl font-display font-semibold text-heading'>Preferences & Management</h2>
+        <p className='text-xs text-body/75 mt-1'>
           Manage workspace projects and day-to-day productivity metrics
         </p>
       </header>
@@ -202,18 +220,18 @@ export default function SettingsView({
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6'>
         {/* Section 1: Projects Management */}
         <div className='md:col-span-2 space-y-4 md:space-y-6'>
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl shadow-xl shadow-black/5 p-6 space-y-5'>
-            <div className='flex items-center justify-between border-b border-[#3e271a]/40 pb-4'>
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 rounded-2xl shadow-xl shadow-black/5 p-6 space-y-5'>
+            <div className='flex items-center justify-between border-b border-border-strong/40 pb-4'>
               <div className='flex items-center gap-2.5'>
-                <FolderPlus className='h-5.5 w-5.5 text-[#dda67a]' />
+                <FolderPlus className='h-5.5 w-5.5 text-accent-text' />
                 <div>
-                  <h3 className='text-sm font-sans font-bold text-white'>Projects</h3>
-                  <p className='text-[10px] text-[#ecd0b9]/50 font-mono hidden md:block'>
+                  <h3 className='text-sm font-sans font-bold text-heading'>Projects</h3>
+                  <p className='text-[10px] text-body/50 font-mono hidden md:block'>
                     WORKSPACE PROJECT MANAGEMENT
                   </p>
                 </div>
               </div>
-              <span className='hidden sm:inline-block px-2.5 py-1 text-[10px] font-mono rounded bg-[#dda67a]/10 text-[#dda67a] border border-[#dda67a]/20 uppercase tracking-widest font-bold'>
+              <span className='hidden sm:inline-block px-2.5 py-1 text-[10px] font-mono rounded bg-accent/10 text-accent-text border border-accent/20 uppercase tracking-widest font-bold'>
                 {projects.length} Active
               </span>
             </div>
@@ -229,15 +247,15 @@ export default function SettingsView({
                 return (
                   <div
                     key={proj.id}
-                    className='flex items-center gap-3 p-3 rounded-xl border border-[#3e271a]/40 bg-[#1c120c]/60 hover:border-[#3e271a]/80 transition group'
+                    className='flex items-center gap-3 p-3 rounded-xl border border-border-strong/40 bg-surface-2/60 hover:border-border-strong/80 transition group'
                   >
                     <span
                       className='h-3 w-3 rounded-full shrink-0 border border-black/30'
                       style={{ backgroundColor: proj.color }}
                     />
                     <div className='min-w-0 flex-1'>
-                      <p className='text-xs font-semibold text-white truncate'>{proj.name}</p>
-                      <p className='text-[10px] text-[#ecd0b9]/50 font-mono truncate'>
+                      <p className='text-xs font-semibold text-heading truncate'>{proj.name}</p>
+                      <p className='text-[10px] text-body/50 font-mono truncate'>
                         {proj.client ? `${proj.client} · ` : ""}
                         {entryCount} {entryCount === 1 ? "entry" : "entries"}
                       </p>
@@ -253,7 +271,7 @@ export default function SettingsView({
                           </button>
                           <button
                             onClick={() => setConfirmDeleteId(null)}
-                            className='px-2.5 py-1.5 text-[10px] rounded-lg bg-[#241610] hover:bg-[#341f17] text-[#ecd0b9] border border-[#3e271a]/50 cursor-pointer transition'
+                            className='px-2.5 py-1.5 text-[10px] rounded-lg bg-surface-3 hover:bg-surface-3 text-body border border-border-strong/50 cursor-pointer transition'
                           >
                             Cancel
                           </button>
@@ -263,14 +281,14 @@ export default function SettingsView({
                           <button
                             onClick={() => startEdit(proj)}
                             title='Edit project'
-                            className='p-2 rounded-lg text-[#ecd0b9]/60 hover:text-[#dda67a] hover:bg-[#dda67a]/10 cursor-pointer transition'
+                            className='p-2 rounded-lg text-body/60 hover:text-accent-text hover:bg-accent/10 cursor-pointer transition'
                           >
                             <Pencil className='h-3.5 w-3.5' />
                           </button>
                           <button
                             onClick={() => handleDelete(proj)}
                             title='Delete project'
-                            className='p-2 rounded-lg text-[#ecd0b9]/60 hover:text-red-400 hover:bg-red-500/10 cursor-pointer transition'
+                            className='p-2 rounded-lg text-body/60 hover:text-red-400 hover:bg-red-500/10 cursor-pointer transition'
                           >
                             <Trash2 className='h-3.5 w-3.5' />
                           </button>
@@ -282,7 +300,7 @@ export default function SettingsView({
               })}
 
               {projects.length === 0 && !showAddForm && (
-                <div className='p-6 text-center text-xs text-[#ecd0b9]/50 italic border border-dashed border-[#3e271a]/60 rounded-xl'>
+                <div className='p-6 text-center text-xs text-body/50 italic border border-dashed border-border-strong/60 rounded-xl'>
                   No projects yet. Create your first project to start organizing time entries.
                 </div>
               )}
@@ -294,7 +312,7 @@ export default function SettingsView({
             ) : (
               <button
                 onClick={startAdd}
-                className='w-full flex items-center justify-center gap-2 py-3 text-xs font-semibold text-[#dda67a] hover:bg-[#dda67a]/10 rounded-xl border border-dashed border-[#dda67a]/40 hover:border-[#dda67a]/70 cursor-pointer transition'
+                className='w-full flex items-center justify-center gap-2 py-3 text-xs font-semibold text-accent-text hover:bg-accent/10 rounded-xl border border-dashed border-accent/40 hover:border-accent/70 cursor-pointer transition'
               >
                 <Plus className='h-4 w-4' />
                 <span>Add Project</span>
@@ -305,15 +323,60 @@ export default function SettingsView({
 
         {/* Column 2: Quick configuration */}
         <div className='space-y-6'>
+          {/* Appearance / Theme Card */}
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
+            <h3 className='text-sm font-display font-bold text-heading mb-4 flex items-center gap-2'>
+              {theme === "dark" ? (
+                <Moon className='h-5 w-5 text-accent-text' />
+              ) : (
+                <Sun className='h-5 w-5 text-accent-text' />
+              )}
+              <span>Appearance</span>
+            </h3>
+
+            <div className='flex items-center justify-between gap-3'>
+              <div className='min-w-0'>
+                <p className='text-xs font-semibold text-heading'>
+                  {theme === "dark" ? "Espresso (Dark)" : "Latte (Light)"}
+                </p>
+                <p className='text-[10px] text-body/60 font-mono mt-0.5'>
+                  Applies to all app screens
+                </p>
+              </div>
+
+              {/* iOS-style switch: dark = off, light = on */}
+              <button
+                type='button'
+                role='switch'
+                aria-checked={theme === "light"}
+                onClick={handleToggleTheme}
+                title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+                className={`relative shrink-0 inline-flex h-7 w-12 items-center rounded-full border transition-colors duration-200 cursor-pointer min-h-[44px] min-w-[44px] justify-start px-1
+                  ${theme === "light" ? "bg-accent-strong border-accent-strong" : "bg-surface-3 border-border-strong/70"}`}
+              >
+                <span
+                  className={`inline-flex h-5 w-5 items-center justify-center rounded-full bg-heading shadow-md transition-transform duration-200
+                    ${theme === "light" ? "translate-x-5" : "translate-x-0"}`}
+                >
+                  {theme === "light" ? (
+                    <Sun className='h-3 w-3 text-accent-strong' />
+                  ) : (
+                    <Moon className='h-3 w-3 text-surface-3' />
+                  )}
+                </span>
+              </button>
+            </div>
+          </div>
+
           {/* Billing & Hourly Rate Card */}
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
-            <h3 className='text-sm font-display font-bold text-white mb-4 flex items-center gap-2'>
-              <Coins className='h-5 w-5 text-[#dda67a]' />
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
+            <h3 className='text-sm font-display font-bold text-heading mb-4 flex items-center gap-2'>
+              <Coins className='h-5 w-5 text-accent-text' />
               <span>Billing & Rates</span>
             </h3>
 
             <div className='space-y-4'>
-              <p className='text-xs text-[#ecd0b9]/75 font-sans leading-relaxed'>
+              <p className='text-xs text-body/75 font-sans leading-relaxed'>
                 Configure your default billable rate. Changes auto-save instantly and apply to all report billing calculations and CSV/PDF exports.
               </p>
 
@@ -326,17 +389,17 @@ export default function SettingsView({
           </div>
 
           {/* Productivity Target parameters */}
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
-            <h3 className='text-sm font-display font-bold text-white mb-4 flex items-center gap-2'>
-              <Sliders className='h-5 w-5 text-[#dda67a]' />
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 rounded-2xl shadow-xl shadow-black/5 p-5'>
+            <h3 className='text-sm font-display font-bold text-heading mb-4 flex items-center gap-2'>
+              <Sliders className='h-5 w-5 text-accent-text' />
               <span>Daily Target</span>
             </h3>
 
             <div className='space-y-4'>
               <div className='space-y-2'>
                 <div className='flex justify-between items-center text-xs'>
-                  <span className='font-semibold text-[#ecd0b9]/75'>Workday Target hours:</span>
-                  <span className='font-mono font-bold text-[#dda67a]'>
+                  <span className='font-semibold text-body/75'>Workday Target hours:</span>
+                  <span className='font-mono font-bold text-accent-text'>
                     {workdayTargetHours} hrs/day
                   </span>
                 </div>
@@ -348,13 +411,13 @@ export default function SettingsView({
                   step='1'
                   value={workdayTargetHours}
                   onChange={(e) => onUpdateTargetHours(Number(e.target.value))}
-                  className='w-full h-1.5 bg-[#1d1410] rounded-lg appearance-none cursor-pointer accent-[#a66e46] border border-[#3e271a]/40'
+                  className='w-full h-1.5 bg-surface-2 rounded-lg appearance-none cursor-pointer accent-accent-strong border border-border-strong/40'
                 />
               </div>
 
               {/* Informational helpful tip */}
-              <div className='p-3.5 bg-[#dda67a]/10 border border-[#dda67a]/20 rounded-xl flex items-start gap-2.5 text-xs text-[#ecd0b9] leading-relaxed font-semibold'>
-                <HelpCircle className='h-4 w-4 shrink-0 mt-0.5 text-[#dda67a]' />
+              <div className='p-3.5 bg-accent/10 border border-accent/20 rounded-xl flex items-start gap-2.5 text-xs text-body leading-relaxed font-semibold'>
+                <HelpCircle className='h-4 w-4 shrink-0 mt-0.5 text-accent-text' />
                 <p>
                   Setting a daily workday benchmark marks visual indicators in the scheduling
                   calendar so you instantly spotted lagging days.
@@ -362,15 +425,15 @@ export default function SettingsView({
               </div>
 
               {/* Secure Session Info & Sign Out */}
-              <div className='pt-4 border-t border-[#3e271a]/40 space-y-3.5'>
+              <div className='pt-4 border-t border-border-strong/40 space-y-3.5'>
                 <div className='flex items-center gap-2'>
                   <Shield className='h-4.5 w-4.5 text-green-500 shrink-0' />
-                  <span className='text-xs font-bold text-white uppercase tracking-wider font-mono'>
+                  <span className='text-xs font-bold text-heading uppercase tracking-wider font-mono'>
                     Secure Access Identity
                   </span>
                 </div>
 
-                <div className='flex items-center gap-3 p-3 bg-[#1d1410]/75 border border-[#3e271a]/50 rounded-xl'>
+                <div className='flex items-center gap-3 p-3 bg-surface-2/75 border border-border-strong/50 rounded-xl'>
                   <img
                     src={user.picture}
                     alt={user.name}
@@ -378,8 +441,8 @@ export default function SettingsView({
                     className='h-10 w-10 rounded-full border border-green-500/35 shadow-sm'
                   />
                   <div className='min-w-0 flex-1'>
-                    <p className='text-xs font-bold text-white truncate'>{user.name}</p>
-                    <p className='text-[10px] text-[#ecd0b9]/50 font-mono truncate'>{user.email}</p>
+                    <p className='text-xs font-bold text-heading truncate'>{user.name}</p>
+                    <p className='text-[10px] text-body/50 font-mono truncate'>{user.email}</p>
                   </div>
                 </div>
 

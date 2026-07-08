@@ -74,7 +74,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       className={`${geist.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Apply the persisted theme before first paint to avoid a flash of the
+            wrong theme. CSP already allows 'unsafe-inline' for script-src, so no
+            next.config.ts change is needed. Only the app screens consume theme
+            tokens; the landing page keeps its hardcoded dark styles. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('tyme_theme');if(t==='light'){document.documentElement.classList.add('light')}}catch(e){}",
+          }}
+        />
+      </head>
       <body className="bg-[#0c0806] text-slate-200 font-sans antialiased">
         <TymeProvider>{children}</TymeProvider>
         <Analytics />

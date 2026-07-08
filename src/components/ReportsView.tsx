@@ -879,12 +879,12 @@ export default function ReportsView({
   return (
     <div className='flex-1 flex flex-col min-w-0 z-10 overflow-y-auto'>
       {/* 1. Page Header with Print & Export actions */}
-      <header className='p-4 border-b shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#120805]/40 backdrop-blur-md border-[#321c11]/45 print:hidden'>
+      <header className='p-4 border-b shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-canvas/40 backdrop-blur-md border-border-soft/45 print:hidden'>
         <div>
-          <h2 className='text-xl font-display font-semibold text-white'>Time Analysis & Reports</h2>
-          <p className='text-xs text-[#ecd0b9]/65 mt-1'>
+          <h2 className='text-xl font-display font-semibold text-heading'>Time Analysis & Reports</h2>
+          <p className='text-xs text-body/65 mt-1'>
             Displaying{" "}
-            <span className='font-semibold text-[#dda67a]'>{filteredEntries.length} entries</span>{" "}
+            <span className='font-semibold text-accent-text'>{filteredEntries.length} entries</span>{" "}
             based on current selected criteria
           </p>
         </div>
@@ -893,7 +893,7 @@ export default function ReportsView({
           {/* Reset Filters */}
           <button
             onClick={handleResetFilters}
-            className='p-2 text-[#ecd0b9]/50 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer'
+            className='p-2 text-body/50 hover:text-heading hover:bg-white/5 rounded-xl cursor-pointer'
             title='Reset Filters'
           >
             <RotateCcw className='h-4.5 w-4.5' />
@@ -901,19 +901,19 @@ export default function ReportsView({
 
           {/* Hourly Billing Rate (View Only) */}
           <div 
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 text-xs font-semibold text-[#ecd0b9]"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border/55 bg-surface-2/40 text-xs font-semibold text-body"
             title="Hourly billing rate (Configure in Settings)"
           >
-            <DollarSign className="h-3.5 w-3.5 text-[#dda67a]" />
-            <span className="font-mono font-bold text-white">${Number(hourlyRate).toFixed(2).replace(/\.00$/, "")}</span>
-            <span className="text-[10px] text-[#ecd0b9]/60">/hr</span>
+            <DollarSign className="h-3.5 w-3.5 text-accent-text" />
+            <span className="font-mono font-bold text-heading">${Number(hourlyRate).toFixed(2).replace(/\.00$/, "")}</span>
+            <span className="text-[10px] text-body/60">/hr</span>
           </div>
 
           {/* Export CSV button */}
           <button
             onClick={() => exportToCSV(filteredEntries, projects)}
             disabled={filteredEntries.length === 0}
-            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl border border-[#3d2416]/55 bg-[#24150d]/40 cursor-pointer text-[#ecd0b9] hover:bg-[#3d2416]/60 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition'
+            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl border border-border/55 bg-surface-2/40 cursor-pointer text-body hover:bg-border/60 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition'
           >
             <Download className='h-4 w-4 text-emerald-400' />
             <span className='hidden sm:inline'>Export CSV</span>
@@ -923,7 +923,7 @@ export default function ReportsView({
           <button
             onClick={handlePrintPDF}
             disabled={filteredEntries.length === 0}
-            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl bg-[#a66e46] cursor-pointer text-white hover:bg-[#8e5a34] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-[#4a2b16]/30 transition'
+            className='px-3.5 py-2 whitespace-nowrap text-xs font-semibold rounded-xl bg-accent-strong cursor-pointer text-white hover:bg-accent-strong-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-glow-1/30 transition'
           >
             <Printer className='h-4 w-4' />
             <span className='hidden sm:inline'>Print Report (PDF)</span>
@@ -936,38 +936,38 @@ export default function ReportsView({
         {/* KPI Cards */}
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
           {/* Card 1: Total logged hours */}
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+              <p className='text-[11px] font-mono text-body/70 uppercase tracking-wider font-semibold'>
                 Total Hours Tracked
               </p>
-              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-heading mt-2 font-mono'>
                 {formatMinutesHHMM(totalMinutes)}
               </h4>
-              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
+              <p className='text-[10px] text-body/45 mt-1'>
                 Equivalent to {formatMinutesDecimal(totalMinutes)} decimal hours
               </p>
             </div>
-            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-[#dda67a]/20 flex items-center justify-center text-[#dda67a]'>
+            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-accent/20 flex items-center justify-center text-accent-text'>
               <BarChart2 className='h-6 w-6 stroke-[2px]' />
             </div>
           </div>
 
           {/* Card 2: Total Amount */}
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+              <p className='text-[11px] font-mono text-body/70 uppercase tracking-wider font-semibold'>
                 Total Amount
               </p>
-              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-heading mt-2 font-mono'>
                 $
                 {((totalMinutes / 60) * hourlyRate).toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}{" "}
-                <span className='text-xs font-sans font-normal text-[#ecd0b9]/50'>USD</span>
+                <span className='text-xs font-sans font-normal text-body/50'>USD</span>
               </h4>
-              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
+              <p className='text-[10px] text-body/45 mt-1'>
                 Based on flat billable rate of {hourlyRate.toLocaleString("en-US", { style: "currency", currency: "USD" })}/hr
               </p>
             </div>
@@ -977,19 +977,19 @@ export default function ReportsView({
           </div>
 
           {/* Card 3: Total Logs Count */}
-          <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
+          <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 p-5 rounded-2xl shadow-xl shadow-black/5 flex items-center justify-between'>
             <div>
-              <p className='text-[11px] font-mono text-[#ecd0b9]/70 uppercase tracking-wider font-semibold'>
+              <p className='text-[11px] font-mono text-body/70 uppercase tracking-wider font-semibold'>
                 Entries Logged
               </p>
-              <h4 className='text-xl md:text-2xl font-display font-bold text-white mt-2 font-mono'>
+              <h4 className='text-xl md:text-2xl font-display font-bold text-heading mt-2 font-mono'>
                 {filteredEntries.length}
               </h4>
-              <p className='text-[10px] text-[#ecd0b9]/45 mt-1'>
+              <p className='text-[10px] text-body/45 mt-1'>
                 Total standalone logged task intervals matching criteria
               </p>
             </div>
-            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-[#a66e46]/20 flex items-center justify-center text-white'>
+            <div className='h-10 w-10 md:h-12 md:w-12 rounded-xl bg-accent-strong/20 flex items-center justify-center text-accent-text'>
               <Sparkles className='h-6 w-6' />
             </div>
           </div>
@@ -998,28 +998,28 @@ export default function ReportsView({
         {/* 4. Visual Analytics Section */}
         <div className='space-y-6'>
           {/* Replicated Full-Width Timeline Hours Chart (styled to match screenshot) */}
-          <div className='bg-[#11171d] border border-[#232f3b]/70 rounded-2xl shadow-2xl overflow-hidden'>
+          <div className='bg-timeline-surface border border-timeline-border/70 rounded-2xl shadow-2xl overflow-hidden'>
             {/* Screenshot top-bar replicate flow */}
-            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#17212a] px-5 py-3.5 border-b border-[#232f3b]/60 gap-4'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-timeline-surface-2 px-5 py-3.5 border-b border-timeline-border/60 gap-4'>
               <div className='flex items-center gap-1.5'>
-                <span className='text-xs font-mono text-[#ecd0b9]/55 font-bold uppercase tracking-wider'>
+                <span className='text-xs font-mono text-body/55 font-bold uppercase tracking-wider'>
                   Total:
                 </span>
-                <span className='text-lg font-bold font-mono text-white'>
+                <span className='text-lg font-bold font-mono text-heading'>
                   {formatMinutesHHMM(totalMinutes)}
                 </span>
               </div>
 
               <div className='flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end'>
                 <div className='flex items-center gap-2'>
-                  <span className='text-[10px] uppercase font-mono text-[#ecd0b9]/50 font-bold tracking-wider'>
+                  <span className='text-[10px] uppercase font-mono text-body/50 font-bold tracking-wider'>
                     Date Range:
                   </span>
                   <div className='relative'>
                     <select
                       value={datePreset}
                       onChange={(e) => setDatePreset(e.target.value as PresetFilterType)}
-                      className='text-xs font-sans font-bold bg-[#11171d] hover:bg-[#1a2530] text-white border border-[#2d3a46] rounded-xl pl-3 pr-8 py-1.5 outline-none cursor-pointer transition appearance-none min-w-[120px] md:min-w-[140px]'
+                      className='text-xs font-sans font-bold bg-timeline-surface hover:bg-timeline-hover text-heading border border-timeline-border rounded-xl pl-3 pr-8 py-1.5 outline-none cursor-pointer transition appearance-none min-w-[120px] md:min-w-[140px]'
                     >
                       <option value='thisWeek'>This Week</option>
                       <option value='lastWeek'>Last Week</option>
@@ -1027,7 +1027,7 @@ export default function ReportsView({
                       <option value='lastMonth'>Previous Month</option>
                       <option value='allTime'>All Records</option>
                     </select>
-                    <div className='absolute inset-y-0 right-2 flex items-center pr-1 pointer-events-none text-[#ecd0b9]/50'>
+                    <div className='absolute inset-y-0 right-2 flex items-center pr-1 pointer-events-none text-body/50'>
                       <svg className='h-3 w-3 fill-current' viewBox='0 0 20 20'>
                         <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
                       </svg>
@@ -1038,7 +1038,7 @@ export default function ReportsView({
             </div>
 
             {/* Chart canvas area precisely replicating the screenshot */}
-            <div className='p-3 md:p-6 bg-[#11171d]'>
+            <div className='p-3 md:p-6 bg-timeline-surface'>
               <div className='w-full overflow-x-auto'>
                 <div className='min-w-[500px] md:min-w-[800px] select-none'>
                   <svg viewBox='0 0 1000 240' className='w-full h-auto font-sans'>
@@ -1162,10 +1162,10 @@ export default function ReportsView({
         </div>
 
         {/* 5. Printable Detailed Log Entries List */}
-        <div className='bg-[#130d0a]/35 backdrop-blur-xl border border-[#3e271a]/55 rounded-2xl overflow-hidden shadow-xl shadow-black/5'>
-          <div className='p-4 md:p-5 border-b border-[#3e271a]/55 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
-            <h3 className='text-base font-display font-bold text-white'>Detailed Sheet Ledger</h3>
-            <span className='text-xs font-mono bg-[#1d1410] border border-[#3e271a] px-3 py-1 rounded-full text-[#ecd0b9]/70 font-bold'>
+        <div className='bg-surface-1/35 backdrop-blur-xl border border-border-strong/55 rounded-2xl overflow-hidden shadow-xl shadow-black/5'>
+          <div className='p-4 md:p-5 border-b border-border-strong/55 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
+            <h3 className='text-base font-display font-bold text-heading'>Detailed Sheet Ledger</h3>
+            <span className='text-xs font-mono bg-surface-2 border border-border-strong px-3 py-1 rounded-full text-body/70 font-bold'>
               Showing {filteredEntries.length} Records
             </span>
           </div>
@@ -1173,7 +1173,7 @@ export default function ReportsView({
           <div className='overflow-x-auto'>
             <table className='w-full text-left border-collapse text-xs'>
               <thead>
-                <tr className='border-b border-[#3e271a]/55 bg-[#1a100c]/75 font-semibold text-[#ecd0b9]/75'>
+                <tr className='border-b border-border-strong/55 bg-surface-1/75 font-semibold text-body/75'>
                   <th className='p-2.5 md:p-4'>Date</th>
                   <th className='p-2.5 md:p-4'>Description</th>
                   <th className='p-2.5 md:p-4 hidden md:table-cell'>Project / client</th>
@@ -1185,15 +1185,15 @@ export default function ReportsView({
                   <th className='p-2.5 md:p-4 text-right print:hidden'>Actions</th>
                 </tr>
               </thead>
-              <tbody className='divide-y divide-[#3e271a]/35 text-[#ecd0b9]/85'>
+              <tbody className='divide-y divide-border-strong/35 text-body/85'>
                 {filteredEntries.map((row) => {
                   const proj = row.projectId ? projects.find((p) => p.id === row.projectId) : null;
                   return (
-                    <tr key={row.id} className='hover:bg-[#342118]/20 transition-all duration-75'>
-                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono font-medium text-[#ecd0b9]/75 text-[10px] md:text-xs'>
+                    <tr key={row.id} className='hover:bg-surface-3/20 transition-all duration-75'>
+                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono font-medium text-body/75 text-[10px] md:text-xs'>
                         {formatDateFriendly(new Date(row.date + "T00:00:00"))}
                       </td>
-                      <td className='p-2.5 md:p-4 font-semibold text-white max-w-[120px] md:max-w-xs break-words truncate md:whitespace-normal'>
+                      <td className='p-2.5 md:p-4 font-semibold text-heading max-w-[120px] md:max-w-xs break-words truncate md:whitespace-normal'>
                         {row.description || "No Description"}
                       </td>
                       <td className='p-2.5 md:p-4 whitespace-nowrap hidden md:table-cell'>
@@ -1210,19 +1210,19 @@ export default function ReportsView({
                               {proj.name}
                             </span>
                             {proj.client && (
-                              <span className='text-[10px] text-[#ecd0b9]/45 font-medium pl-3.5'>
+                              <span className='text-[10px] text-body/45 font-medium pl-3.5'>
                                 Client: {proj.client}
                               </span>
                             )}
                           </div>
                         ) : (
-                          <span className='text-[#ecd0b9]/30'>None</span>
+                          <span className='text-body/30'>None</span>
                         )}
                       </td>
-                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono text-[#ecd0b9]/65 hidden md:table-cell'>
+                      <td className='p-2.5 md:p-4 whitespace-nowrap font-mono text-body/65 hidden md:table-cell'>
                         {row.startTime} - {row.endTime}
                       </td>
-                      <td className='p-2.5 md:p-4 whitespace-nowrap text-right font-mono font-bold text-[#dda67a]'>
+                      <td className='p-2.5 md:p-4 whitespace-nowrap text-right font-mono font-bold text-accent-text'>
                         {formatMinutesHHMM(row.durationMinutes)}
                       </td>
                       <td className='p-2.5 md:p-4 print:hidden text-center hidden lg:table-cell'>
@@ -1230,13 +1230,13 @@ export default function ReportsView({
                           {row.tags.map((tag, tIdx) => (
                             <span
                               key={tIdx}
-                              className='px-2 py-0.5 rounded text-[10px] font-medium bg-[#1d1410] border border-[#3e271a]/65 text-[#ecd0b9]/75'
+                              className='px-2 py-0.5 rounded text-[10px] font-medium bg-surface-2 border border-border-strong/65 text-body/75'
                             >
                               {tag}
                             </span>
                           ))}
                           {row.tags.length === 0 && (
-                            <span className='text-[#ecd0b9]/30 text-[10px]'>-</span>
+                            <span className='text-body/30 text-[10px]'>-</span>
                           )}
                         </div>
                       </td>
@@ -1244,14 +1244,14 @@ export default function ReportsView({
                         <div className='flex justify-end gap-1'>
                           <button
                             onClick={() => onDuplicateEntry(row)}
-                            className='p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-[#dda67a] cursor-pointer transition'
+                            className='p-1.5 rounded-lg hover:bg-border-strong/30 text-body/60 hover:text-accent-text cursor-pointer transition'
                             title='Duplicate record'
                           >
                             <Copy className='h-4 w-4' />
                           </button>
                           <button
                             onClick={() => onDeleteEntry(row.id)}
-                            className='p-1.5 rounded-lg hover:bg-[#3e271a]/30 text-[#ecd0b9]/60 hover:text-red-400 cursor-pointer transition'
+                            className='p-1.5 rounded-lg hover:bg-border-strong/30 text-body/60 hover:text-red-400 cursor-pointer transition'
                             title='Delete record'
                           >
                             <Trash2 className='h-4 w-4' />
@@ -1264,7 +1264,7 @@ export default function ReportsView({
 
                 {filteredEntries.length === 0 && (
                   <tr>
-                    <td colSpan={7} className='p-8 text-center text-[#ecd0b9]/45 font-mono'>
+                    <td colSpan={7} className='p-8 text-center text-body/45 font-mono'>
                       No records match active criteria. Set date parameters or track inside the
                       Calendar dashboard.
                     </td>
@@ -1320,7 +1320,7 @@ export default function ReportsView({
             <span className='text-[9px] uppercase font-mono text-stone-400 font-bold tracking-wider'>
               Billable Duration
             </span>
-            <div className='text-lg font-bold font-mono text-[#a66e46] mt-1'>
+            <div className='text-lg font-bold font-mono text-accent-strong mt-1'>
               {formatMinutesHHMM(totalMinutes)}
             </div>
           </div>
@@ -1577,7 +1577,7 @@ export default function ReportsView({
                     </div>
                     <div className='flex items-center gap-4 text-xs font-bold font-mono'>
                       <span className='text-stone-600'>{formatMinutesHHMM(group.totalMins)}</span>
-                      <span className='text-[#a66e46]'>
+                      <span className='text-accent-strong'>
                         $
                         {projAmount.toLocaleString("en-US", {
                           minimumFractionDigits: 2,

@@ -22,6 +22,8 @@ export default function SettingsPage() {
     user,
     handleLogout,
     contacts,
+    theme,
+    toggleTheme,
   } = useTyme();
 
   if (!user) return null;
@@ -45,6 +47,8 @@ export default function SettingsPage() {
       user={user}
       onLogout={handleLogout}
       contacts={contacts}
+      theme={theme}
+      onToggleTheme={toggleTheme}
     />
   );
 }

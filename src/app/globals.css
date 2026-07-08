@@ -1,5 +1,91 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Theme tokens — "Espresso" (dark, default) + "Latte" (light, html.light)
+   --------------------------------------------------------------------------
+   Semantic colors are declared once as raw CSS custom properties on :root
+   (the dark values), then overridden under `html.light`. The @theme inline
+   block maps each raw var to a Tailwind color so utilities like `bg-surface-1`,
+   `text-body/60`, `border-border-strong` exist with opacity-modifier support
+   (Tailwind v4 uses color-mix() on variable-backed colors).
+
+   The marketing landing page (`/`) and src/components/landing/** never consume
+   these tokens (they keep inline hexes) and <body> keeps a hardcoded dark bg,
+   so the landing page stays permanently dark regardless of the html class.
+   ========================================================================== */
+:root {
+  --canvas: #0c0806;
+  --surface-1: #140d0a;
+  --surface-2: #1c120c;
+  --surface-3: #2a1a10;
+  --border-strong: #3e271a;
+  --border: #3d2416;
+  --border-soft: #2a1b12;
+  --accent: #dda67a;        /* decorative tan (blobs, dots, fills, borders) */
+  --accent-text: #dda67a;   /* contrast-safe accent for text/icons */
+  --accent-strong: #a66e46; /* copper buttons */
+  --accent-strong-hover: #8e5a34;
+  --heading: #ffffff;
+  --body: #ecd0b9;
+  --glow-1: #4a2b16;
+  --glow-2: #9a6a42;
+  --glow-3: #2e1d13;
+  /* Reports "timeline" slate card — a deliberate Clockify replication */
+  --timeline-surface: #11171d;
+  --timeline-surface-2: #17212a;
+  --timeline-hover: #1a2530;
+  --timeline-border: #232f3b;
+}
+
+html.light {
+  --canvas: #f7f1ea;
+  --surface-1: #fffbf7;
+  --surface-2: #f3e9df;
+  --surface-3: #ecdfd2;
+  --border-strong: #dcc7b4;
+  --border: #e5d4c4;
+  --border-soft: #efe2d4;
+  --accent: #c98d5d;
+  --accent-text: #8a5a30;
+  --accent-strong: #a66e46;       /* copper buttons unchanged (dark on both) */
+  --accent-strong-hover: #8e5a34;
+  --heading: #241408;
+  --body: #43301f;
+  --glow-1: #ecd9c4;
+  --glow-2: #e3c3a0;
+  --glow-3: #efe0cf;
+  --timeline-surface: #eef2f7;
+  --timeline-surface-2: #e3e9f0;
+  --timeline-hover: #dbe4ee;
+  --timeline-border: #cdd9e5;
+}
+
+/* Structural (non-color) per-theme tweaks, e.g. ambient glow-blob opacity. */
+@custom-variant light (&:where(.light, .light *));
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border-strong: var(--border-strong);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-strong-hover: var(--accent-strong-hover);
+  --color-heading: var(--heading);
+  --color-body: var(--body);
+  --color-glow-1: var(--glow-1);
+  --color-glow-2: var(--glow-2);
+  --color-glow-3: var(--glow-3);
+  --color-timeline-surface: var(--timeline-surface);
+  --color-timeline-surface-2: var(--timeline-surface-2);
+  --color-timeline-hover: var(--timeline-hover);
+  --color-timeline-border: var(--timeline-border);
+}
+
 @theme {
   /* Fonts are self-hosted via next/font (see app/layout.tsx); these vars hold the
      generated font-family stacks. Geist drives display/headings, Inter the body. */

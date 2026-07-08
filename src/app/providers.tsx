@@ -32,7 +32,8 @@ interface TymeContextValue {
   handleLogout: () => Promise<void>;
 
   // Visual settings
-  theme: 'dark';
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
   logoStyle: LogoStyle;
   saveLogoStyle: (style: LogoStyle) => Promise<void>;
   workdayTargetHours: number;
@@ -75,7 +76,35 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
   const [workdayTargetHours, setWorkdayTargetHours] = useState<number>(8);
   const [hourlyRate, setHourlyRate] = useState<number>(1);
 
-  const theme = 'dark' as const;
+  // Theme is a device preference persisted in localStorage under `tyme_theme`.
+  // Dark ("Espresso") is the default; light ("Latte") is an opt-in `html.light`
+  // class. The pre-paint script in the root layout applies the class before
+  // hydration, so this initializer just mirrors that persisted value.
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('tyme_theme');
+    if (stored === 'light' || stored === 'dark') {
+      setTheme(stored);
+    } else {
+      // Fall back to whatever the pre-paint script already put on <html>.
+      setTheme(document.documentElement.classList.contains('light') ? 'light' : 'dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      const root = document.documentElement;
+      root.classList.toggle('light', next === 'light');
+      localStorage.setItem('tyme_theme', next);
+      // Next's static viewport export can't react to a client toggle, so keep
+      // the address-bar/theme color in sync with the active canvas at runtime.
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', next === 'light' ? '#f7f1ea' : '#0c0806');
+      return next;
+    });
+  };
 
   // Subscribed States
   const [projects, setProjects] = useState<Project[]>([]);
@@ -310,6 +339,7 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
     handleLogin,
     handleLogout,
     theme,
+    toggleTheme,
     logoStyle,
     saveLogoStyle,
     workdayTargetHours,

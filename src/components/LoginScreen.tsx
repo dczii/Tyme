@@ -73,32 +73,32 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
   };
 
   const inputClass =
-    'w-full bg-[#1a110c]/70 border border-[#3e271a] focus:border-[#dda67a]/70 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-[#ecd0b9]/30 outline-none transition focus:ring-2 focus:ring-[#dda67a]/20 min-h-[48px]';
+    'w-full bg-surface-2/70 border border-border-strong focus:border-accent/70 rounded-xl px-4 py-3 text-sm text-heading placeholder:text-body/30 outline-none transition focus:ring-2 focus:ring-accent/20 min-h-[48px]';
 
   return (
-    <div id="login-container-root" className="min-h-screen w-full flex items-center justify-center bg-[#0c0806] text-slate-100 p-4 pb-safe relative overflow-hidden font-sans">
+    <div id="login-container-root" className="min-h-screen w-full flex items-center justify-center bg-canvas text-body p-4 pb-safe relative overflow-hidden font-sans">
       {/* Espresso Theme Ambient Visuals */}
-      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#4a2b16]/30 animate-pulse duration-[6s]"></div>
-      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-[#9a6a42]/15 animate-pulse duration-[8s]"></div>
+      <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-glow-1/30 animate-pulse duration-[6s]"></div>
+      <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none bg-glow-2/15 animate-pulse duration-[8s]"></div>
 
       {/* Glassmorphism Credentials Panel */}
-      <div className="w-full max-w-[430px] bg-[#140d0a]/75 backdrop-blur-2xl border border-[#3e271a] rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl relative z-10 flex flex-col items-center">
+      <div className="w-full max-w-[430px] bg-surface-1/75 backdrop-blur-2xl border border-border-strong rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl relative z-10 flex flex-col items-center">
 
         {/* Workspace Flag */}
-        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-[#2d1b11]/60 border border-[#5e3820]/40 rounded-full text-[10px] font-mono text-[#dda67a] tracking-wider uppercase">
+        <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 bg-surface-3/60 border border-border-strong/40 rounded-full text-[10px] font-mono text-accent-text tracking-wider uppercase">
           <Sparkles className="h-3 w-3 animate-spin duration-3000" />
           <span>Tyme Workspace</span>
         </div>
 
         {/* Corporate branding header */}
         <div className="mt-8 mb-7 text-center flex flex-col items-center">
-          <div className="h-14 w-14 rounded-2xl bg-[#201410] border border-[#3d2416]/55 flex items-center justify-center p-2.5 shadow-xl shadow-[#4a2b16]/60 mb-4 scale-102">
+          <div className="h-14 w-14 rounded-2xl bg-surface-2 border border-border/55 flex items-center justify-center p-2.5 shadow-xl shadow-glow-1/60 mb-4 scale-102">
             <BrandLogo size={36} showBackground={false} className="brightness-125 select-none pointer-events-none" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
+          <h1 className="text-2xl font-bold tracking-tight text-heading font-sans">
             {mode === 'signin' ? 'Welcome to Tyme' : 'Create your Account'}
           </h1>
-          <p className="text-xs text-[#ecd0b9]/70 mt-2 max-w-[280px] leading-relaxed">
+          <p className="text-xs text-body/70 mt-2 max-w-[280px] leading-relaxed">
             {mode === 'signin'
               ? 'Sign in to your time-tracking workspace.'
               : 'Register with your email to set up and sync your workspace.'}
@@ -145,9 +145,9 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
           {/* Divider */}
           <div className="flex items-center gap-3 py-1">
-            <div className="h-px flex-1 bg-[#3e271a]/60"></div>
-            <span className="text-[10px] uppercase tracking-widest font-mono text-[#ecd0b9]/40">or continue with email</span>
-            <div className="h-px flex-1 bg-[#3e271a]/60"></div>
+            <div className="h-px flex-1 bg-border-strong/60"></div>
+            <span className="text-[10px] uppercase tracking-widest font-mono text-body/40">or continue with email</span>
+            <div className="h-px flex-1 bg-border-strong/60"></div>
           </div>
 
           {/* Email / Password form */}
@@ -198,7 +198,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             <button
               type="submit"
               disabled={isLoading || isGoogleLoading}
-              className="w-full bg-[#dda67a] hover:bg-[#e8b88c] active:bg-[#c9925f] text-[#201410] text-sm font-bold py-3.5 px-5 rounded-xl transition shadow-lg shadow-[#4a2b16]/40 cursor-pointer flex items-center justify-center gap-2.5 select-none duration-150 disabled:opacity-60 disabled:cursor-wait min-h-[48px]"
+              className="w-full bg-accent hover:bg-[#e8b88c] active:bg-[#c9925f] text-surface-2 text-sm font-bold py-3.5 px-5 rounded-xl transition shadow-lg shadow-glow-1/40 cursor-pointer flex items-center justify-center gap-2.5 select-none duration-150 disabled:opacity-60 disabled:cursor-wait min-h-[48px]"
             >
               {isLoading ? (
                 <>
@@ -246,20 +246,20 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
         </div>
 
         {/* Toggle Mode Link */}
-        <div className="mt-6 pt-5 border-t border-[#3e271a]/30 w-full text-center">
-          <p className="text-xs text-[#ecd0b9]/60">
+        <div className="mt-6 pt-5 border-t border-border-strong/30 w-full text-center">
+          <p className="text-xs text-body/60">
             {mode === 'signin' ? "Don't have an account? " : "Already have an account? "}
             <button
               type="button"
               onClick={() => switchMode(mode === 'signin' ? 'register' : 'signin')}
-              className="text-[#dda67a] hover:text-[#f3be94] font-semibold transition cursor-pointer hover:underline focus:outline-none"
+              className="text-accent-text hover:text-[#f3be94] font-semibold transition cursor-pointer hover:underline focus:outline-none"
             >
               {mode === 'signin' ? 'Register' : 'Sign in'}
             </button>
           </p>
         </div>
 
-        <div className="mt-8 text-center text-[10px] text-[#ecd0b9]/25 font-mono tracking-wide uppercase leading-normal max-w-[270px]">
+        <div className="mt-8 text-center text-[10px] text-body/25 font-mono tracking-wide uppercase leading-normal max-w-[270px]">
           By continuing, you agree to securely sync your time-tracking workspace.
         </div>
       </div>

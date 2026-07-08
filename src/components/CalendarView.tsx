@@ -273,7 +273,7 @@ export default function CalendarView({
             <button
               type='button'
               onClick={prevMonths}
-              className='p-1 rounded-lg hover:bg-white/10 text-[#ecd0b9]/80 hover:text-white cursor-pointer transition'
+              className='p-1 rounded-lg hover:bg-white/10 text-body/80 hover:text-heading cursor-pointer transition'
             >
               <ChevronLeft className='h-4 w-4' />
             </button>
@@ -281,13 +281,13 @@ export default function CalendarView({
             <div className='w-6' />
           )}
 
-          <span className='text-xs font-bold tracking-wider text-white'>{monthName}</span>
+          <span className='text-xs font-bold tracking-wider text-heading'>{monthName}</span>
 
           {!isLeftMonth ? (
             <button
               type='button'
               onClick={nextMonths}
-              className='p-1 rounded-lg hover:bg-white/10 text-[#ecd0b9]/80 hover:text-white cursor-pointer transition'
+              className='p-1 rounded-lg hover:bg-white/10 text-body/80 hover:text-heading cursor-pointer transition'
             >
               <ChevronRight className='h-4 w-4' />
             </button>
@@ -299,7 +299,7 @@ export default function CalendarView({
         {/* Days of Week Row */}
         <div className='grid grid-cols-7 mb-1.5 text-center'>
           {dayHeaders.map((day) => (
-            <span key={day} className='text-[10px] font-bold text-[#ecd0b9]/50 select-none'>
+            <span key={day} className='text-[10px] font-bold text-body/50 select-none'>
               {day}
             </span>
           ))}
@@ -338,11 +338,11 @@ export default function CalendarView({
             let textClass =
               "text-[11px] font-sans font-semibold text-center py-1.5 w-full relative flex items-center justify-center cursor-pointer transition duration-150 z-10";
             if (!isCurrentMonth) {
-              textClass += " text-white/15 hover:text-white/40";
+              textClass += " text-heading/15 hover:text-heading/40";
             } else if (isSelected) {
               textClass += " text-white";
             } else {
-              textClass += " text-[#ecd0b9]/80 hover:bg-white/5 hover:text-white rounded-lg";
+              textClass += " text-body/80 hover:bg-white/5 hover:text-heading rounded-lg";
             }
 
             return (
@@ -354,7 +354,7 @@ export default function CalendarView({
                 {/* Selected Range highlighting background block */}
                 {isSelected && (
                   <span
-                    className={`absolute inset-y-0.5 bg-[#a66e46]/35 z-0
+                    className={`absolute inset-y-0.5 bg-accent-strong/35 z-0
                       ${isStart ? "left-1/2 right-0 rounded-l-none" : ""}
                       ${isEnd ? "left-0 right-1/2 rounded-r-none" : ""}
                       ${!isStart && !isEnd ? "left-0 right-0" : ""}`}
@@ -362,7 +362,7 @@ export default function CalendarView({
                 )}
                 {/* Selected Endpoint Circle */}
                 {(isStart || isEnd) && (
-                  <span className='absolute h-6.5 w-6.5 rounded-full bg-[#a66e46] shadow-md shadow-[#4a2b16]/40 z-0' />
+                  <span className='absolute h-6.5 w-6.5 rounded-full bg-accent-strong shadow-md shadow-glow-1/40 z-0' />
                 )}
 
                 <span className={textClass}>{dateObj.getDate()}</span>
@@ -940,12 +940,12 @@ export default function CalendarView({
   return (
     <div className='flex-1 flex flex-col min-w-0 z-10'>
       {/* 1. Header Area with dynamic details */}
-      <header className='relative z-45 p-4 border-b shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#120805]/40 backdrop-blur-md border-[#321c11]/45'>
+      <header className='relative z-45 p-4 border-b shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-canvas/40 backdrop-blur-md border-border-soft/45'>
         <div>
-          <h2 className='text-xl font-display font-semibold text-white'>Calendar Workspace</h2>
-          <p className='text-xs text-[#ecd0b9]/65 mt-1'>
+          <h2 className='text-xl font-display font-semibold text-heading'>Calendar Workspace</h2>
+          <p className='text-xs text-body/65 mt-1'>
             Weekly total:{" "}
-            <span className='font-mono font-bold text-[#dda67a]'>
+            <span className='font-mono font-bold text-accent-text'>
               {formatMinutesHHMM(getWeeklyTotalMinutes())}
             </span>{" "}
             hours logged
@@ -956,19 +956,19 @@ export default function CalendarView({
         <div className='flex items-center gap-3'>
           <button
             onClick={jumpToToday}
-            className='px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-[#3d2416]/50 cursor-pointer bg-[#24150d]/40 backdrop-blur-md hover:bg-[#3d2416]/60 text-[#ecd0b9]'
+            className='px-3.5 py-1.5 text-xs font-semibold rounded-lg border border-border/50 cursor-pointer bg-surface-2/40 backdrop-blur-md hover:bg-border/60 text-body'
           >
             Today's Week
           </button>
 
           <div className='relative' ref={rangePickerRef}>
-            <div className='flex items-center rounded-xl border border-[#3d2416]/55 bg-[#170e0a]/40 backdrop-blur-md h-10 text-white'>
+            <div className='flex items-center rounded-xl border border-border/55 bg-surface-1/40 backdrop-blur-md h-10 text-heading'>
               <button
                 onClick={() => setShowRangePicker(!showRangePicker)}
-                className='px-4 py-2 text-xs md:text-sm font-semibold text-[#ecd0b9] hover:bg-[#2c1a11]/45 hover:text-white transition duration-200 cursor-pointer flex items-center gap-2.5 h-full rounded-l-xl select-none'
+                className='px-4 py-2 text-xs md:text-sm font-semibold text-body hover:bg-surface-3/45 hover:text-heading transition duration-200 cursor-pointer flex items-center gap-2.5 h-full rounded-l-xl select-none'
                 title='Click to select week'
               >
-                <Calendar className='h-4 w-4 text-[#dda67a] shrink-0' />
+                <Calendar className='h-4 w-4 text-accent-text shrink-0' />
                 <span className='font-mono tracking-wide hidden md:inline'>
                   {formatDateMMDDYYYY(weekDays[0])} - {formatDateMMDDYYYY(weekDays[6])}
                 </span>
@@ -977,21 +977,21 @@ export default function CalendarView({
                 </span>
               </button>
 
-              <div className='w-[1px] h-6 bg-[#3d2416]/55 shrink-0' />
+              <div className='w-[1px] h-6 bg-border/55 shrink-0' />
 
               <button
                 onClick={() => navigateWeek(-1)}
-                className='p-2.5 bg-transparent hover:bg-white/5 text-[#ecd0b9]/80 cursor-pointer h-full flex items-center justify-center transition'
+                className='p-2.5 bg-transparent hover:bg-white/5 text-body/80 cursor-pointer h-full flex items-center justify-center transition'
                 title='Previous Week'
               >
                 <ChevronLeft className='h-4 w-4' />
               </button>
 
-              <div className='w-[1px] h-6 bg-[#3d2416]/55 shrink-0' />
+              <div className='w-[1px] h-6 bg-border/55 shrink-0' />
 
               <button
                 onClick={() => navigateWeek(1)}
-                className='p-2.5 bg-transparent hover:bg-white/5 text-[#ecd0b9]/80 cursor-pointer h-full flex items-center justify-center transition rounded-r-xl'
+                className='p-2.5 bg-transparent hover:bg-white/5 text-body/80 cursor-pointer h-full flex items-center justify-center transition rounded-r-xl'
                 title='Next Week'
               >
                 <ChevronRight className='h-4 w-4' />
@@ -1002,10 +1002,10 @@ export default function CalendarView({
             {showRangePicker && (
               <div
                 id='date-range-picker-popover'
-                className='fixed inset-x-4 top-20 md:absolute md:inset-x-auto md:right-0 md:top-11 mt-1 rounded-2xl border border-[#3d2416] bg-[#110a08] shadow-2xl p-0 overflow-hidden z-50 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-[#3d2416]/50 w-[calc(100vw-2rem)] md:min-w-[620px] md:w-auto'
+                className='fixed inset-x-4 top-20 md:absolute md:inset-x-auto md:right-0 md:top-11 mt-1 rounded-2xl border border-border bg-canvas shadow-2xl p-0 overflow-hidden z-50 flex flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border/50 w-[calc(100vw-2rem)] md:min-w-[620px] md:w-auto'
               >
                 {/* Left Sidebar Presets */}
-                <div className='w-full md:w-36 shrink-0 bg-[#0c0604]/90 p-2.5 flex flex-row md:flex-col gap-1'>
+                <div className='w-full md:w-36 shrink-0 bg-canvas/90 p-2.5 flex flex-row md:flex-col gap-1'>
                   {[
                     { id: "thisWeek", label: "This week", action: selectThisWeek },
                     { id: "lastWeek", label: "Last week", action: selectLastWeek },
@@ -1031,8 +1031,8 @@ export default function CalendarView({
                         className={`w-full text-left px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-150 cursor-pointer
                           ${
                             isActive
-                              ? "bg-[#a66e46] text-white"
-                              : "text-[#ecd0b9]/75 hover:bg-white/5"
+                              ? "bg-accent-strong text-white"
+                              : "text-body/75 hover:bg-white/5"
                           }`}
                       >
                         {preset.label}
@@ -1042,7 +1042,7 @@ export default function CalendarView({
                 </div>
 
                 {/* Right Dual Calendar Month Grids */}
-                <div className='p-4 flex flex-col md:flex-row gap-6 bg-[#130d0a]/90'>
+                <div className='p-4 flex flex-col md:flex-row gap-6 bg-surface-1/90'>
                   {renderCalendarMonth(pickerYear, pickerMonth1, true)}
                   <div className='hidden md:block'>
                     {renderCalendarMonth(pickerYear2, pickerMonth2, false)}
@@ -1055,12 +1055,12 @@ export default function CalendarView({
       </header>
 
       {/* 2. Clockify-Style Top Interactive Timer bar */}
-      <section className='p-4 border-b shrink-0 bg-[#120805]/20 border-[#2b180d]/40'>
-        <div className='max-w-7xl mx-auto bg-[#1c120c]/40 backdrop-blur-xl rounded-2xl border border-[#3d2516]/50 shadow-2xl p-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center'>
+      <section className='p-4 border-b shrink-0 bg-canvas/20 border-surface-2/40'>
+        <div className='max-w-7xl mx-auto bg-surface-2/40 backdrop-blur-xl rounded-2xl border border-border/50 shadow-2xl p-3 flex flex-col lg:flex-row gap-3 items-stretch lg:items-center'>
           {/* Working input */}
           <div className='flex-1 flex items-center gap-3 px-2'>
             <Clock
-              className={`h-5 w-5 ${isTracking ? "text-[#dda67a] animate-pulse" : "text-[#ecd0b9]/40"}`}
+              className={`h-5 w-5 ${isTracking ? "text-accent-text animate-pulse" : "text-body/40"}`}
             />
             <input
               type='text'
@@ -1069,11 +1069,11 @@ export default function CalendarView({
               }
               value={timerDesc}
               onChange={(e) => setTimerDesc(e.target.value)}
-              className='w-full text-xs font-sans md:text-sm outline-none bg-transparent text-white placeholder-[#ecd0b9]/40 font-medium'
+              className='w-full text-xs font-sans md:text-sm outline-none bg-transparent text-heading placeholder-body/40 font-medium'
             />
           </div>
 
-          <div className='flex flex-wrap items-center gap-2 justify-between w-full lg:w-auto border-t lg:border-t-0 pt-3 lg:pt-0 border-[#3d2516]/40'>
+          <div className='flex flex-wrap items-center gap-2 justify-between w-full lg:w-auto border-t lg:border-t-0 pt-3 lg:pt-0 border-border/40'>
             {/* Project Pill - selects the project the running timer logs to */}
             <div className='relative'>
               <button
@@ -1081,7 +1081,7 @@ export default function CalendarView({
                   setShowProjDropdown(!showProjDropdown);
                   setShowTagDropdown(false);
                 }}
-                className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-[#3d2516]/60 bg-[#2d1a10]/40 hover:bg-[#3d2516]/60 backdrop-blur-md cursor-pointer text-[#ecd0b9] font-medium'
+                className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-border/60 bg-surface-3/40 hover:bg-border/60 backdrop-blur-md cursor-pointer text-body font-medium'
               >
                 {(() => {
                   const timerProj = projects.find((p) => p.id === timerProjId);
@@ -1095,7 +1095,7 @@ export default function CalendarView({
                     </>
                   ) : (
                     <>
-                      <Folder className='h-3.5 w-3.5 text-[#dda67a]' />
+                      <Folder className='h-3.5 w-3.5 text-accent-text' />
                       <span>No Project</span>
                     </>
                   );
@@ -1103,8 +1103,8 @@ export default function CalendarView({
               </button>
 
               {showProjDropdown && (
-                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-64 rounded-xl shadow-xl bg-[#170e0a]/95 backdrop-blur-xl border border-[#3d2516]/50 p-2 z-50'>
-                  <p className='text-[10px] font-mono text-[#ecd0b9]/60 uppercase tracking-wide px-2 py-1'>
+                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-64 rounded-xl shadow-xl bg-surface-1/95 backdrop-blur-xl border border-border/50 p-2 z-50'>
+                  <p className='text-[10px] font-mono text-body/60 uppercase tracking-wide px-2 py-1'>
                     Projects
                   </p>
                   <div className='max-h-48 overflow-y-auto space-y-0.5 my-1'>
@@ -1114,7 +1114,7 @@ export default function CalendarView({
                         setShowProjDropdown(false);
                       }}
                       className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition text-left
-                        ${!timerProjId ? "bg-[#a66e46]/20 text-[#dda67a] font-semibold" : "hover:bg-white/5 text-[#ecd0b9]/75"}`}
+                        ${!timerProjId ? "bg-accent-strong/20 text-accent-text font-semibold" : "hover:bg-white/5 text-body/75"}`}
                     >
                       <div className='h-2 w-2 rounded-full bg-slate-400'></div>
                       <span>No Project</span>
@@ -1127,7 +1127,7 @@ export default function CalendarView({
                           setShowProjDropdown(false);
                         }}
                         className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition text-left
-                          ${timerProjId === proj.id ? "bg-[#a66e46]/20 text-[#dda67a] font-semibold" : "hover:bg-white/5 text-[#ecd0b9]/75"}`}
+                          ${timerProjId === proj.id ? "bg-accent-strong/20 text-accent-text font-semibold" : "hover:bg-white/5 text-body/75"}`}
                       >
                         <span className='flex items-center gap-2 font-medium'>
                           <span
@@ -1138,19 +1138,19 @@ export default function CalendarView({
                         </span>
                         <span className='flex items-center gap-1.5'>
                           {proj.client && (
-                            <span className='text-[10px] text-[#ecd0b9]/40'>({proj.client})</span>
+                            <span className='text-[10px] text-body/40'>({proj.client})</span>
                           )}
-                          {timerProjId === proj.id && <Check className='h-3 w-3 text-[#dda67a]' />}
+                          {timerProjId === proj.id && <Check className='h-3 w-3 text-accent-text' />}
                         </span>
                       </button>
                     ))}
                   </div>
 
-                  <div className='border-t border-[#3d2516]/40 pt-2 mt-1'>
+                  <div className='border-t border-border/40 pt-2 mt-1'>
                     {!showProjCreator ? (
                       <button
                         onClick={() => setShowProjCreator(true)}
-                        className='w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-[#dda67a] hover:bg-[#dda67a]/15 rounded-lg font-medium cursor-pointer transition'
+                        className='w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-accent-text hover:bg-accent/15 rounded-lg font-medium cursor-pointer transition'
                       >
                         <Plus className='h-3.5 w-3.5' />
                         <span>Create Project</span>
@@ -1163,14 +1163,14 @@ export default function CalendarView({
                           required
                           value={newProjName}
                           onChange={(e) => setNewProjName(e.target.value)}
-                          className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                          className='w-full text-xs p-1.5 rounded border border-border-strong bg-surface-2 text-heading outline-none'
                         />
                         <input
                           type='text'
                           placeholder='Client (optional)'
                           value={newProjClient}
                           onChange={(e) => setNewProjClient(e.target.value)}
-                          className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                          className='w-full text-xs p-1.5 rounded border border-border-strong bg-surface-2 text-heading outline-none'
                         />
                         <div className='flex justify-between items-center gap-2'>
                           <div className='flex gap-1.5'>
@@ -1180,7 +1180,7 @@ export default function CalendarView({
                                   type='button'
                                   key={col}
                                   onClick={() => setNewProjColor(col)}
-                                  className={`h-4.5 w-4.5 rounded-full border cursor-pointer ${newProjColor === col ? "ring-2 ring-[#dda67a]" : "opacity-70"}`}
+                                  className={`h-4.5 w-4.5 rounded-full border cursor-pointer ${newProjColor === col ? "ring-2 ring-accent" : "opacity-70"}`}
                                   style={{ backgroundColor: col }}
                                 />
                               ),
@@ -1190,13 +1190,13 @@ export default function CalendarView({
                             <button
                               type='button'
                               onClick={() => setShowProjCreator(false)}
-                              className='px-2 py-1 text-[10px] rounded bg-[#241610] hover:bg-[#341f17] text-[#ecd0b9] border border-[#3e271a]/50'
+                              className='px-2 py-1 text-[10px] rounded bg-surface-3 hover:bg-surface-3 text-body border border-border-strong/50'
                             >
                               Cancel
                             </button>
                             <button
                               type='submit'
-                              className='px-2 py-1 text-[10px] rounded bg-[#a66e46] text-white font-medium hover:bg-[#8e5a34]'
+                              className='px-2 py-1 text-[10px] rounded bg-accent-strong text-white font-medium hover:bg-accent-strong-hover'
                             >
                               Save
                             </button>
@@ -1216,15 +1216,15 @@ export default function CalendarView({
                   setShowTagDropdown(!showTagDropdown);
                   setShowProjDropdown(false);
                 }}
-                className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-[#3d2516]/60 bg-[#2d1a10]/40 hover:bg-[#3d2516]/60 backdrop-blur-md cursor-pointer text-[#ecd0b9] font-medium'
+                className='flex items-center gap-1.5 text-xs py-1.5 px-3 rounded-lg border border-border/60 bg-surface-3/40 hover:bg-border/60 backdrop-blur-md cursor-pointer text-body font-medium'
               >
-                <Tag className='h-3.5 w-3.5 text-[#dda67a]' />
+                <Tag className='h-3.5 w-3.5 text-accent-text' />
                 <span>{timerTags.length > 0 ? `${timerTags.length} filter` : "Tags"}</span>
               </button>
 
               {showTagDropdown && (
-                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-56 rounded-xl shadow-xl bg-[#170e0a]/95 backdrop-blur-xl border border-[#3d2516]/50 p-2 z-50'>
-                  <p className='text-[10px] font-mono text-[#ecd0b9]/60 uppercase tracking-wide px-2 py-1'>
+                <div className='absolute right-0 mt-2 w-[calc(100vw-3rem)] md:w-56 rounded-xl shadow-xl bg-surface-1/95 backdrop-blur-xl border border-border/50 p-2 z-50'>
+                  <p className='text-[10px] font-mono text-body/60 uppercase tracking-wide px-2 py-1'>
                     Tags
                   </p>
                   <div className='max-h-48 overflow-y-auto space-y-0.5 my-1'>
@@ -1237,8 +1237,8 @@ export default function CalendarView({
                           className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs text-left transition
                             ${
                               isSelected
-                                ? "bg-[#a66e46]/20 text-[#dda67a] font-semibold"
-                                : "hover:bg-white/5 text-[#ecd0b9]/75"
+                                ? "bg-accent-strong/20 text-accent-text font-semibold"
+                                : "hover:bg-white/5 text-body/75"
                             }`}
                         >
                           <span>{t.name}</span>
@@ -1248,7 +1248,7 @@ export default function CalendarView({
                     })}
                   </div>
 
-                  <div className='border-t border-[#3d2516]/40 pt-2 mt-1'>
+                  <div className='border-t border-border/40 pt-2 mt-1'>
                     {!showTagCreator ? (
                       <button
                         onClick={() => setShowTagCreator(true)}
@@ -1268,7 +1268,7 @@ export default function CalendarView({
                           required
                           value={newTagName}
                           onChange={(e) => setNewTagName(e.target.value)}
-                          className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                          className='w-full text-xs p-1.5 rounded border border-border-strong bg-surface-2 text-heading outline-none'
                         />
                         <button
                           type='submit'
@@ -1297,7 +1297,7 @@ export default function CalendarView({
                 </span>
               </div>
             ) : (
-              <div className='text-[11px] font-mono text-[#ecd0b9]/40 uppercase tracking-widest px-2'>
+              <div className='text-[11px] font-mono text-body/40 uppercase tracking-widest px-2'>
                 Ready
               </div>
             )}
@@ -1314,7 +1314,7 @@ export default function CalendarView({
             ) : (
               <button
                 onClick={handleStartTimer}
-                className='px-5 py-3 md:py-2.5 bg-[#a66e46] hover:bg-[#8e5a34] text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#4a2b16]/30 transition duration-150'
+                className='px-5 py-3 md:py-2.5 bg-accent-strong hover:bg-accent-strong-hover text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-lg shadow-glow-1/30 transition duration-150'
               >
                 <Play className='h-3 w-3 fill-current' />
                 <span>Start</span>
@@ -1325,11 +1325,11 @@ export default function CalendarView({
       </section>
 
       {/* 3. The Calendar Content Area */}
-      <div className='flex-1 overflow-y-auto bg-[#1a110a]/10 relative'>
+      <div className='flex-1 overflow-y-auto bg-surface-2/10 relative'>
         {/* MOBILE DAY VIEW (< md) */}
         <div className='md:hidden flex flex-col pb-24'>
           {/* Day Selector Tabs */}
-          <div className='grid grid-cols-7 gap-1 bg-[#150d0a]/90 backdrop-blur-md border-b border-[#3c2518]/45 p-2 sticky top-0 z-25'>
+          <div className='grid grid-cols-7 gap-1 bg-surface-1/90 backdrop-blur-md border-b border-border/45 p-2 sticky top-0 z-25'>
             {weekDays.map((dateObj, idx) => {
               const dayStr = formatDateYYYYMMDD(dateObj);
               const totalMins = getDailyTotalMinutes(dayStr);
@@ -1344,10 +1344,10 @@ export default function CalendarView({
                   className={`flex flex-col items-center justify-center py-2 px-1 rounded-xl transition duration-150 cursor-pointer
                     ${
                       isSelected
-                        ? "bg-[#a66e46] text-[#fff6f0] shadow-md shadow-[#4a2b16]/40"
+                        ? "bg-accent-strong text-[#fff6f0] shadow-md shadow-glow-1/40"
                         : isToday
-                          ? "bg-[#a66e46]/10 text-[#dda67a] border border-[#a66e46]/25"
-                          : "text-[#ecd0b9]/60 hover:text-[#ecd0b9] hover:bg-white/[0.02]"
+                          ? "bg-accent-strong/10 text-accent-text border border-accent-strong/25"
+                          : "text-body/60 hover:text-body hover:bg-white/[0.02]"
                     }`}
                 >
                   <span className='text-[9px] font-bold tracking-wider uppercase opacity-85'>
@@ -1362,8 +1362,8 @@ export default function CalendarView({
                       isSelected
                         ? "bg-black/20 text-[#fff6f0]"
                         : totalMins > 0
-                          ? "bg-[#4a2d1a]/40 text-[#dda67a]"
-                          : "text-[#ecd0b9]/30"
+                          ? "bg-surface-3/40 text-accent-text"
+                          : "text-body/30"
                     }`}
                   >
                     {totalMins > 0 ? formatMinutesHHMM(totalMins) : "0:00"}
@@ -1404,7 +1404,7 @@ export default function CalendarView({
                           onTouchStart={(e) => handleTouchDragStart(entry, e)}
                           onTouchMove={handleTouchDragMove}
                           onTouchEnd={handleTouchDragEnd}
-                          className={`bg-[#1c120c]/60 backdrop-blur-xl border border-[#3d2516]/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-[#a66e46]/60 cursor-grab active:cursor-grabbing active:scale-[0.99] transition duration-150
+                          className={`bg-surface-2/60 backdrop-blur-xl border border-border/50 rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-md hover:border-accent-strong/60 cursor-grab active:cursor-grabbing active:scale-[0.99] transition duration-150
                             ${touchDragEntryId === entry.id ? 'opacity-30 border-dashed' : ''}`}
                         style={{
                           borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
@@ -1427,17 +1427,17 @@ export default function CalendarView({
                                 </span>
                               </div>
                             )}
-                            <h4 className='text-sm font-semibold text-white leading-snug break-words'>
+                            <h4 className='text-sm font-semibold text-heading leading-snug break-words'>
                               {entry.description || "No Description"}
                             </h4>
                           </div>
-                          <span className='text-sm font-mono font-bold text-[#dda67a] bg-[#dda67a]/10 px-2 py-0.5 rounded-lg shrink-0'>
+                          <span className='text-sm font-mono font-bold text-accent-text bg-accent/10 px-2 py-0.5 rounded-lg shrink-0'>
                             {formatHoursAndMinutes(entry.durationMinutes)}
                           </span>
                         </div>
 
-                        <div className='flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-[#3d2516]/20'>
-                          <span className='text-[11px] font-mono text-[#ecd0b9]/60'>
+                        <div className='flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-border/20'>
+                          <span className='text-[11px] font-mono text-body/60'>
                             {entry.startTime} - {entry.endTime}
                           </span>
 
@@ -1452,7 +1452,7 @@ export default function CalendarView({
                             {entry.tags.map((tag, tIdx) => (
                               <span
                                 key={tIdx}
-                                className='px-2 py-0.5 rounded text-[9px] font-medium bg-[#1d1410] border border-[#3e271a]/65 text-[#ecd0b9]/75'
+                                className='px-2 py-0.5 rounded text-[9px] font-medium bg-surface-2 border border-border-strong/65 text-body/75'
                               >
                                 {tag}
                               </span>
@@ -1468,13 +1468,13 @@ export default function CalendarView({
             } else {
               return (
                 <div className='flex flex-col items-center justify-center py-20 px-4 text-center'>
-                  <div className='h-12 w-12 rounded-full bg-[#3d2416]/20 flex items-center justify-center mb-3'>
-                    <Clock className='h-6 w-6 text-[#dda67a]/60' />
+                  <div className='h-12 w-12 rounded-full bg-border/20 flex items-center justify-center mb-3'>
+                    <Clock className='h-6 w-6 text-accent-text/60' />
                   </div>
-                  <p className='text-sm font-semibold text-[#ecd0b9]/80'>
+                  <p className='text-sm font-semibold text-body/80'>
                     No time logged for this day
                   </p>
-                  <p className='text-xs text-[#ecd0b9]/50 mt-1'>
+                  <p className='text-xs text-body/50 mt-1'>
                     Tap the floating button below or start a live timer to log hours.
                   </p>
                 </div>
@@ -1497,16 +1497,16 @@ export default function CalendarView({
                 }}
               >
                 <div
-                  className='bg-[#1c120c]/90 backdrop-blur-xl border-2 border-[#dda67a]/50 rounded-2xl p-3 shadow-2xl'
+                  className='bg-surface-2/90 backdrop-blur-xl border-2 border-accent/50 rounded-2xl p-3 shadow-2xl'
                   style={{ borderLeft: `4px solid ${proj?.color || '#a66e46'}` }}
                 >
-                  <p className='text-xs font-semibold text-white truncate'>
+                  <p className='text-xs font-semibold text-heading truncate'>
                     {dragEntry.description || 'Untitled'}
                   </p>
-                  <p className='text-[10px] font-mono text-[#dda67a] mt-1'>
+                  <p className='text-[10px] font-mono text-accent-text mt-1'>
                     {dragEntry.startTime} – {dragEntry.endTime}
                   </p>
-                  <p className='text-[9px] text-[#ecd0b9]/50 mt-0.5'>
+                  <p className='text-[9px] text-body/50 mt-0.5'>
                     Drag to a day tab to move
                   </p>
                 </div>
@@ -1519,12 +1519,12 @@ export default function CalendarView({
         <div className='hidden md:block p-6 min-w-[700px] overflow-x-auto'>
           <div
             id='calendar-week-grid'
-            className='border border-[#3c2518]/45 rounded-3xl overflow-hidden bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
+            className='border border-border/45 rounded-3xl overflow-hidden bg-surface-1/30 backdrop-blur-2xl shadow-2xl flex flex-col'
           >
           {/* Calendar Headers columns */}
-          <div className='grid grid-cols-[44px_repeat(7,1fr)] md:grid-cols-[60px_repeat(7,1fr)] border-b border-[#3c2518]/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
+          <div className='grid grid-cols-[44px_repeat(7,1fr)] md:grid-cols-[60px_repeat(7,1fr)] border-b border-border/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
             {/* Hour marker blank header */}
-            <div className='border-r border-[#3c2518]/45 flex items-center justify-center text-[10px] font-mono text-[#ecd0b9]/55 font-bold uppercase'>
+            <div className='border-r border-border/45 flex items-center justify-center text-[10px] font-mono text-body/55 font-bold uppercase'>
               TIME
             </div>
 
@@ -1537,11 +1537,11 @@ export default function CalendarView({
               return (
                 <div
                   key={idx}
-                  className={`p-3 text-center border-r border-[#3c2518]/30 last:border-r-0 flex flex-col items-center justify-between gap-1
-                    ${isToday ? "bg-[#a66e46]/10" : ""}`}
+                  className={`p-3 text-center border-r border-border/30 last:border-r-0 flex flex-col items-center justify-between gap-1
+                    ${isToday ? "bg-accent-strong/10" : ""}`}
                 >
                   <p
-                    className={`text-[9px] md:text-[11px] font-bold tracking-wider uppercase ${isToday ? "text-[#dda67a] font-extrabold" : "text-[#ecd0b9]/55"}`}
+                    className={`text-[9px] md:text-[11px] font-bold tracking-wider uppercase ${isToday ? "text-accent-text font-extrabold" : "text-body/55"}`}
                   >
                     {dateObj.toLocaleDateString("en-US", { weekday: "short" })}
                   </p>
@@ -1550,8 +1550,8 @@ export default function CalendarView({
                     className={`h-6 w-6 text-xs md:h-8 md:w-8 md:text-sm rounded-full font-display font-semibold flex items-center justify-center mt-1
                     ${
                       isToday
-                        ? "bg-[#a66e46] text-[#fff6f0] shadow-md shadow-[#4a2b16]/40"
-                        : "text-[#ecd0b9]"
+                        ? "bg-accent-strong text-[#fff6f0] shadow-md shadow-glow-1/40"
+                        : "text-body"
                     }`}
                   >
                     {dateObj.getDate()}
@@ -1564,8 +1564,8 @@ export default function CalendarView({
                       totalMins > 0
                         ? totalMins >= 480
                           ? "bg-emerald-800/25 text-emerald-400 border border-emerald-500/15"
-                          : "bg-[#4a2d1a]/40 text-[#ecd0b9] border border-[#a66e46]/30"
-                        : "text-[#ecd0b9]/30"
+                          : "bg-surface-3/40 text-body border border-accent-strong/30"
+                        : "text-body/30"
                     }`}
                   >
                     {totalMins > 0 ? formatMinutesHHMM(totalMins) : "0:00"}
@@ -1573,7 +1573,7 @@ export default function CalendarView({
 
                   {/* Highlighting under-logged hours for workdays */}
                   {idx < 5 && totalMins > 0 && totalMins < 480 && (
-                    <span className='text-[9px] font-mono text-[#ecd0b9]/45 leading-none'>
+                    <span className='text-[9px] font-mono text-body/45 leading-none'>
                       <span className='hidden md:inline'>under target (8h)</span>
                     </span>
                   )}
@@ -1595,12 +1595,12 @@ export default function CalendarView({
             {HOURS.map((hour, idx) => (
               <div
                 key={hour}
-                className='absolute w-full flex items-center border-b border-white/20 dark:border-slate-800/20 pointer-events-none'
+                className='absolute w-full flex items-center border-b border-border-soft/50 pointer-events-none'
                 style={{ top: `${idx * ROW_HEIGHT}px`, height: `${ROW_HEIGHT}px` }}
               >
                 {/* Visual Hour Indicator Column */}
-                <div className='w-[44px] md:w-[60px] h-full border-r border-white/30 dark:border-slate-800/30 shrink-0 flex items-start justify-center pt-1.5'>
-                  <span className='text-[10px] font-mono dark:text-slate-500 text-slate-400 font-semibold select-none'>
+                <div className='w-[44px] md:w-[60px] h-full border-r border-border-soft/60 shrink-0 flex items-start justify-center pt-1.5'>
+                  <span className='text-[10px] font-mono text-body/45 font-semibold select-none'>
                     {String(hour).padStart(2, "0")}:00
                   </span>
                 </div>
@@ -1613,8 +1613,8 @@ export default function CalendarView({
                       onClick={() => handleSlotClicked(formattedWeekDays[dIdx], hour)}
                       onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
                       onDrop={handleGridDrop}
-                      className={`border-r border-white/20 dark:border-slate-800/20 last:border-r-0 pointer-events-auto cursor-cell transition duration-75 relative
-                        ${draggedEntryId ? 'hover:bg-[#a66e46]/10' : 'hover:bg-white/40 dark:hover:bg-white/[0.02]'}`}
+                      className={`border-r border-border-soft/50 last:border-r-0 pointer-events-auto cursor-cell transition duration-75 relative
+                        ${draggedEntryId ? 'hover:bg-accent-strong/10' : 'hover:bg-surface-3/40'}`}
                       title='Click slot to log hours'
                     />
                   ))}
@@ -1655,7 +1655,7 @@ export default function CalendarView({
                             onDragEnd={handleDragEnd}
                             onClick={() => { if (!draggedEntryId) setEditingEntry(entry); }}
                             className={`absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden
-                              bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg
+                              bg-surface-1/75 backdrop-blur-md border-border/50 hover:bg-surface-2/90 hover:border-accent-strong/60 hover:shadow-lg
                               ${isDragging ? 'opacity-30 border-dashed cursor-grabbing scale-[0.97]' : 'cursor-grab hover:scale-[1.01]'}`}
                           style={{
                             ...pos,
@@ -1682,14 +1682,14 @@ export default function CalendarView({
                             )}
 
                             {/* Description */}
-                            <p className='text-[10px] md:text-xs font-semibold leading-tight max-h-[44px] overflow-hidden text-ellipsis dark:text-[#fcdbbd] text-slate-800 break-words group-hover:text-[#dda67a] transition-colors'>
+                            <p className='text-[10px] md:text-xs font-semibold leading-tight max-h-[44px] overflow-hidden text-ellipsis text-heading break-words group-hover:text-accent-text transition-colors'>
                               {entry.description || "No Description"}
                             </p>
                           </div>
 
                           {/* Footer details + quick adjust layout icons */}
-                          <div className='flex justify-between items-end mt-2 pt-1 border-t border-white/20 dark:border-[#3d2416]/50'>
-                            <span className='text-[10px] font-mono text-[#ecd0b9] font-bold shrink-0'>
+                          <div className='flex justify-between items-end mt-2 pt-1 border-t border-border/50'>
+                            <span className='text-[10px] font-mono text-body font-bold shrink-0'>
                               {formatHoursAndMinutes(entry.durationMinutes)}
                             </span>
 
@@ -1734,10 +1734,10 @@ export default function CalendarView({
                   }}
                 >
                   <div
-                    className='h-full w-full rounded-xl border-2 border-dashed border-[#dda67a]/70 bg-[#a66e46]/15 backdrop-blur-sm flex flex-col justify-center items-center'
+                    className='h-full w-full rounded-xl border-2 border-dashed border-accent/70 bg-accent-strong/15 backdrop-blur-sm flex flex-col justify-center items-center'
                     style={{ borderLeftWidth: '4px', borderLeftStyle: 'solid', borderLeftColor: proj?.color || '#a66e46' }}
                   >
-                    <span className='text-[10px] font-mono font-bold text-[#dda67a]/90'>
+                    <span className='text-[10px] font-mono font-bold text-accent-text/90'>
                       {(() => {
                         const startMins = Math.round(dragGhostPosition.startHour * 60);
                         const endMins = startMins + (draggedEntry?.durationMinutes || 60);
@@ -1748,7 +1748,7 @@ export default function CalendarView({
                         return `${String(sH).padStart(2, '0')}:${String(sM).padStart(2, '0')} – ${String(eH).padStart(2, '0')}:${String(eM).padStart(2, '0')}`;
                       })()}
                     </span>
-                    <span className='text-[9px] text-[#ecd0b9]/50 mt-0.5 truncate px-2 max-w-full'>
+                    <span className='text-[9px] text-body/50 mt-0.5 truncate px-2 max-w-full'>
                       {draggedEntry?.description || 'Untitled'}
                     </span>
                   </div>
@@ -1772,7 +1772,7 @@ export default function CalendarView({
             setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
             setIsCreateModalOpen(true);
           }}
-          className='md:hidden fixed bottom-20 right-6 z-40 h-14 w-14 rounded-full bg-[#a66e46] hover:bg-[#8e5a34] text-white flex items-center justify-center shadow-lg shadow-[#4a2b16]/50 cursor-pointer active:scale-95 transition-all duration-150'
+          className='md:hidden fixed bottom-20 right-6 z-40 h-14 w-14 rounded-full bg-accent-strong hover:bg-accent-strong-hover text-white flex items-center justify-center shadow-lg shadow-glow-1/50 cursor-pointer active:scale-95 transition-all duration-150'
           title='Add Time Entry'
         >
           <Plus className='h-6 w-6' />
@@ -1802,17 +1802,17 @@ export default function CalendarView({
                 transition: { type: "spring", damping: 25, stiffness: 350 }
               }}
               exit={{ scale: 0.95, y: 15, opacity: 0, transition: { duration: 0.15 } }}
-              className='bg-[#140d09] rounded-2xl w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto p-6 border border-[#3e271a] shadow-2xl relative text-white backdrop-blur-3xl'
+              className='bg-surface-1 rounded-2xl w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto p-6 border border-border-strong shadow-2xl relative text-heading backdrop-blur-3xl'
             >
-            <h3 className='text-base font-display font-bold text-white flex items-center gap-2 mb-4'>
-              <Sparkles className='h-5 w-5 text-[#dda67a]' />
+            <h3 className='text-base font-display font-bold text-heading flex items-center gap-2 mb-4'>
+              <Sparkles className='h-5 w-5 text-accent-text' />
               <span>Modify Time Entry</span>
             </h3>
 
             <div className='space-y-4'>
               {/* Description */}
               <div>
-                <label className='text-xs font-semibold text-[#ecd0b9]/60 block mb-1'>
+                <label className='text-xs font-semibold text-body/60 block mb-1'>
                   Description / Task Name
                 </label>
                 <textarea
@@ -1820,13 +1820,13 @@ export default function CalendarView({
                   onChange={(e) =>
                     setEditingEntry({ ...editingEntry, description: e.target.value })
                   }
-                  className='w-full text-sm p-2.5 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] focus:ring-2 focus:ring-[#dda67a]/40 outline-none h-20 resize-y'
+                  className='w-full text-sm p-2.5 rounded-xl border border-border-strong bg-surface-2 text-heading focus:ring-2 focus:ring-accent/40 outline-none h-20 resize-y'
                 />
               </div>
 
               {/* Project */}
               <div>
-                <label className='text-xs font-semibold text-[#ecd0b9]/60 block mb-1'>
+                <label className='text-xs font-semibold text-body/60 block mb-1'>
                   Project Alignment
                 </label>
                 <div className='relative'>
@@ -1835,18 +1835,18 @@ export default function CalendarView({
                     onChange={(e) =>
                       setEditingEntry({ ...editingEntry, projectId: e.target.value || undefined })
                     }
-                    className='w-full text-sm p-3 rounded-xl border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none cursor-pointer focus:ring-2 focus:ring-[#dda67a]/40 appearance-none pr-8 font-semibold'
+                    className='w-full text-sm p-3 rounded-xl border border-border-strong bg-surface-2 text-heading outline-none cursor-pointer focus:ring-2 focus:ring-accent/40 appearance-none pr-8 font-semibold'
                   >
-                    <option value='' className='bg-[#140d09] text-[#ecd0b9]/60'>
+                    <option value='' className='bg-surface-1 text-body/60'>
                       No Project
                     </option>
                     {projects.map((p) => (
-                      <option key={p.id} value={p.id} className='bg-[#1d1410] text-[#fcdbbd]'>
+                      <option key={p.id} value={p.id} className='bg-surface-2 text-heading'>
                         {p.name} {p.client ? `(${p.client})` : ""}
                       </option>
                     ))}
                   </select>
-                  <div className='absolute inset-y-0 right-3 flex items-center pointer-events-none text-[#ecd0b9]/60'>
+                  <div className='absolute inset-y-0 right-3 flex items-center pointer-events-none text-body/60'>
                     <ChevronRight className='h-4 w-4 rotate-90' />
                   </div>
                 </div>
@@ -1854,7 +1854,7 @@ export default function CalendarView({
 
               {/* Tags checkboxes */}
               <div>
-                <label className='text-xs font-semibold text-[#ecd0b9]/60 block mb-1.5'>
+                <label className='text-xs font-semibold text-body/60 block mb-1.5'>
                   Category Tags
                 </label>
                 <div className='flex flex-wrap gap-1.5'>
@@ -1873,8 +1873,8 @@ export default function CalendarView({
                         className={`px-3 py-1.5 text-xs font-medium rounded-full cursor-pointer border transition-colors
                           ${
                             selected
-                              ? "bg-[#a66e46] border-[#a66e46] text-white shadow-md"
-                              : "bg-[#221611]/60 border-[#3d2416]/80 text-[#ecd0b9]/70 hover:bg-[#342118]/60 hover:text-white"
+                              ? "bg-accent-strong border-accent-strong text-white shadow-md"
+                              : "bg-surface-2/60 border-border/80 text-body/70 hover:bg-surface-3/60 hover:text-heading"
                           }`}
                       >
                         {t.name}
@@ -1886,23 +1886,23 @@ export default function CalendarView({
 
               {/* Time and date section */}
               <div className='space-y-2'>
-                <label className='text-xs font-semibold text-[#ecd0b9]/60 block'>
+                <label className='text-xs font-semibold text-body/60 block'>
                   Time and date
                 </label>
 
-                <div className='flex flex-wrap sm:flex-nowrap items-center gap-3 bg-[#120b07] p-3 rounded-xl border border-[#3e271a]/50'>
+                <div className='flex flex-wrap sm:flex-nowrap items-center gap-3 bg-canvas p-3 rounded-xl border border-border-strong/50'>
                   {/* Dynamic Duration Box */}
                   <input
                     type='text'
                     value={editDurationStr}
                     onChange={(e) => handleEditDurationStrChange(e.target.value)}
                     placeholder='1:00'
-                    className='bg-[#241610] border border-[#3e271a] px-3 py-2 rounded-lg text-base font-bold text-[#dda67a] w-[90px] text-center font-mono outline-none focus:border-[#dda67a] transition shadow-inner'
+                    className='bg-surface-3 border border-border-strong px-3 py-2 rounded-lg text-base font-bold text-accent-text w-[90px] text-center font-mono outline-none focus:border-accent transition shadow-inner'
                     title='Edit duration (H:MM) to update end time automatically'
                   />
 
                   {/* Dotted separator */}
-                  <div className='hidden sm:block h-6 border-l border-dashed border-[#3e271a]/50' />
+                  <div className='hidden sm:block h-6 border-l border-dashed border-border-strong/50' />
 
                   {/* Horizontal Time Input Interval Wrapper */}
                   <div className='flex items-center gap-2'>
@@ -1920,9 +1920,9 @@ export default function CalendarView({
                         });
                         setEditDurationStr(formatMinutesHHMM(newDur));
                       }}
-                      className='bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer'
+                      className='bg-surface-2 border border-border-strong rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-heading outline-none w-[95px] focus:border-accent transition cursor-pointer'
                     />
-                    <span className='text-[#ecd0b9]/50'>-</span>
+                    <span className='text-body/50'>-</span>
                     <input
                       type='time'
                       required
@@ -1937,12 +1937,12 @@ export default function CalendarView({
                         });
                         setEditDurationStr(formatMinutesHHMM(newDur));
                       }}
-                      className='bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer'
+                      className='bg-surface-2 border border-border-strong rounded-lg px-3 py-2 text-sm text-center font-bold font-mono text-heading outline-none w-[95px] focus:border-accent transition cursor-pointer'
                     />
                   </div>
 
                   {/* Calendar symbol icon */}
-                  <Calendar className='h-4 w-4 text-[#ecd0b9]/50 shrink-0' />
+                  <Calendar className='h-4 w-4 text-body/50 shrink-0' />
 
                   {/* Date selection picker */}
                   <input
@@ -1950,14 +1950,14 @@ export default function CalendarView({
                     required
                     value={editingEntry.date}
                     onChange={(e) => setEditingEntry({ ...editingEntry, date: e.target.value })}
-                    className='bg-[#1c120c] border border-[#3e271a] rounded-lg px-3 py-2 text-xs text-center font-bold text-white outline-none flex-1 focus:border-[#dda67a] transition cursor-pointer'
+                    className='bg-surface-2 border border-border-strong rounded-lg px-3 py-2 text-xs text-center font-bold text-heading outline-none flex-1 focus:border-accent transition cursor-pointer'
                   />
                 </div>
               </div>
             </div>
 
             {/* Footer buttons */}
-            <div className='flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6 border-t border-[#3e271a]/60 pt-4'>
+            <div className='flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-6 border-t border-border-strong/60 pt-4'>
               <button
                 onClick={() => {
                   onDeleteEntry(editingEntry.id);
@@ -1972,7 +1972,7 @@ export default function CalendarView({
               <div className='flex gap-2'>
                 <button
                   onClick={() => setEditingEntry(null)}
-                  className='py-2.5 px-4 rounded-xl border border-[#3e271a] bg-[#241610] text-[#ecd0b9] hover:bg-[#341f17] text-xs font-semibold cursor-pointer transition'
+                  className='py-2.5 px-4 rounded-xl border border-border-strong bg-surface-3 text-body hover:bg-surface-3 text-xs font-semibold cursor-pointer transition'
                 >
                   Cancel
                 </button>
@@ -1981,7 +1981,7 @@ export default function CalendarView({
                     onUpdateEntry(editingEntry);
                     setEditingEntry(null);
                   }}
-                  className='py-2.5 px-5 rounded-xl bg-[#a66e46] text-white hover:bg-[#8e5a34] text-xs font-semibold cursor-pointer shadow-lg shadow-[#4a2b16]/30 transition'
+                  className='py-2.5 px-5 rounded-xl bg-accent-strong text-white hover:bg-accent-strong-hover text-xs font-semibold cursor-pointer shadow-lg shadow-glow-1/30 transition'
                 >
                   Apply Changes
                 </button>
@@ -2016,15 +2016,15 @@ export default function CalendarView({
                 transition: { type: "spring", damping: 25, stiffness: 350 }
               }}
               exit={{ scale: 0.95, y: 15, opacity: 0, transition: { duration: 0.15 } }}
-              className='bg-[#1a110a] rounded-xl border border-[#3e271a] w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-white'
+              className='bg-surface-2 rounded-xl border border-border-strong w-full max-w-full md:max-w-[620px] max-h-[90vh] overflow-y-auto shadow-2xl flex flex-col text-heading'
             >
             {/* Header */}
-            <div className='px-6 py-4 border-b border-[#3e271a]/60 flex items-center justify-between'>
-              <h3 className='text-lg font-medium text-white tracking-tight'>Add time entry</h3>
+            <div className='px-6 py-4 border-b border-border-strong/60 flex items-center justify-between'>
+              <h3 className='text-lg font-medium text-heading tracking-tight'>Add time entry</h3>
               <button
                 type='button'
                 onClick={() => setIsCreateModalOpen(false)}
-                className='p-1.5 rounded-md hover:bg-[#2c1a11]/50 text-[#ecd0b9]/60 hover:text-white transition cursor-pointer'
+                className='p-1.5 rounded-md hover:bg-surface-3/50 text-body/60 hover:text-heading transition cursor-pointer'
               >
                 <X className='h-5 w-5' />
               </button>
@@ -2054,23 +2054,23 @@ export default function CalendarView({
             >
               {/* Time and date section */}
               <div className='space-y-2'>
-                <label className='text-xs font-semibold text-[#ecd0b9]/75 block'>
+                <label className='text-xs font-semibold text-body/75 block'>
                   Time and date
                 </label>
 
-                <div className='flex flex-wrap sm:flex-nowrap items-center gap-3 bg-[#120b07] p-3 rounded border border-[#3e271a]/50'>
+                <div className='flex flex-wrap sm:flex-nowrap items-center gap-3 bg-canvas p-3 rounded border border-border-strong/50'>
                   {/* Dynamic Duration Box */}
                   <input
                     type='text'
                     value={modalDurationStr}
                     onChange={(e) => handleDurationStrChange(e.target.value)}
                     placeholder='1:00'
-                    className='bg-[#241610] border border-[#3e271a] px-3 py-2 rounded text-base font-bold text-[#dda67a] w-[90px] text-center font-mono outline-none focus:border-[#dda67a] transition shadow-inner'
+                    className='bg-surface-3 border border-border-strong px-3 py-2 rounded text-base font-bold text-accent-text w-[90px] text-center font-mono outline-none focus:border-accent transition shadow-inner'
                     title='Edit duration (H:MM) to update end time automatically'
                   />
 
                   {/* Dotted separator */}
-                  <div className='hidden sm:block h-6 border-l border-dashed border-[#3e271a]/50' />
+                  <div className='hidden sm:block h-6 border-l border-dashed border-border-strong/50' />
 
                   {/* Horizontal Time Input Interval Wrapper */}
                   <div className='flex items-center gap-2'>
@@ -2079,20 +2079,20 @@ export default function CalendarView({
                       required
                       value={newEntryStartTime}
                       onChange={(e) => handleStartTimeChange(e.target.value)}
-                      className='bg-[#1c120c] border border-[#3e271a] rounded px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer'
+                      className='bg-surface-2 border border-border-strong rounded px-3 py-2 text-sm text-center font-bold font-mono text-heading outline-none w-[95px] focus:border-accent transition cursor-pointer'
                     />
-                    <span className='text-[#ecd0b9]/50'>-</span>
+                    <span className='text-body/50'>-</span>
                     <input
                       type='time'
                       required
                       value={newEntryEndTime}
                       onChange={(e) => handleEndTimeChange(e.target.value)}
-                      className='bg-[#1c120c] border border-[#3e271a] rounded px-3 py-2 text-sm text-center font-bold font-mono text-white outline-none w-[95px] focus:border-[#dda67a] transition cursor-pointer'
+                      className='bg-surface-2 border border-border-strong rounded px-3 py-2 text-sm text-center font-bold font-mono text-heading outline-none w-[95px] focus:border-accent transition cursor-pointer'
                     />
                   </div>
 
                   {/* Calendar symbol icon */}
-                  <Calendar className='h-4 w-4 text-[#ecd0b9]/50 shrink-0' />
+                  <Calendar className='h-4 w-4 text-body/50 shrink-0' />
 
                   {/* Date selection picker */}
                   <input
@@ -2100,30 +2100,30 @@ export default function CalendarView({
                     required
                     value={newEntryDate}
                     onChange={(e) => setNewEntryDate(e.target.value)}
-                    className='bg-[#1c120c] border border-[#3e271a] rounded px-3 py-2 text-xs text-center font-bold text-white outline-none flex-1 focus:border-[#dda67a] transition cursor-pointer'
+                    className='bg-surface-2 border border-border-strong rounded px-3 py-2 text-xs text-center font-bold text-heading outline-none flex-1 focus:border-accent transition cursor-pointer'
                   />
                 </div>
               </div>
 
               {/* Divider spacer line */}
-              <hr className='border-[#3e271a]/40 my-4' />
+              <hr className='border-border-strong/40 my-4' />
 
               {/* Description field */}
               <div className='flex flex-col sm:flex-row sm:items-start gap-4'>
-                <label className='text-sm font-semibold text-[#ecd0b9]/75 sm:w-[120px] pt-1.5 shrink-0'>
+                <label className='text-sm font-semibold text-body/75 sm:w-[120px] pt-1.5 shrink-0'>
                   Description
                 </label>
                 <textarea
                   name='description'
                   required
                   placeholder='What have you worked on?'
-                  className='flex-1 bg-[#1c120c] border border-[#3e271a] rounded p-3 h-20 text-sm text-white placeholder-[#ecd0b9]/30 outline-none focus:border-[#dda67a] transition'
+                  className='flex-1 bg-surface-2 border border-border-strong rounded p-3 h-20 text-sm text-heading placeholder-body/30 outline-none focus:border-accent transition'
                 />
               </div>
 
               {/* Project field */}
               <div className='flex flex-col sm:flex-row sm:items-start gap-4'>
-                <label className='text-sm font-semibold text-[#ecd0b9]/75 sm:w-[120px] pt-1.5 shrink-0'>
+                <label className='text-sm font-semibold text-body/75 sm:w-[120px] pt-1.5 shrink-0'>
                   Project
                 </label>
                 <div className='relative flex-1'>
@@ -2134,28 +2134,28 @@ export default function CalendarView({
                       setShowModalProjDropdown(!showModalProjDropdown);
                       setShowModalTagDropdown(false);
                     }}
-                    className='w-full text-left bg-[#1c120c] border border-[#3e271a] rounded p-3 pr-10 text-sm text-white focus:border-[#dda67a] flex items-center justify-between cursor-pointer transition hover:border-[#3e271a]/80'
+                    className='w-full text-left bg-surface-2 border border-border-strong rounded p-3 pr-10 text-sm text-heading focus:border-accent flex items-center justify-between cursor-pointer transition hover:border-border-strong/80'
                   >
                     {(() => {
                       const modalProj = projects.find((p) => p.id === modalProjId);
                       return modalProj ? (
-                        <span className='flex items-center gap-2 font-medium text-[#ecd0b9]'>
+                        <span className='flex items-center gap-2 font-medium text-body'>
                           <span
                             className='h-2.5 w-2.5 rounded-full shrink-0'
                             style={{ backgroundColor: modalProj.color }}
                           />
                           <span>{modalProj.name}</span>
                           {modalProj.client && (
-                            <span className='text-[11px] text-[#ecd0b9]/40'>
+                            <span className='text-[11px] text-body/40'>
                               ({modalProj.client})
                             </span>
                           )}
                         </span>
                       ) : (
-                        <span className='text-[#ecd0b9]/60'>No Project</span>
+                        <span className='text-body/60'>No Project</span>
                       );
                     })()}
-                    <span className='text-[#ecd0b9]/60'>
+                    <span className='text-body/60'>
                       <svg className='h-4 w-4 fill-current' viewBox='0 0 20 20'>
                         <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
                       </svg>
@@ -2164,7 +2164,7 @@ export default function CalendarView({
 
                   {/* Dropdown popup project list */}
                   {showModalProjDropdown && (
-                    <div className='absolute left-0 right-0 mt-1 bg-[#1a110a] border border-[#3e271a] rounded-md shadow-2xl z-50 max-h-60 overflow-y-auto p-2 space-y-1'>
+                    <div className='absolute left-0 right-0 mt-1 bg-surface-2 border border-border-strong rounded-md shadow-2xl z-50 max-h-60 overflow-y-auto p-2 space-y-1'>
                       <button
                         type='button'
                         onClick={() => {
@@ -2172,13 +2172,13 @@ export default function CalendarView({
                           setShowModalProjDropdown(false);
                         }}
                         className={`w-full text-left px-3 py-2 text-xs rounded transition flex items-center justify-between cursor-pointer
-                          ${!modalProjId ? "bg-[#2f1d13] text-white font-semibold" : "text-[#ecd0b9]/70 hover:bg-[#2c1a11]/40 hover:text-white"}`}
+                          ${!modalProjId ? "bg-surface-3 text-heading font-semibold" : "text-body/70 hover:bg-surface-3/40 hover:text-heading"}`}
                       >
                         <span className='flex items-center gap-2'>
                           <span className='h-2 w-2 rounded-full bg-slate-400'></span>
                           <span>No Project</span>
                         </span>
-                        {!modalProjId && <Check className='h-3 w-3 text-[#dda67a]' />}
+                        {!modalProjId && <Check className='h-3 w-3 text-accent-text' />}
                       </button>
                       {projects.map((p) => {
                         const active = modalProjId === p.id;
@@ -2191,7 +2191,7 @@ export default function CalendarView({
                               setShowModalProjDropdown(false);
                             }}
                             className={`w-full text-left px-3 py-2 text-xs rounded transition flex items-center justify-between cursor-pointer
-                              ${active ? "bg-[#2f1d13] text-white font-semibold" : "text-[#ecd0b9]/70 hover:bg-[#2c1a11]/40 hover:text-white"}`}
+                              ${active ? "bg-surface-3 text-heading font-semibold" : "text-body/70 hover:bg-surface-3/40 hover:text-heading"}`}
                           >
                             <span className='flex items-center gap-2'>
                               <span
@@ -2200,21 +2200,21 @@ export default function CalendarView({
                               ></span>
                               <span>{p.name}</span>
                               {p.client && (
-                                <span className='text-[10px] text-[#ecd0b9]/40'>({p.client})</span>
+                                <span className='text-[10px] text-body/40'>({p.client})</span>
                               )}
                             </span>
-                            {active && <Check className='h-3 w-3 text-[#dda67a]' />}
+                            {active && <Check className='h-3 w-3 text-accent-text' />}
                           </button>
                         );
                       })}
 
                       {/* Inline quick-create */}
-                      <div className='border-t border-[#3e271a]/60 pt-2 mt-1'>
+                      <div className='border-t border-border-strong/60 pt-2 mt-1'>
                         {!showModalProjCreator ? (
                           <button
                             type='button'
                             onClick={() => setShowModalProjCreator(true)}
-                            className='w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-[#dda67a] hover:bg-[#dda67a]/15 rounded font-medium cursor-pointer transition'
+                            className='w-full flex items-center justify-center gap-1.5 py-1.5 text-xs text-accent-text hover:bg-accent/15 rounded font-medium cursor-pointer transition'
                           >
                             <Plus className='h-3.5 w-3.5' />
                             <span>Create Project</span>
@@ -2226,14 +2226,14 @@ export default function CalendarView({
                               placeholder='Project name *'
                               value={newProjName}
                               onChange={(e) => setNewProjName(e.target.value)}
-                              className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                              className='w-full text-xs p-1.5 rounded border border-border-strong bg-surface-2 text-heading outline-none'
                             />
                             <input
                               type='text'
                               placeholder='Client (optional)'
                               value={newProjClient}
                               onChange={(e) => setNewProjClient(e.target.value)}
-                              className='w-full text-xs p-1.5 rounded border border-[#3e271a] bg-[#1d1410] text-[#fcdbbd] outline-none'
+                              className='w-full text-xs p-1.5 rounded border border-border-strong bg-surface-2 text-heading outline-none'
                             />
                             <div className='flex justify-between items-center gap-2'>
                               <div className='flex gap-1.5'>
@@ -2242,7 +2242,7 @@ export default function CalendarView({
                                     type='button'
                                     key={col}
                                     onClick={() => setNewProjColor(col)}
-                                    className={`h-4.5 w-4.5 rounded-full border cursor-pointer ${newProjColor === col ? "ring-2 ring-[#dda67a]" : "opacity-70"}`}
+                                    className={`h-4.5 w-4.5 rounded-full border cursor-pointer ${newProjColor === col ? "ring-2 ring-accent" : "opacity-70"}`}
                                     style={{ backgroundColor: col }}
                                   />
                                 ))}
@@ -2251,14 +2251,14 @@ export default function CalendarView({
                                 <button
                                   type='button'
                                   onClick={() => setShowModalProjCreator(false)}
-                                  className='px-2 py-1 text-[10px] rounded bg-[#241610] hover:bg-[#341f17] text-[#ecd0b9] border border-[#3e271a]/50'
+                                  className='px-2 py-1 text-[10px] rounded bg-surface-3 hover:bg-surface-3 text-body border border-border-strong/50'
                                 >
                                   Cancel
                                 </button>
                                 <button
                                   type='button'
                                   onClick={handleCreateProjectInModal}
-                                  className='px-2 py-1 text-[10px] rounded bg-[#a66e46] text-white font-medium hover:bg-[#8e5a34]'
+                                  className='px-2 py-1 text-[10px] rounded bg-accent-strong text-white font-medium hover:bg-accent-strong-hover'
                                 >
                                   Save
                                 </button>
@@ -2274,7 +2274,7 @@ export default function CalendarView({
 
               {/* Tags field */}
               <div className='flex flex-col sm:flex-row sm:items-start gap-4'>
-                <label className='text-sm font-semibold text-[#ecd0b9]/75 sm:w-[120px] pt-1.5 shrink-0'>
+                <label className='text-sm font-semibold text-body/75 sm:w-[120px] pt-1.5 shrink-0'>
                   Tags
                 </label>
                 <div className='relative flex-1'>
@@ -2282,23 +2282,23 @@ export default function CalendarView({
                   <button
                     type='button'
                     onClick={() => setShowModalTagDropdown(!showModalTagDropdown)}
-                    className='w-full text-left bg-[#1c120c] border border-[#3e271a] rounded p-3 pr-10 text-sm text-white focus:border-[#dda67a] flex items-center justify-between cursor-pointer transition hover:border-[#3e271a]/80'
+                    className='w-full text-left bg-surface-2 border border-border-strong rounded p-3 pr-10 text-sm text-heading focus:border-accent flex items-center justify-between cursor-pointer transition hover:border-border-strong/80'
                   >
                     {modalSelectedTags.length > 0 ? (
                       <div className='flex flex-wrap gap-1.5 max-w-[calc(100%-20px)]'>
                         {modalSelectedTags.map((tag) => (
                           <span
                             key={tag}
-                            className='px-2 py-0.5 rounded text-[11px] font-medium bg-[#2f1d13] text-[#ecd0b9] border border-[#3e271a]/50 flex items-center gap-1'
+                            className='px-2 py-0.5 rounded text-[11px] font-medium bg-surface-3 text-body border border-border-strong/50 flex items-center gap-1'
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <span className='text-[#ecd0b9]/30'>Add tags</span>
+                      <span className='text-body/30'>Add tags</span>
                     )}
-                    <span className='text-[#ecd0b9]/60'>
+                    <span className='text-body/60'>
                       <svg className='h-4 w-4 fill-current' viewBox='0 0 20 20'>
                         <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
                       </svg>
@@ -2307,7 +2307,7 @@ export default function CalendarView({
 
                   {/* Dropdown popup menu checklist */}
                   {showModalTagDropdown && (
-                    <div className='absolute left-0 right-0 mt-1 bg-[#1a110a] border border-[#3e271a] rounded-md shadow-2xl z-50 max-h-45 overflow-y-auto p-2 space-y-1'>
+                    <div className='absolute left-0 right-0 mt-1 bg-surface-2 border border-border-strong rounded-md shadow-2xl z-50 max-h-45 overflow-y-auto p-2 space-y-1'>
                       {tags.map((t) => {
                         const active = modalSelectedTags.includes(t.name);
                         return (
@@ -2322,15 +2322,15 @@ export default function CalendarView({
                               }
                             }}
                             className={`w-full text-left px-3 py-2 text-xs rounded transition flex items-center justify-between cursor-pointer
-                              ${active ? "bg-[#2f1d13] text-white font-semibold" : "text-[#ecd0b9]/70 hover:bg-[#2c1a11]/40 hover:text-white"}`}
+                              ${active ? "bg-surface-3 text-heading font-semibold" : "text-body/70 hover:bg-surface-3/40 hover:text-heading"}`}
                           >
                             <span>{t.name}</span>
-                            {active && <Check className='h-3 w-3 text-[#dda67a]' />}
+                            {active && <Check className='h-3 w-3 text-accent-text' />}
                           </button>
                         );
                       })}
                       {tags.length === 0 && (
-                        <div className='p-2 text-xs text-[#ecd0b9]/40 italic text-center'>
+                        <div className='p-2 text-xs text-body/40 italic text-center'>
                           No workspace tags. Setup tags in Settings!
                         </div>
                       )}
@@ -2340,20 +2340,20 @@ export default function CalendarView({
               </div>
 
               {/* Footer CTA */}
-              <div className='flex flex-col-reverse sm:flex-row gap-6 items-center justify-end mt-8 pt-4 border-t border-[#3e271a]/40'>
+              <div className='flex flex-col-reverse sm:flex-row gap-6 items-center justify-end mt-8 pt-4 border-t border-border-strong/40'>
                 <button
                   type='button'
                   onClick={() => {
                     setIsCreateModalOpen(false);
                     setShowModalTagDropdown(false); setShowModalProjDropdown(false); setShowModalProjCreator(false);
                   }}
-                  className='text-[#dda67a] hover:text-[#ecd0b9] text-sm font-semibold cursor-pointer transition bg-transparent border-none outline-none py-2 px-1'
+                  className='text-accent-text hover:text-body text-sm font-semibold cursor-pointer transition bg-transparent border-none outline-none py-2 px-1'
                 >
                   Cancel
                 </button>
                 <button
                   type='submit'
-                  className='bg-[#a66e46] hover:bg-[#8e5a34] text-white uppercase text-xs font-bold py-3 px-8 rounded transition cursor-pointer tracking-wider shadow-lg shadow-[#4a2b16]/40'
+                  className='bg-accent-strong hover:bg-accent-strong-hover text-white uppercase text-xs font-bold py-3 px-8 rounded transition cursor-pointer tracking-wider shadow-lg shadow-glow-1/40'
                 >
                   ADD
                 </button>
