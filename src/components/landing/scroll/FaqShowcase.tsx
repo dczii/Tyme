@@ -245,7 +245,15 @@ export default function FaqShowcase() {
           trigger: pinRef.current, // align pin start with the stage, not the padded section
           pin: pinRef.current, // pin the wrapper, never the animated track
           start: 'top top',
-          end: () => '+=' + distance(),
+          // Pace the horizontal travel to the panel rhythm: roughly one viewport of
+          // vertical scroll advances one whole card. The pin length is (number of
+          // card-advances × 100vh) rather than the raw horizontal distance, so the
+          // gallery pages card-by-card like the rest of the site instead of racing.
+          end: () => {
+            const step = cardAdvance();
+            const advances = step ? Math.max(1, Math.round(distance() / step)) : 1;
+            return '+=' + advances * window.innerHeight;
+          },
           scrub: 1,
           anticipatePin: 1,
           invalidateOnRefresh: true,

@@ -13,6 +13,7 @@ import AppShowcase from "@/components/landing/scroll/AppShowcase";
 import FeatureShowcase from "@/components/landing/scroll/FeatureShowcase";
 import FaqShowcase from "@/components/landing/scroll/FaqShowcase";
 import SmoothScrollProvider from "@/components/landing/scroll/SmoothScrollProvider";
+import SnapController from "@/components/landing/scroll/SnapController";
 
 // Shared anchor targets — one source for the header nav, footer nav, and the
 // sections themselves, so every panel is reachable from both navs (#19).
@@ -60,6 +61,8 @@ export default function Home() {
       <SmoothScrollProvider>
         <div className='relative min-h-screen overflow-hidden bg-[#0c0806] text-slate-200 font-sans'>
           <LogoIntroAnimation />
+          {/* Desktop-only panel snapping (fine-pointer, motion-OK). Renders nothing. */}
+          <SnapController />
           {/* Ambient espresso-theme glow (decorative). The two blobs breathe with a
           slow, offset opacity pulse — gated behind motion-safe so reduced-motion
           users get a static backdrop. */}
@@ -125,6 +128,7 @@ export default function Home() {
             every one a verifiable product fact. Static, SSR-rendered markup. */}
             <SectionComment label='PROOF BAND (section 3) - honest stat tiles (monospace numerals)' />
             <section
+              data-snap-panel
               aria-labelledby='proof-heading'
               className='mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 py-20 sm:px-8'
             >
@@ -151,6 +155,7 @@ export default function Home() {
             <SectionComment label='HOW IT WORKS (section 4) - 3 steps: sign in, log time, export' />
             <section
               id='how-it-works'
+              data-snap-panel
               aria-labelledby='how-heading'
               className='mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8'
             >
@@ -192,6 +197,7 @@ export default function Home() {
             <SectionComment label='PRICING (section 5) - free-forever panel + dual CTA' />
             <section
               id='pricing'
+              data-snap-panel
               aria-labelledby='pricing-heading'
               className='mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8'
             >
@@ -203,9 +209,7 @@ export default function Home() {
                   Free forever, for freelancers and VAs
                 </h2>
               </Reveal>
-              <Reveal delay={0.08}>
-                <PricingPanel />
-              </Reveal>
+              <PricingPanel />
             </section>
 
             {/* ===== FAQ (section 6) =====
@@ -221,6 +225,8 @@ export default function Home() {
             Closing conversion band with a glow accent and the same dual CTA pair. */}
             <SectionComment label='FINAL CTA (section 7) - closing conversion band + dual CTA' />
             <section
+              data-snap-panel
+              data-cta-hide-zone
               aria-labelledby='final-cta-heading'
               className='mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 py-20 sm:px-8'
             >

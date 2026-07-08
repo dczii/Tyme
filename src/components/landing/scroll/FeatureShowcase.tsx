@@ -59,7 +59,10 @@ export default function FeatureShowcase() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: `+=${n * 80}%`,
+          // ≈ one viewport of scroll per card (cards × 100vh), so each card
+          // transition reads as one clean "virtual panel" of the Tesla-style paging
+          // — the regularity is what makes the pinned deal feel intentional.
+          end: `+=${n * 100}%`,
           pin: pinRef.current,
           scrub: 0.6,
           anticipatePin: 1,
