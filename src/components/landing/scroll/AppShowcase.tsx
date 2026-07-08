@@ -5,7 +5,7 @@ import { useReducedMotion } from "motion/react";
 import { gsap } from "gsap";
 import { CalendarDays, FileBarChart2, Settings, FileDown, TrendingUp, Clock } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
-import SignInButton from "../SignInButton";
+import { PrimaryCta, SecondaryCta } from "../CtaButton";
 import { useIntro } from "../IntroContext";
 
 // ── Mock data for the "screenshot" — a faithful still of the Tyme weekly calendar ──
@@ -119,18 +119,18 @@ export default function AppShowcase() {
   return (
     <section
       ref={sectionRef}
-      className='relative mx-auto flex min-h-[88vh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8 sm:py-24'
+      className='relative mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8 sm:py-24'
     >
       <div ref={headingRef} className='mx-auto mb-12 max-w-2xl text-center sm:mb-16'>
         <h1 className='text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl'>
           Every hour, exactly where you logged it
         </h1>
-        <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/70'>
-          Drop entries onto the weekly grid, colour-code by project, and watch your billable total
-          add up in real time.
+        <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/80'>
+          Free for freelancers and virtual assistants — no credit card.
         </p>
-        <div className='pointer-events-auto mt-9 flex justify-center'>
-          <SignInButton variant='hero' />
+        <div className='pointer-events-auto mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+          <PrimaryCta>Start tracking free</PrimaryCta>
+          <SecondaryCta href='#how-it-works'>See how it works</SecondaryCta>
         </div>
       </div>
 
@@ -165,7 +165,9 @@ export default function AppShowcase() {
                 <BrandLogo size={26} showBackground={false} className='brightness-125' />
                 <span className='text-sm font-bold text-white'>Tyme</span>
               </div>
-              <nav className='flex flex-col gap-1'>
+              {/* Decorative fake sidebar inside the product screenshot — hidden from
+                  the a11y tree so it isn't an unlabelled landmark. */}
+              <nav aria-hidden='true' className='flex flex-col gap-1'>
                 {NAV.map(({ icon: Icon, label, active }) => (
                   <span
                     key={label}

@@ -5,6 +5,7 @@ import { useReducedMotion } from 'motion/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import { setLenis } from './lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,8 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
     if (reduce) return;
 
     const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    // Expose the instance so in-page CTA anchors can drive a smooth scroll.
+    setLenis(lenis);
 
     // Keep ScrollTrigger's notion of scroll position synced to Lenis.
     lenis.on('scroll', ScrollTrigger.update);
@@ -32,6 +35,7 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
     return () => {
       gsap.ticker.remove(tick);
       gsap.ticker.lagSmoothing(500, 33);
+      setLenis(null);
       lenis.destroy();
     };
   }, [reduce]);

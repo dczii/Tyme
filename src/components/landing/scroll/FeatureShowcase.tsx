@@ -111,7 +111,12 @@ export default function FeatureShowcase() {
   }, [n, reduce]);
 
   return (
-    <section ref={sectionRef} id="features" className="relative scroll-mt-20">
+    <section
+      ref={sectionRef}
+      id="features"
+      aria-labelledby="features-heading"
+      className="relative scroll-mt-20"
+    >
       <div
         ref={pinRef}
         className="mx-auto flex min-h-screen max-w-6xl flex-col justify-center gap-10 px-5 py-20 sm:px-8 lg:flex-row lg:items-center lg:gap-16"
@@ -121,7 +126,10 @@ export default function FeatureShowcase() {
           <span className="inline-flex items-center gap-2 rounded-full border border-[#5e3820]/40 bg-[#2d1b11]/50 px-4 py-1.5 font-mono text-[11px] uppercase tracking-wider text-[#dda67a]">
             What you get
           </span>
-          <h2 className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+          <h2
+            id="features-heading"
+            className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
+          >
             Everything you need to bill with confidence
           </h2>
           <p className="mt-4 max-w-md text-lg text-[#ecd0b9]/70">

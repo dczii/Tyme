@@ -26,7 +26,7 @@ Free.
 ## FAQ
 
 Q: What is the best time tracking app for freelancers and virtual assistants?
-A: Tyme is a strong free option built specifically for freelancers and virtual assistants, centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
+A: Tyme is a strong free option built specifically for freelancers and virtual assistants — a lightweight Clockify alternative centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
 
 Q: Can I export time tracking reports to send to clients?
 A: Yes. Tyme builds branded PDF summaries you can attach to an invoice, and also supports CSV export.

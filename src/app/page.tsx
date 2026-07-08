@@ -2,7 +2,10 @@ import Link from "next/link";
 import { LogIn, MousePointerClick, FileDown } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import Reveal from "@/components/landing/Reveal";
-import SignInButton from "@/components/landing/SignInButton";
+import { PrimaryCta, SecondaryCta } from "@/components/landing/CtaButton";
+import StatsBand from "@/components/landing/StatsBand";
+import PricingPanel from "@/components/landing/PricingPanel";
+import MobileCtaBar from "@/components/landing/MobileCtaBar";
 import AppNavButton from "@/components/landing/AppNavButton";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
@@ -10,6 +13,15 @@ import AppShowcase from "@/components/landing/scroll/AppShowcase";
 import FeatureShowcase from "@/components/landing/scroll/FeatureShowcase";
 import FaqShowcase from "@/components/landing/scroll/FaqShowcase";
 import SmoothScrollProvider from "@/components/landing/scroll/SmoothScrollProvider";
+
+// Shared anchor targets — one source for the header nav, footer nav, and the
+// sections themselves, so every panel is reachable from both navs (#19).
+const NAV_LINKS = [
+  { href: "#features", label: "Features" },
+  { href: "#how-it-works", label: "How it works" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#faq", label: "FAQ" },
+];
 
 // The three "how it works" steps rendered in the how-it-works section.
 const steps = [
@@ -72,22 +84,16 @@ export default function Home() {
                 </span>
                 <span className='text-lg font-bold tracking-tight text-white'>Tyme</span>
               </Link>
-              <nav className='hidden items-center gap-8 text-sm text-[#ecd0b9]/70 md:flex'>
-                <a
-                  href='#features'
-                  className='transition-colors duration-150 ease hover:text-white'
-                >
-                  Features
-                </a>
-                <a
-                  href='#how-it-works'
-                  className='transition-colors duration-150 ease hover:text-white'
-                >
-                  How it works
-                </a>
-                <a href='#faq' className='transition-colors duration-150 ease hover:text-white'>
-                  FAQ
-                </a>
+              <nav aria-label='Primary' className='hidden items-center gap-8 text-sm text-[#ecd0b9]/80 md:flex'>
+                {NAV_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className='transition-colors duration-150 ease hover:text-white'
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </nav>
               {/* Login / Go To App — top right */}
               <AppNavButton variant='header' />
@@ -114,16 +120,45 @@ export default function Home() {
             <SectionComment label='FEATURES (section 2) - pinned heading + scroll-dealt feature cards (GSAP), wero-style' />
             <FeatureShowcase />
 
-            {/* ===== How it works =====
+            {/* ===== Proof band (section 3) =====
+            Tesla panels sell with numbers, not adjectives: a row of stat tiles,
+            every one a verifiable product fact. Static, SSR-rendered markup. */}
+            <SectionComment label='PROOF BAND (section 3) - honest stat tiles (monospace numerals)' />
+            <section
+              aria-labelledby='proof-heading'
+              className='mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 py-20 sm:px-8'
+            >
+              <div className='mx-auto mb-12 max-w-2xl text-center'>
+                <p className='font-mono text-xs uppercase tracking-widest text-[#dda67a]'>
+                  Why freelancers switch
+                </p>
+                <h2
+                  id='proof-heading'
+                  className='mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl'
+                >
+                  Free, and built to bill
+                </h2>
+                <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/75'>
+                  Track billable hours, export invoices, and keep every client project straight.
+                </p>
+              </div>
+              <StatsBand />
+            </section>
+
+            {/* ===== How it works (section 4) =====
             Three numbered steps (sign in → log time → export) that reveal with a
             left-to-right stagger. */}
-            <SectionComment label='HOW IT WORKS - 3 steps: sign in, log time, export' />
+            <SectionComment label='HOW IT WORKS (section 4) - 3 steps: sign in, log time, export' />
             <section
               id='how-it-works'
-              className='mx-auto max-w-6xl scroll-mt-20 px-5 py-16 sm:px-8 sm:py-24'
+              aria-labelledby='how-heading'
+              className='mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8'
             >
               <Reveal className='mx-auto max-w-2xl text-center'>
-                <h2 className='text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+                <h2
+                  id='how-heading'
+                  className='text-3xl font-bold tracking-tight text-white sm:text-4xl'
+                >
                   From sign-in to invoice in three steps
                 </h2>
               </Reveal>
@@ -150,43 +185,75 @@ export default function Home() {
               </ol>
             </section>
 
-            {/* ===== FAQ =====
+            {/* ===== Pricing (section 5) =====
+            The price story is "free" — give it its own panel so the cost objection
+            is answered before the FAQ. Headline + ₱0 price line + inclusions + the
+            same dual CTA pair as the hero. SSR-rendered; the JSON-LD Offer is 0. */}
+            <SectionComment label='PRICING (section 5) - free-forever panel + dual CTA' />
+            <section
+              id='pricing'
+              aria-labelledby='pricing-heading'
+              className='mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8'
+            >
+              <Reveal className='mx-auto mb-10 max-w-2xl text-center'>
+                <h2
+                  id='pricing-heading'
+                  className='text-3xl font-bold tracking-tight text-white sm:text-4xl'
+                >
+                  Free forever, for freelancers and VAs
+                </h2>
+              </Reveal>
+              <Reveal delay={0.08}>
+                <PricingPanel />
+              </Reveal>
+            </section>
+
+            {/* ===== FAQ (section 6) =====
             Restyled after wero's FAQ — giant questions, one accent keyword each, a
             floating accent illustration, revealed word-by-word on scroll. Still the
             same faqItems array that feeds the FAQPage JSON-LD in layout.tsx, and the
             answers stay rendered beneath every question, so the structured data and
             on-page copy stay in sync (FAQ rich results + AI answer engines / GEO). */}
-            <SectionComment label='FAQ - wero-style giant questions + accent keyword, mirrored by FAQPage JSON-LD (SEO + GEO)' />
+            <SectionComment label='FAQ (section 6) - wero-style giant questions + accent keyword, mirrored by FAQPage JSON-LD (SEO + GEO)' />
             <FaqShowcase />
 
-            {/* ===== Final CTA =====
-            Closing conversion band with a glow accent and a repeat of the Google
-            sign-in button. */}
-            <SectionComment label='FINAL CTA - closing conversion band + Google sign-in' />
-            <section className='mx-auto max-w-6xl px-5 pb-24 sm:px-8'>
+            {/* ===== Final CTA (section 7) =====
+            Closing conversion band with a glow accent and the same dual CTA pair. */}
+            <SectionComment label='FINAL CTA (section 7) - closing conversion band + dual CTA' />
+            <section
+              aria-labelledby='final-cta-heading'
+              className='mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-5 py-20 sm:px-8'
+            >
               <Reveal>
                 <div className='relative overflow-hidden rounded-3xl border border-[#3e271a] bg-[#140d0a]/80 px-6 py-14 text-center sm:px-12 sm:py-20'>
                   <div
                     aria-hidden='true'
                     className='pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#9a6a42]/15 blur-[120px]'
                   />
-                  <h2 className='relative text-3xl font-bold tracking-tight text-white sm:text-4xl'>
+                  <h2
+                    id='final-cta-heading'
+                    className='relative text-3xl font-bold tracking-tight text-white sm:text-4xl'
+                  >
                     Start tracking your time today
                   </h2>
-                  <p className='relative mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/70'>
+                  <p className='relative mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/75'>
                     Join freelancers and virtual assistants who bill accurately and never lose an
                     hour.
                   </p>
-                  <div className='relative mt-8 flex justify-center'>
-                    <SignInButton variant='hero' />
+                  <div className='relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+                    <PrimaryCta>Start tracking free</PrimaryCta>
+                    <SecondaryCta href='#pricing'>See pricing</SecondaryCta>
                   </div>
-                  <p className='relative mt-5 font-mono text-xs text-[#ecd0b9]/40'>
+                  <p className='relative mt-5 font-mono text-xs text-[#ecd0b9]/50'>
                     Free for freelancers and virtual assistants.
                   </p>
                 </div>
               </Reveal>
             </section>
           </main>
+
+          {/* Docked mobile CTA bar — conversion one thumb-tap away on <md viewports. */}
+          <MobileCtaBar />
 
           {/* ===== Footer =====
             Brand mark, anchor nav, and copyright. */}
@@ -197,22 +264,16 @@ export default function Home() {
                 <BrandLogo size={28} showBackground={false} className='brightness-125' />
                 <span className='font-semibold text-white'>Tyme</span>
               </div>
-              <nav className='flex items-center gap-6 text-sm text-[#ecd0b9]/55'>
-                <a
-                  href='#features'
-                  className='transition-colors duration-150 ease hover:text-white'
-                >
-                  Features
-                </a>
-                <a
-                  href='#how-it-works'
-                  className='transition-colors duration-150 ease hover:text-white'
-                >
-                  How it works
-                </a>
-                <a href='#faq' className='transition-colors duration-150 ease hover:text-white'>
-                  FAQ
-                </a>
+              <nav aria-label='Footer' className='flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-[#ecd0b9]/70'>
+                {NAV_LINKS.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className='transition-colors duration-150 ease hover:text-white'
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </nav>
               <p className='font-mono text-xs text-[#ecd0b9]/40'>© {year} Tyme</p>
             </div>

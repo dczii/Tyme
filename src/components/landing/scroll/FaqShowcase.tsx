@@ -339,7 +339,7 @@ export default function FaqShowcase() {
   }, [reduce]);
 
   return (
-    <section ref={sectionRef} id="faq" className="relative overflow-hidden scroll-mt-20 py-20 sm:py-28">
+    <section ref={sectionRef} id="faq" aria-labelledby="faq-heading" className="relative overflow-hidden scroll-mt-20 py-20 sm:py-28">
       {/* Decorative "tentacle" curve that draws itself on entrance — echoes octopush's
           stray line behind the heading. Purely ornamental, behind all content. */}
       <svg
@@ -391,7 +391,7 @@ export default function FaqShowcase() {
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div ref={headerRef}>
               <span className="font-mono text-[11px] uppercase tracking-widest text-[#dda67a]">FAQ</span>
-              <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+              <h2 id="faq-heading" className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
                 Frequently asked questions
               </h2>
               <p className="mt-3 max-w-md text-[#ecd0b9]/60">
