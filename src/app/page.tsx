@@ -9,6 +9,7 @@ import MobileCtaBar from "@/components/landing/MobileCtaBar";
 import AppNavButton from "@/components/landing/AppNavButton";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
+import { SignupModalProvider } from "@/components/landing/SignupModalContext";
 import AppShowcase from "@/components/landing/scroll/AppShowcase";
 import FeatureShowcase from "@/components/landing/scroll/FeatureShowcase";
 import FaqShowcase from "@/components/landing/scroll/FaqShowcase";
@@ -58,7 +59,8 @@ export default function Home() {
 
   return (
     <IntroProvider>
-      <SmoothScrollProvider>
+      <SignupModalProvider>
+        <SmoothScrollProvider>
         <div className='relative min-h-screen overflow-hidden bg-[#0c0806] text-slate-200 font-sans'>
           <LogoIntroAnimation />
           {/* Desktop-only panel snapping (fine-pointer, motion-OK). Renders nothing. */}
@@ -284,8 +286,9 @@ export default function Home() {
               <p className='font-mono text-xs text-[#ecd0b9]/40'>© {year} Tyme</p>
             </div>
           </footer>
-        </div>
-      </SmoothScrollProvider>
+          </div>
+        </SmoothScrollProvider>
+      </SignupModalProvider>
     </IntroProvider>
   );
 }

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useTyme } from '@/app/providers';
-import { googleSignIn } from '@/lib/supabase';
+import { useSignupModal } from './SignupModalContext';
 import { scrollToAnchor } from './scroll/lenis';
 
 // One CTA vocabulary shared by the hero, pricing panel, final CTA band, and the
@@ -27,47 +27,41 @@ interface CtaProps {
 }
 
 /**
- * Primary conversion action, repeated on every panel. For now it opens the real
- * Google OAuth flow (the dedicated signup modal arrives in Milestone 3); until then
- * this IS the "registration entry". Signed-in visitors are auto-forwarded into the
- * workspace, preserving the landing page's existing redirect behaviour.
+ * Primary conversion action, repeated on every panel and pointed at the single
+ * shared SignupModal (Tesla's "one order flow on every panel"). It renders as a real
+ * `<a href="/login">` so crawlers and no-JS visitors get a working registration
+ * entry, then progressively enhances into the modal on click. Signed-in visitors get
+ * "Go to app" → `/calendar` and never see the modal (#27).
  */
 export function PrimaryCta({ size = 'lg', className = '', children }: CtaProps) {
   const { user, authLoading } = useTyme();
+  const { openModal } = useSignupModal();
   const router = useRouter();
-  const [isConnecting, setIsConnecting] = useState(false);
 
-  useEffect(() => {
-    if (!authLoading && user) router.replace('/calendar');
-  }, [authLoading, user, router]);
+  const signedIn = !authLoading && !!user;
+  const href = signedIn ? '/calendar' : '/login';
+  const label = signedIn ? 'Go to app' : children;
 
-  const handleClick = async () => {
-    setIsConnecting(true);
-    try {
-      await googleSignIn();
-      // Redirect-based OAuth: the browser navigates away to Google.
-    } catch (err) {
-      console.error('Google Sign-in error:', err);
-      setIsConnecting(false);
-    }
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Modifier-clicks / middle-clicks keep native link behaviour (open in new tab).
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    if (authLoading) return; // wait for auth to resolve — no wrong action mid-load
+    if (signedIn) router.push('/calendar');
+    else openModal();
   };
 
   return (
-    <button
-      type='button'
+    <a
+      href={href}
       onClick={handleClick}
-      disabled={isConnecting}
-      className={`group inline-flex items-center justify-center bg-[#a66e46] font-semibold text-white shadow-lg shadow-[#4a2b16]/40 cursor-pointer select-none transition duration-150 ease-out hover:bg-[#8e5a34] active:scale-[0.97] disabled:cursor-wait disabled:opacity-90 ${FOCUS_RING} ${SIZES[size]} ${className}`}
+      aria-busy={authLoading || undefined}
+      className={`group inline-flex items-center justify-center bg-[#a66e46] font-semibold text-white shadow-lg shadow-[#4a2b16]/40 cursor-pointer select-none transition duration-150 ease-out hover:bg-[#8e5a34] active:scale-[0.97] ${FOCUS_RING} ${SIZES[size]} ${className}`}
     >
-      {isConnecting ? (
-        <>
-          <span className='h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white' />
-          <span className='font-mono text-xs uppercase tracking-widest'>Connecting…</span>
-        </>
-      ) : (
-        children
-      )}
-    </button>
+      {/* No wrong-label flash: hide the label until auth resolves, keeping the
+          button's footprint so nothing shifts (neutral state per #27). */}
+      <span className={authLoading ? 'opacity-0' : ''}>{label}</span>
+    </a>
   );
 }
 

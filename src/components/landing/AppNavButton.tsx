@@ -12,8 +12,7 @@ interface AppNavButtonProps {
 
 /**
  * Dynamic landing-page CTA. Shows "Login" for signed-out visitors (→ /login) and
- * "Go To App" once a session exists (→ /calendar). Reuses the white-pill styling
- * shared with SignInButton.
+ * "Go To App" once a session exists (→ /calendar).
  */
 export default function AppNavButton({ variant = 'header', className = '' }: AppNavButtonProps) {
   const { user, authLoading } = useTyme();

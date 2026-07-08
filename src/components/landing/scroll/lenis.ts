@@ -15,6 +15,21 @@ export function setLenis(next: Lenis | null) {
 }
 
 /**
+ * Lock / unlock page scrolling while a modal is open (Milestone 3, #29). Stops the
+ * Lenis loop when it's running and pins the body either way, so it also works under
+ * reduced motion / no-JS, where Lenis is never created.
+ */
+export function lockScroll() {
+  instance?.stop();
+  if (typeof document !== 'undefined') document.body.style.overflow = 'hidden';
+}
+
+export function unlockScroll() {
+  instance?.start();
+  if (typeof document !== 'undefined') document.body.style.overflow = '';
+}
+
+/**
  * Smooth-scroll to an in-page anchor, routed through Lenis when it's running and
  * falling back to the platform's native smooth scroll (which honours `scroll-mt-*`)
  * otherwise. The -80px offset clears the sticky header.
