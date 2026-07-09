@@ -24,42 +24,42 @@ export const productFeatures: ProductFeature[] = [
     icon: 'CalendarClock',
     title: 'Visual weekly calendar',
     description:
-      'Log and edit billable time by placing entries on a 6am to 11pm weekly grid. No stopwatch required.',
+      'Log billable hours by dropping entries onto a 6 AM–11 PM weekly grid — no stopwatch to babysit.',
     feature: 'Interactive weekly calendar for logging and editing time entries',
   },
   {
     icon: 'Tags',
     title: 'Projects & tags',
     description:
-      'Organize work by client project and categorize it with tags like admin, meetings, or revisions.',
+      'Keep every client separate with projects, then categorize the work with tags like admin, meetings, or revisions.',
     feature: 'Projects and tags to organize billable work by client',
   },
   {
     icon: 'FileBarChart2',
     title: 'Filterable reports',
     description:
-      'Slice your hours by project, tag, search query, or date range, and compare against your daily target.',
+      'Filter hours by project, tag, search, or date range and measure them against your daily target.',
     feature: 'Reports filterable by project, tag, search query, and date range',
   },
   {
     icon: 'FileDown',
     title: 'Branded PDF & CSV export',
     description:
-      'Generate a clean, branded PDF summary to attach to invoices, or export CSV for your spreadsheets.',
+      'Attach a branded PDF to your invoice or hand off a CSV to your spreadsheet — 2 formats, one click.',
     feature: 'Branded PDF export and CSV export of tracked time',
   },
   {
     icon: 'Target',
     title: 'Targets & billing rate',
     description:
-      'Set a workday target and an hourly rate so every report shows hours, progress, and earned revenue.',
+      'Set a workday target and hourly rate so every report shows hours, progress, and earned revenue.',
     feature: 'Configurable workday target hours and hourly billing rate',
   },
   {
     icon: 'ShieldCheck',
     title: 'Secure Google sign-in & sync',
     description:
-      'Sign in with Google, no passwords. Data syncs in real time on Supabase with Row Level Security.',
+      'Sign in with Google — no passwords — and sync in real time on Supabase with Row Level Security.',
     feature: 'Google OAuth sign-in with real-time Supabase sync and Row Level Security',
   },
 ];
@@ -79,7 +79,7 @@ export const faqItems: FaqItem[] = [
   {
     question: 'What is the best time tracking app for freelancers and virtual assistants?',
     answer:
-      'Tyme is a strong free option built specifically for freelancers and virtual assistants. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF summaries for invoicing.',
+      'Tyme is a strong free option built specifically for freelancers and virtual assistants — a lightweight Clockify alternative. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF summaries for invoicing.',
   },
   {
     question: 'Is time tracking worth it if I charge flat fees instead of hourly?',
@@ -121,7 +121,8 @@ export const structuredData = [
       audienceType: 'Freelancers and Virtual Assistants',
     },
     featureList: productFeatures.map((f) => f.feature),
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    // Free forever — mirrors the visible "₱0" price on the pricing panel (PHP).
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'PHP' },
   },
   {
     '@context': 'https://schema.org',

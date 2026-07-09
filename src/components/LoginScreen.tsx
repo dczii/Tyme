@@ -1,79 +1,57 @@
 'use client';
 
-import React, { useState } from 'react';
-import { AlertCircle, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { UserProfile } from '../types';
-import { googleSignIn, signInWithEmail, signUpWithEmail } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import BrandLogo from './BrandLogo';
+import { useAuthForm } from './auth/useAuthForm';
+import { readAuthReturnState, type AuthReturnState } from './auth/authReturnState';
+import { trackSignupConfirmedReturn } from '@/lib/analytics';
+import GoogleAuthButton from './auth/GoogleAuthButton';
+import { AuthBanner } from './auth/AuthBanners';
 
 interface LoginScreenProps {
   onLoginSuccess: (profile: UserProfile) => void;
 }
 
-export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [mode, setMode] = useState<'signin' | 'register'>('signin');
+export default function LoginScreen({ onLoginSuccess: _onLoginSuccess }: LoginScreenProps) {
+  const {
+    mode,
+    switchMode,
+    error,
+    fieldErrors,
+    isLoading,
+    isGoogleLoading,
+    fullName,
+    setFullName,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmEmailSent,
+    handleGoogle,
+    handleEmailSubmit,
+  } = useAuthForm('signin');
 
-  // Email/password form state
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  // Shown after a sign-up when Supabase requires email confirmation.
-  const [confirmEmailSent, setConfirmEmailSent] = useState(false);
-
-  const handleOpenGoogleAuth = async () => {
-    setError('');
-    setIsGoogleLoading(true);
-
-    try {
-      await googleSignIn();
-      // Supabase uses redirect-based OAuth — the browser will redirect to Google.
-      // When the user returns, onAuthStateChange in providers.tsx handles the session.
-    } catch (err: any) {
-      console.error('Google Sign-in error:', err);
-      setError(err?.message || 'Failed to authenticate via Google OAuth. Please try again.');
-      setIsGoogleLoading(false);
+  // Greet email-confirmation / cancelled-OAuth returns with a clear next step
+  // rather than a bare form (#28). Read once on mount, client-side only.
+  const [returnState, setReturnState] = useState<AuthReturnState | null>(null);
+  // Fire the funnel's tail event at most once, even if the effect re-runs (React
+  // Strict Mode double-invokes mount effects in dev).
+  const confirmedTracked = useRef(false);
+  useEffect(() => {
+    const state = readAuthReturnState();
+    setReturnState(state);
+    if (state?.kind === 'confirmed' && !confirmedTracked.current) {
+      confirmedTracked.current = true;
+      trackSignupConfirmedReturn();
     }
-  };
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setConfirmEmailSent(false);
-    setIsLoading(true);
-
-    try {
-      if (mode === 'register') {
-        const data = await signUpWithEmail(fullName.trim(), email.trim(), password);
-        // When email confirmation is enabled, no session is returned yet.
-        if (!data.session) {
-          setConfirmEmailSent(true);
-          setIsLoading(false);
-          return;
-        }
-        // Otherwise onAuthStateChange fires and the app takes over.
-      } else {
-        await signInWithEmail(email.trim(), password);
-        // onAuthStateChange fires and the app takes over.
-      }
-    } catch (err: any) {
-      console.error('Email auth error:', err);
-      setError(err?.message || 'Authentication failed. Please check your details and try again.');
-      setIsLoading(false);
-    }
-  };
-
-  const switchMode = (next: 'signin' | 'register') => {
-    setMode(next);
-    setError('');
-    setConfirmEmailSent(false);
-  };
+  }, []);
 
   const inputClass =
-    'w-full bg-[#1a110c]/70 border border-[#3e271a] focus:border-[#dda67a]/70 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-[#ecd0b9]/30 outline-none transition focus:ring-2 focus:ring-[#dda67a]/20 min-h-[48px]';
+    'w-full bg-[#1a110c]/70 border border-[#3e271a] focus:border-[#dda67a]/70 rounded-xl px-4 py-3 text-base text-slate-100 placeholder:text-[#ecd0b9]/30 outline-none transition focus:ring-2 focus:ring-[#dda67a]/20 min-h-[48px]';
+  const fieldErrorClass = 'mt-1.5 pl-1 text-xs text-red-300/90';
 
   return (
     <div id="login-container-root" className="min-h-screen w-full flex items-center justify-center bg-[#0c0806] text-slate-100 p-4 pb-safe relative overflow-hidden font-sans">
@@ -107,41 +85,18 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
 
         <div className="w-full space-y-4">
 
+          {/* Off-page return banner (email confirmed / cancelled Google consent) */}
+          <AuthBanner show={!!returnState} tone={returnState?.kind === 'error' ? 'error' : 'success'}>
+            {returnState?.message}
+          </AuthBanner>
+
           {/* Google OAuth */}
-          <button
-            onClick={handleOpenGoogleAuth}
-            disabled={isGoogleLoading || isLoading}
-            className="w-full bg-white hover:bg-slate-50 active:bg-slate-100 text-[#1f1f1f] text-sm font-semibold py-3.5 px-5 rounded-xl border border-slate-200/80 transition shadow-lg cursor-pointer flex items-center justify-center gap-3 select-none duration-150 disabled:opacity-85 text-center min-h-[48px]"
-          >
-            {isGoogleLoading ? (
-              <div className="flex items-center gap-2.5">
-                <div className="h-3.5 w-3.5 border-2 border-slate-300 border-t-[#4285F4] rounded-full animate-spin"></div>
-                <span className="text-xs text-slate-500 uppercase tracking-widest font-mono font-bold">Connecting...</span>
-              </div>
-            ) : (
-              <>
-                <svg className="h-5 w-5" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>{mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}</span>
-              </>
-            )}
-          </button>
+          <GoogleAuthButton
+            onClick={handleGoogle}
+            loading={isGoogleLoading}
+            disabled={isLoading}
+            label={mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google'}
+          />
 
           {/* Divider */}
           <div className="flex items-center gap-3 py-1">
@@ -151,7 +106,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
           </div>
 
           {/* Email / Password form */}
-          <form onSubmit={handleEmailAuth} className="space-y-3">
+          <form onSubmit={handleEmailSubmit} className="space-y-3" noValidate>
             <AnimatePresence initial={false}>
               {mode === 'register' && (
                 <motion.div
@@ -167,33 +122,39 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Full name"
                     autoComplete="name"
-                    required={mode === 'register'}
+                    aria-invalid={!!fieldErrors.fullName}
                     className={inputClass}
                   />
+                  {fieldErrors.fullName && <p className={fieldErrorClass}>{fieldErrors.fullName}</p>}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email address"
-              autoComplete="email"
-              required
-              className={inputClass}
-            />
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                autoComplete="email"
+                aria-invalid={!!fieldErrors.email}
+                className={inputClass}
+              />
+              {fieldErrors.email && <p className={fieldErrorClass}>{fieldErrors.email}</p>}
+            </div>
 
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
-              required
-              minLength={8}
-              className={inputClass}
-            />
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
+                aria-invalid={!!fieldErrors.password}
+                className={inputClass}
+              />
+              {fieldErrors.password && <p className={fieldErrorClass}>{fieldErrors.password}</p>}
+            </div>
 
             <button
               type="submit"
@@ -213,35 +174,13 @@ export default function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
             </button>
           </form>
 
-          <AnimatePresence>
-            {confirmEmailSent && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="bg-emerald-950/40 border border-emerald-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-emerald-200 overflow-hidden"
-              >
-                <CheckCircle2 className="h-4.5 w-4.5 shrink-0 text-emerald-400 mt-0.5" />
-                <span>Almost there — we sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <AuthBanner show={confirmEmailSent} tone="success">
+            Almost there — we sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
+          </AuthBanner>
 
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, y: -10 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="bg-red-950/45 border border-red-500/25 rounded-xl p-3 flex items-start gap-2.5 text-xs text-red-300 overflow-hidden"
-              >
-                <AlertCircle className="h-4.5 w-4.5 shrink-0 text-red-400 mt-0.5" />
-                <span>{error}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <AuthBanner show={!!error} tone="error">
+            {error}
+          </AuthBanner>
 
         </div>
 

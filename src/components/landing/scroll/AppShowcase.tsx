@@ -3,9 +3,9 @@
 import { useLayoutEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
 import { gsap } from "gsap";
-import { CalendarDays, FileBarChart2, Settings, FileDown, TrendingUp, Clock } from "lucide-react";
+import { CalendarDays, FileBarChart2, Settings, FileDown, TrendingUp, Clock, ChevronDown } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
-import SignInButton from "../SignInButton";
+import { PrimaryCta, SecondaryCta } from "../CtaButton";
 import { useIntro } from "../IntroContext";
 
 // ── Mock data for the "screenshot" — a faithful still of the Tyme weekly calendar ──
@@ -57,6 +57,7 @@ export default function AppShowcase() {
   const headingRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const entryRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cueRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     // Reduced motion: render the final static state — never leave anything hidden.
@@ -66,6 +67,11 @@ export default function AppShowcase() {
     const frame = frameRef.current;
     const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
     const entries = entryRefs.current.filter(Boolean) as HTMLDivElement[];
+    const cue = cueRef.current;
+
+    // Removes the "scroll to explore" listener if the entrance sets one up; assigned
+    // inside the context and called from cleanup so it never leaks past unmount.
+    let disposeCue = () => {};
 
     const ctx = gsap.context(() => {
       // Prime the hidden start state up front so there's no flash of the final
@@ -111,26 +117,59 @@ export default function AppShowcase() {
           "-=0.7",
         );
       }
+
+      // 5) Scroll cue — a chevron that teaches first-time visitors the page scrolls.
+      // It fades in at the tail of the entrance, then bounces on a loop until the
+      // first scroll (or 8s), at which point it fades out permanently. Decorative
+      // (aria-hidden) and never rendered under reduced motion (the effect returns
+      // before this runs), so it can only add motion, never hide content.
+      if (cue) {
+        const chevron = cue.querySelector<HTMLElement>("[data-cue-chevron]");
+        tl.to(cue, { opacity: 1, duration: 0.5, ease: "power2.out" }, "-=0.3");
+
+        const bounce = chevron
+          ? gsap.to(chevron, { y: 8, duration: 0.9, ease: "sine.inOut", repeat: -1, yoyo: true })
+          : null;
+
+        let dismissed = false;
+        const dismiss = () => {
+          if (dismissed) return;
+          dismissed = true;
+          bounce?.kill();
+          timeout.kill();
+          window.removeEventListener("scroll", onScroll);
+          gsap.to(cue, { opacity: 0, duration: 0.4, ease: "power2.out" });
+        };
+        const onScroll = () => dismiss();
+        const timeout = gsap.delayedCall(8, dismiss);
+        window.addEventListener("scroll", onScroll, { passive: true, once: true });
+        disposeCue = () => window.removeEventListener("scroll", onScroll);
+      }
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+      disposeCue();
+      ctx.revert();
+    };
   }, [introDone, reduce]);
 
   return (
     <section
       ref={sectionRef}
-      className='relative mx-auto flex min-h-[88vh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8 sm:py-24'
+      data-snap-panel
+      data-cta-hide-zone
+      className='relative mx-auto flex min-h-[100svh] max-w-6xl scroll-mt-20 flex-col justify-center px-5 py-20 sm:px-8 sm:py-24'
     >
       <div ref={headingRef} className='mx-auto mb-12 max-w-2xl text-center sm:mb-16'>
         <h1 className='text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl'>
           Every hour, exactly where you logged it
         </h1>
-        <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/70'>
-          Drop entries onto the weekly grid, colour-code by project, and watch your billable total
-          add up in real time.
+        <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/80'>
+          Free for freelancers and virtual assistants — no credit card.
         </p>
-        <div className='pointer-events-auto mt-9 flex justify-center'>
-          <SignInButton variant='hero' />
+        <div className='pointer-events-auto mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+          <PrimaryCta panel='hero'>Start tracking free</PrimaryCta>
+          <SecondaryCta panel='hero' href='#how-it-works'>See how it works</SecondaryCta>
         </div>
       </div>
 
@@ -165,7 +204,9 @@ export default function AppShowcase() {
                 <BrandLogo size={26} showBackground={false} className='brightness-125' />
                 <span className='text-sm font-bold text-white'>Tyme</span>
               </div>
-              <nav className='flex flex-col gap-1'>
+              {/* Decorative fake sidebar inside the product screenshot — hidden from
+                  the a11y tree so it isn't an unlabelled landmark. */}
+              <nav aria-hidden='true' className='flex flex-col gap-1'>
                 {NAV.map(({ icon: Icon, label, active }) => (
                   <span
                     key={label}
@@ -313,6 +354,20 @@ export default function AppShowcase() {
           <span className='text-sm font-medium text-white'>Client call</span>
           <span className='font-mono text-xs text-[#ecd0b9]/50'>1:30</span>
         </div>
+      </div>
+
+      {/* Scroll cue — starts invisible (opacity-0) so it's absent under reduced motion
+          / no-JS; the entrance timeline fades it in and loops the chevron until the
+          first scroll. Decorative, so hidden from the a11y tree. */}
+      <div
+        ref={cueRef}
+        aria-hidden='true'
+        className='pointer-events-none absolute inset-x-0 bottom-6 flex justify-center opacity-0'
+      >
+        <span className='flex flex-col items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-[#ecd0b9]/45'>
+          Scroll
+          <ChevronDown data-cue-chevron className='h-5 w-5 text-[#dda67a]' />
+        </span>
       </div>
     </section>
   );
