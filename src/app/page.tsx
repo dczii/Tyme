@@ -68,7 +68,7 @@ export default function Home() {
     <IntroProvider>
       <SignupModalProvider>
         <SmoothScrollProvider>
-        <div className='relative min-h-screen overflow-hidden bg-[#0c0806] text-slate-200 font-sans'>
+        <div className='relative min-h-screen overflow-clip bg-[#0c0806] text-slate-200 font-sans'>
           <LogoIntroAnimation />
           {/* Desktop-only panel snapping (fine-pointer, motion-OK). Renders nothing. */}
           <SnapController />

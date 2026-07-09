@@ -55,8 +55,14 @@ export default function MobileCtaBar() {
         };
 
         // Hide while a "big CTA already visible" panel is on screen.
+        // `zoneTriggers` is read inside onToggle, which ScrollTrigger fires
+        // synchronously during .create() when the trigger starts active (the hero is
+        // on screen at load). Declaring it first (rather than a `const` bound to the
+        // .map result) avoids a temporal-dead-zone crash on that first toggle; the
+        // list is empty then, and the real state is primed just below.
         const zones = gsap.utils.toArray<HTMLElement>('[data-cta-hide-zone]');
-        const zoneTriggers = zones.map((zone) =>
+        let zoneTriggers: ScrollTrigger[] = [];
+        zoneTriggers = zones.map((zone) =>
           ScrollTrigger.create({
             trigger: zone,
             start: 'top 80%',

@@ -29,6 +29,20 @@ export default function SnapController() {
     mm.add(
       '(min-width: 1024px) and (prefers-reduced-motion: no-preference) and (pointer: fine)',
       () => {
+        // Don't settle until the reader actually scrolls. ScrollTrigger's snap can fire
+        // on the load-time refresh (once pin-spacing lands), which would yank the page a
+        // few px off the true top the instant the intro clears — a visible lurch. We flip
+        // this on the first real scroll intent (wheel/touch/keys — never a programmatic
+        // scroll, so the snap tween can't re-arm itself).
+        let userScrolled = false;
+        const flagScroll = () => {
+          userScrolled = true;
+        };
+        const scrollIntentEvents = ['wheel', 'touchmove', 'keydown'] as const;
+        scrollIntentEvents.forEach((e) =>
+          window.addEventListener(e, flagScroll, { passive: true }),
+        );
+
         // Live px scroll offset of each snappable panel's top (recomputed on demand so
         // pin-spacing added by the pinned scenes is always reflected).
         const panelOffsets = () =>
@@ -53,6 +67,9 @@ export default function SnapController() {
             // `value` is the trigger's natural landing progress (0–1); since the
             // trigger spans the whole page it maps linearly to scroll pixels.
             snapTo: (value) => {
+              // Before the first user scroll, never settle — hold the true load position.
+              if (!userScrolled) return value;
+
               const max = ScrollTrigger.maxScroll(window);
               if (!max) return value;
               const curPx = value * max;
@@ -101,7 +118,10 @@ export default function SnapController() {
           },
         });
 
-        return () => st.kill();
+        return () => {
+          st.kill();
+          scrollIntentEvents.forEach((e) => window.removeEventListener(e, flagScroll));
+        };
       },
     );
 
