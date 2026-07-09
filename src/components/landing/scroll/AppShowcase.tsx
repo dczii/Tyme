@@ -168,8 +168,8 @@ export default function AppShowcase() {
           Free for freelancers and virtual assistants — no credit card.
         </p>
         <div className='pointer-events-auto mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row'>
-          <PrimaryCta>Start tracking free</PrimaryCta>
-          <SecondaryCta href='#how-it-works'>See how it works</SecondaryCta>
+          <PrimaryCta panel='hero'>Start tracking free</PrimaryCta>
+          <SecondaryCta panel='hero' href='#how-it-works'>See how it works</SecondaryCta>
         </div>
       </div>
 

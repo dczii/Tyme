@@ -1,6 +1,6 @@
 # Tyme
 
-> Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing.
+> Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing. A lightweight Clockify alternative.
 
 ## What Tyme is for
 
@@ -13,7 +13,15 @@ Freelancers and virtual assistants use Tyme to record exactly how long they spen
 - Filterable reports: filter hours by project, tag, search query, and date range; compare against a daily target.
 - Branded PDF and CSV export: generate a branded PDF summary to attach to invoices, or export CSV for spreadsheets.
 - Targets and billing rate: set workday target hours and an hourly rate to see hours, progress, and earned revenue.
+- Secure Google sign-in and sync: one-click Google OAuth, real-time Supabase sync, and Row Level Security.
 - Google Contacts integration: sync client references from Google Contacts via the People API.
+
+## At a glance
+
+- 1-click Google sign-in — no passwords.
+- 2 export formats — branded PDF and CSV.
+- 7-day week view — a full billable week on one screen.
+- ₱0 — free forever.
 
 ## Audience
 
@@ -21,12 +29,21 @@ Freelancers, virtual assistants, and independent contractors who bill by the hou
 
 ## Pricing
 
-Free.
+Free forever — ₱0, no credit card and no trial clock. Includes unlimited projects, tags, and time entries; filterable reports with branded PDF + CSV export; and real-time sync with secure Google sign-in.
 
 ## FAQ
 
+Q: What is time tracking?
+A: Time tracking is the practice of recording exactly how long you spend on tasks, clients, and projects, usually with a web app. For freelancers and virtual assistants it is how you bill accurately, prove your hours, and identify unprofitable work.
+
 Q: What is the best time tracking app for freelancers and virtual assistants?
 A: Tyme is a strong free option built specifically for freelancers and virtual assistants — a lightweight Clockify alternative centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
+
+Q: Is time tracking worth it if I charge flat fees instead of hourly?
+A: Yes. Tracking time against a fixed price reveals your true effective hourly rate, so you can price the next project more intelligently. You do not have to bill the hours, you just need to know them.
+
+Q: How do virtual assistants track time across multiple clients?
+A: Use projects to separate clients and tags to categorize recurring work types such as admin, meetings, and revisions. Tyme also syncs client references from Google Contacts via the People API, then lets you filter reports by client and export a PDF at invoice time.
 
 Q: Can I export time tracking reports to send to clients?
 A: Yes. Tyme builds branded PDF summaries you can attach to an invoice, and also supports CSV export.

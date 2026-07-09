@@ -1,0 +1,36 @@
+name: Lighthouse CI
+
+# Core Web Vitals regression gate for the landing page (#35). Builds the app and
+# runs Lighthouse CI against `/` on every pull request, asserting the Milestone 4
+# targets (LCP < 2.5s, CLS < 0.1, TBT < 300ms) plus a route-JS byte budget. A failing
+# budget fails the check; the run's report link is printed in the job log and posted
+# to temporary public storage.
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lighthouse:
+    name: Lighthouse budget
+    runs-on: ubuntu-latest
+    env:
+      # src/lib/supabase.ts throws at import without these — the landing page never
+      # calls Supabase, so dummy values are enough to build and serve `/`.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Run Lighthouse CI
+        run: npx --yes @lhci/cli@0.14.x autorun

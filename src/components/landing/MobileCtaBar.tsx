@@ -109,10 +109,10 @@ export default function MobileCtaBar() {
             base padding-bottom below it. */}
         <div className='pb-safe px-4 pt-3'>
           <div className='flex items-center gap-3 pb-3'>
-            <PrimaryCta size='sm' className='flex-1'>
+            <PrimaryCta panel='mobile_bar' size='sm' className='flex-1'>
               Start tracking free
             </PrimaryCta>
-            <SecondaryCta href='#how-it-works' size='sm' className='shrink-0 px-4'>
+            <SecondaryCta panel='mobile_bar' href='#how-it-works' size='sm' className='shrink-0 px-4'>
               How it works
             </SecondaryCta>
           </div>

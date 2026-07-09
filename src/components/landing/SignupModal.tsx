@@ -59,7 +59,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
     confirmEmailSent,
     handleGoogle,
     handleEmailSubmit,
-  } = useAuthForm('register');
+  } = useAuthForm('register', { trackSignupFunnel: true });
 
   // Lock background scroll, trap focus, and wire Esc while the modal is open (#29).
   useEffect(() => {

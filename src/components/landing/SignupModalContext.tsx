@@ -1,7 +1,14 @@
 'use client';
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import SignupModal from './SignupModal';
+import dynamic from 'next/dynamic';
+import { trackSignupModalOpen } from '@/lib/analytics';
+
+// The signup modal is interaction-gated and carries no SEO weight, so it's split
+// out of the initial `/` bundle with `ssr: false` and only mounted once the visitor
+// first opens it (#33). This keeps its framer-motion animation, the auth form, and
+// the Google button out of first-load JS until they're actually needed.
+const SignupModal = dynamic(() => import('./SignupModal'), { ssr: false });
 
 // One shared signup-modal instance for the whole landing page. Every primary CTA
 // opens this same modal (Tesla's "one order flow, repeated on every panel"), so the
@@ -23,6 +30,9 @@ export function useSignupModal() {
 
 export function SignupModalProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  // Once true the lazy modal chunk is mounted for good; it stays mounted after a
+  // close so AnimatePresence can still play its exit transition.
+  const [hasOpened, setHasOpened] = useState(false);
   // The element that opened the modal, so focus can return to it on close (#29).
   const triggerRef = useRef<HTMLElement | null>(null);
 
@@ -30,7 +40,9 @@ export function SignupModalProvider({ children }: { children: React.ReactNode })
     if (typeof document !== 'undefined') {
       triggerRef.current = document.activeElement as HTMLElement | null;
     }
+    setHasOpened(true);
     setIsOpen(true);
+    trackSignupModalOpen();
   }, []);
 
   const closeModal = useCallback(() => {
@@ -48,7 +60,9 @@ export function SignupModalProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('signup') === '1') {
+      setHasOpened(true);
       setIsOpen(true);
+      trackSignupModalOpen();
       params.delete('signup');
       const query = params.toString();
       const url = window.location.pathname + (query ? `?${query}` : '') + window.location.hash;
@@ -61,7 +75,7 @@ export function SignupModalProvider({ children }: { children: React.ReactNode })
       {/* Background is inert while the modal is open: not focusable, not read by
           assistive tech, so the dialog is the only interactive surface (#29). */}
       <div inert={isOpen}>{children}</div>
-      <SignupModal isOpen={isOpen} onClose={closeModal} />
+      {hasOpened && <SignupModal isOpen={isOpen} onClose={closeModal} />}
     </SignupModalContext.Provider>
   );
 }

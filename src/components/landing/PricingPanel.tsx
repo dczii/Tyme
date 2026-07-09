@@ -52,8 +52,8 @@ export default function PricingPanel() {
 
         <Reveal delay={STEP * (INCLUDED.length + 1)}>
           <div className='relative mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row'>
-            <PrimaryCta className='w-full sm:w-auto'>Start tracking free</PrimaryCta>
-            <SecondaryCta href='#features' className='w-full sm:w-auto'>
+            <PrimaryCta panel='pricing' className='w-full sm:w-auto'>Start tracking free</PrimaryCta>
+            <SecondaryCta panel='pricing' href='#features' className='w-full sm:w-auto'>
               See the features
             </SecondaryCta>
           </div>

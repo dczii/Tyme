@@ -1,20 +1,27 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { LogIn, MousePointerClick, FileDown } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import Reveal from "@/components/landing/Reveal";
 import { PrimaryCta, SecondaryCta } from "@/components/landing/CtaButton";
-import StatsBand from "@/components/landing/StatsBand";
-import PricingPanel from "@/components/landing/PricingPanel";
-import MobileCtaBar from "@/components/landing/MobileCtaBar";
 import AppNavButton from "@/components/landing/AppNavButton";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
 import { SignupModalProvider } from "@/components/landing/SignupModalContext";
 import AppShowcase from "@/components/landing/scroll/AppShowcase";
-import FeatureShowcase from "@/components/landing/scroll/FeatureShowcase";
-import FaqShowcase from "@/components/landing/scroll/FaqShowcase";
 import SmoothScrollProvider from "@/components/landing/scroll/SmoothScrollProvider";
 import SnapController from "@/components/landing/scroll/SnapController";
+
+// Below-the-fold islands are code-split out of the initial `/` bundle (#33). Each
+// keeps `ssr: true` (next/dynamic's default), so its markup still renders in the SSR
+// HTML — the SEO/CLS house rule: headings, feature cards, stat tiles, pricing, and
+// FAQ answers all stay crawlable and paint before hydration, they just ship their
+// client JS as a separate chunk that loads after the above-the-fold hero.
+const StatsBand = dynamic(() => import("@/components/landing/StatsBand"));
+const PricingPanel = dynamic(() => import("@/components/landing/PricingPanel"));
+const MobileCtaBar = dynamic(() => import("@/components/landing/MobileCtaBar"));
+const FeatureShowcase = dynamic(() => import("@/components/landing/scroll/FeatureShowcase"));
+const FaqShowcase = dynamic(() => import("@/components/landing/scroll/FaqShowcase"));
 
 // Shared anchor targets — one source for the header nav, footer nav, and the
 // sections themselves, so every panel is reachable from both navs (#19).
@@ -249,8 +256,8 @@ export default function Home() {
                     hour.
                   </p>
                   <div className='relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
-                    <PrimaryCta>Start tracking free</PrimaryCta>
-                    <SecondaryCta href='#pricing'>See pricing</SecondaryCta>
+                    <PrimaryCta panel='final'>Start tracking free</PrimaryCta>
+                    <SecondaryCta panel='final' href='#pricing'>See pricing</SecondaryCta>
                   </div>
                   <p className='relative mt-5 font-mono text-xs text-[#ecd0b9]/50'>
                     Free for freelancers and virtual assistants.

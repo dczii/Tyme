@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { googleSignIn, signInWithEmail, signUpWithEmail } from '@/lib/supabase';
+import { trackSignupMethod, trackSignupSubmitted } from '@/lib/analytics';
 
 // Shared auth-form logic for every surface that signs a user in or registers one:
 // the full-page LoginScreen and the landing-page SignupModal. Keeping the state
@@ -33,7 +34,15 @@ export function validateAuthFields(
   return errors;
 }
 
-export function useAuthForm(initialMode: AuthMode) {
+export interface UseAuthFormOptions {
+  // When true, the registration funnel events (signup_method / signup_submitted)
+  // fire from this form. The landing SignupModal opts in; the LoginScreen (a
+  // sign-in surface) leaves it off so its login flow never emits signup events.
+  trackSignupFunnel?: boolean;
+}
+
+export function useAuthForm(initialMode: AuthMode, options: UseAuthFormOptions = {}) {
+  const { trackSignupFunnel = false } = options;
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -49,6 +58,13 @@ export function useAuthForm(initialMode: AuthMode) {
 
   const handleGoogle = async () => {
     setError('');
+    // Funnel: the visitor committed to Google, then we hand off to the OAuth
+    // redirect (the "submission"). Fired before the async call so a slow network
+    // can't drop the event, and only on the signup surface.
+    if (trackSignupFunnel) {
+      trackSignupMethod('google');
+      trackSignupSubmitted('google');
+    }
     setIsGoogleLoading(true);
     try {
       await googleSignIn();
@@ -70,6 +86,13 @@ export function useAuthForm(initialMode: AuthMode) {
     const errs = validateAuthFields(mode, { fullName, email, password });
     setFieldErrors(errs);
     if (Object.keys(errs).length > 0) return;
+
+    // Funnel: a valid registration was submitted via the email path. Gated on the
+    // signup surface + register mode so a sign-in submit never counts as a signup.
+    if (trackSignupFunnel && mode === 'register') {
+      trackSignupMethod('email');
+      trackSignupSubmitted('email');
+    }
 
     setIsLoading(true);
     try {

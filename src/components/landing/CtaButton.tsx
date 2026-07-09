@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useTyme } from '@/app/providers';
 import { useSignupModal } from './SignupModalContext';
 import { scrollToAnchor } from './scroll/lenis';
+import { trackCtaClick, type CtaPanel } from '@/lib/analytics';
 
 // One CTA vocabulary shared by the hero, pricing panel, final CTA band, and the
 // mobile bar so every panel carries the identical primary action (Tesla's "same
@@ -24,6 +25,8 @@ interface CtaProps {
   size?: CtaSize;
   className?: string;
   children: React.ReactNode;
+  /** Which panel this CTA lives on — tags the `cta_click` funnel event (#32). */
+  panel?: CtaPanel;
 }
 
 /**
@@ -33,7 +36,7 @@ interface CtaProps {
  * entry, then progressively enhances into the modal on click. Signed-in visitors get
  * "Go to app" → `/calendar` and never see the modal (#27).
  */
-export function PrimaryCta({ size = 'lg', className = '', children }: CtaProps) {
+export function PrimaryCta({ size = 'lg', className = '', children, panel }: CtaProps) {
   const { user, authLoading } = useTyme();
   const { openModal } = useSignupModal();
   const router = useRouter();
@@ -46,6 +49,9 @@ export function PrimaryCta({ size = 'lg', className = '', children }: CtaProps) 
     // Modifier-clicks / middle-clicks keep native link behaviour (open in new tab).
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
+    // Record the primary-CTA click for the funnel before acting (once per real,
+    // same-tab click — modifier/new-tab clicks bailed above).
+    if (panel) trackCtaClick(panel, 'primary');
     if (authLoading) return; // wait for auth to resolve — no wrong action mid-load
     if (signedIn) router.push('/calendar');
     else openModal();
@@ -75,8 +81,9 @@ interface SecondaryCtaProps extends CtaProps {
  * lands in the SSR HTML; on click it intercepts same-page anchors and routes the
  * scroll through Lenis (native smooth-scroll fallback lives in scrollToAnchor).
  */
-export function SecondaryCta({ href, size = 'lg', className = '', children }: SecondaryCtaProps) {
+export function SecondaryCta({ href, size = 'lg', className = '', children, panel }: SecondaryCtaProps) {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (panel) trackCtaClick(panel, 'secondary');
     if (href.startsWith('#')) {
       e.preventDefault();
       scrollToAnchor(href);

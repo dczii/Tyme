@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 import BrandLogo from './BrandLogo';
 import { useAuthForm } from './auth/useAuthForm';
 import { readAuthReturnState, type AuthReturnState } from './auth/authReturnState';
+import { trackSignupConfirmedReturn } from '@/lib/analytics';
 import GoogleAuthButton from './auth/GoogleAuthButton';
 import { AuthBanner } from './auth/AuthBanners';
 
@@ -36,8 +37,16 @@ export default function LoginScreen({ onLoginSuccess: _onLoginSuccess }: LoginSc
   // Greet email-confirmation / cancelled-OAuth returns with a clear next step
   // rather than a bare form (#28). Read once on mount, client-side only.
   const [returnState, setReturnState] = useState<AuthReturnState | null>(null);
+  // Fire the funnel's tail event at most once, even if the effect re-runs (React
+  // Strict Mode double-invokes mount effects in dev).
+  const confirmedTracked = useRef(false);
   useEffect(() => {
-    setReturnState(readAuthReturnState());
+    const state = readAuthReturnState();
+    setReturnState(state);
+    if (state?.kind === 'confirmed' && !confirmedTracked.current) {
+      confirmedTracked.current = true;
+      trackSignupConfirmedReturn();
+    }
   }, []);
 
   const inputClass =

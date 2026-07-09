@@ -17,9 +17,12 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+  // Keyword-first + benefit + brand, ≤60 chars (Google truncates ~60). Description
+  // is ≤155 chars and closes on a call to action (#30). The fuller phrasing lives in
+  // the OG/Twitter cards and JSON-LD below, so search snippets stay tight.
+  title: 'Time Tracking for Freelancers & VAs — Free | Tyme',
   description:
-    'Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, filter reports by project and tag, and export branded PDF summaries.',
+    'Track billable hours on a visual weekly calendar, filter reports by project and tag, and export PDF invoices. Free for freelancers & VAs — start now.',
   applicationName: 'Tyme',
   authors: [{ name: 'Tyme' }],
   keywords: [

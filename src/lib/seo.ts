@@ -121,7 +121,8 @@ export const structuredData = [
       audienceType: 'Freelancers and Virtual Assistants',
     },
     featureList: productFeatures.map((f) => f.feature),
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    // Free forever — mirrors the visible "₱0" price on the pricing panel (PHP).
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'PHP' },
   },
   {
     '@context': 'https://schema.org',
