@@ -4,6 +4,7 @@ import BrandLogo from "@/components/BrandLogo";
 import Reveal from "@/components/landing/Reveal";
 import SignInButton from "@/components/landing/SignInButton";
 import AppNavButton from "@/components/landing/AppNavButton";
+import HeaderLogo from "@/components/landing/HeaderLogo";
 import LogoIntroAnimation from "@/components/landing/LogoIntroAnimation";
 import { IntroProvider } from "@/components/landing/IntroContext";
 import AppShowcase from "@/components/landing/scroll/AppShowcase";
@@ -67,9 +68,7 @@ export default function Home() {
           <header className='sticky top-0 z-30 border-b border-[#3e271a]/40 bg-[#0c0806]/70 backdrop-blur-xl'>
             <div className='mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8'>
               <Link href='/' className='flex items-center gap-2.5' aria-label='Tyme home'>
-                <span data-header-logo className='flex'>
-                  <BrandLogo size={34} showBackground={false} className='brightness-125' />
-                </span>
+                <HeaderLogo />
                 <span className='text-lg font-bold tracking-tight text-white'>Tyme</span>
               </Link>
               <nav className='hidden items-center gap-8 text-sm text-[#ecd0b9]/70 md:flex'>

@@ -107,6 +107,8 @@ export default function LogoIntroAnimation() {
       const targetScale = rect.width / LOGO_SIZE;
 
       // Fly (full transform string → GPU-composited) while the backdrop fades out.
+      // The backdrop fade lags the fly so the header (and its empty logo slot) is
+      // only uncovered once the logo is nearly home — never while it's mid-flight.
       await Promise.all([
         logoControls.start({
           transform: `translate(${targetX}px, ${targetY}px) scale(${targetScale})`,
@@ -114,12 +116,15 @@ export default function LogoIntroAnimation() {
         }),
         bgControls.start({
           opacity: 0,
-          transition: { duration: 0.55, ease: EASE_IN_OUT },
+          transition: { duration: 0.7, ease: EASE_IN_OUT },
         }),
       ]);
 
-      await logoControls.start({ opacity: 0, transition: { duration: 0.15 } });
-      finish();
+      // Hand off: reveal the real header logo, then crossfade the flying logo out on
+      // top of it. Both are pixel-aligned, so the swap is seamless.
+      markIntroDone();
+      await logoControls.start({ opacity: 0, transition: { duration: 0.2 } });
+      setVisible(false);
     };
 
     run();
