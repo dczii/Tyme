@@ -1979,6 +1979,10 @@ export default function CalendarView({
                 <button
                   onClick={() => {
                     onUpdateEntry(editingEntry);
+                    toast.success("Time entry updated", {
+                      description: `${editingEntry.description || "Untitled"} · ${editingEntry.startTime}–${editingEntry.endTime}`,
+                      duration: 2000,
+                    });
                     setEditingEntry(null);
                   }}
                   className='py-2.5 px-5 rounded-xl bg-[#a66e46] text-white hover:bg-[#8e5a34] text-xs font-semibold cursor-pointer shadow-lg shadow-[#4a2b16]/30 transition'
