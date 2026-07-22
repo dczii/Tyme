@@ -192,7 +192,7 @@ export default function AppShowcase() {
             <span className='h-3 w-3 rounded-full bg-[#5e3820]/50' />
             <span className='h-3 w-3 rounded-full bg-[#5e3820]/30' />
             <span className='ml-4 flex-1 truncate rounded-md bg-[#0c0806]/70 px-3 py-1 text-center font-mono text-[11px] text-[#ecd0b9]/40'>
-              app.tyme / calendar
+              tymeapp.space / calendar
             </span>
           </div>
 

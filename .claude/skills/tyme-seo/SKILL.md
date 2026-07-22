@@ -8,7 +8,7 @@ description: Tyme's SEO/GEO system — src/lib/seo.ts as the single source of tr
 ## The one rule: seo.ts is the single source of truth
 
 [src/lib/seo.ts](src/lib/seo.ts) exports:
-- `SITE_URL` — ⚠️ currently the **placeholder `https://tyme.app`**. It feeds canonical, Open Graph, sitemap, robots, and every JSON-LD url. Replace it once when the real domain exists; nothing else needs touching.
+- `SITE_URL` — the production domain **`https://tymeapp.space`**. It feeds canonical, Open Graph, sitemap, robots, and every JSON-LD url. Changing the domain means editing only this one constant.
 - `productFeatures[]` — icon name (string, mapped to lucide components in FeatureShowcase), `title`, `description` (card copy), and `feature` (full sentence for the schema featureList).
 - `faqItems[]` — question/answer pairs.
 - `structuredData[]` — three JSON-LD schemas (SoftwareApplication with featureList + free Offer, WebSite, FAQPage) built FROM the two arrays above.

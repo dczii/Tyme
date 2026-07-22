@@ -53,4 +53,4 @@ A: Yes. Tyme runs on Supabase PostgreSQL with Row Level Security policies that i
 
 ## Links
 
-- Home: https://tyme.app/
+- Home: https://tymeapp.space/

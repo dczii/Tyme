@@ -39,7 +39,7 @@ Audited at v2.3.1 (2026-07-07), reconciled same day with the v2.3.2 merges (mult
 19. ⚠️ **Never `next build` while `npm run dev` runs** — shared `.next/` gets clobbered and the dev server 500s. Typecheck with `npm run lint`.
 20. ⚠️ **Claude preview tab freezes rAF** — GSAP/Lenis/Framer animation can't be visually verified in the preview browser; the page appears stuck at its initial state. Not a regression.
 21. ⚠️ **OAuth redirect allow-list**: every new deploy origin + `{origin}/calendar` must be added in Supabase Auth → URL Configuration, or Google sign-in breaks only on that environment.
-22. ⚠️ **`SITE_URL` is a placeholder** (`https://tyme.app`) feeding canonical/OG/sitemap/JSON-LD. Fine until a real domain exists; then change exactly one constant in seo.ts.
+22. **`SITE_URL` is the production domain** (`https://tymeapp.space`) feeding canonical/OG/sitemap/JSON-LD. To change domains, edit exactly one constant in seo.ts.
 23. ⚠️ **Timer state in localStorage** (5 `tyme_timer_*` keys) survives reloads by design; logout clears them. A "phantom running timer" after login-as-different-user on the same browser would come from a missed clear — check providers.tsx `handleLogout`. Note the timer's project selection intentionally persists after Stop.
 24. ⚠️ **Mixed id generations coexist**: rows created before v2.3.2 have `entry-{timestamp}-{rand}`/`tag-{timestamp}` ids; new rows use `{prefix}-{uuid}`. Never parse or sort by id shape.
 25. ⚠️ **No tests, no ESLint.** `npm run lint` = `tsc --noEmit` only. The verification bar for changes is: typecheck clean + manual/preview walkthrough of the affected screen.

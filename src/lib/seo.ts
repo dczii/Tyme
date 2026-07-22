@@ -5,9 +5,9 @@
 // on-page content can never drift apart — which is exactly what Google's FAQ rich
 // results and AI answer engines (GEO) require.
 
-// SEO / GEO base URL. Replace https://tyme.app with your real production domain
-// (this one constant feeds the canonical, Open Graph, sitemap, robots, and JSON-LD URLs).
-export const SITE_URL = 'https://tyme.app';
+// SEO / GEO base URL — the production domain. This one constant feeds the
+// canonical, Open Graph, sitemap, robots, and JSON-LD URLs.
+export const SITE_URL = 'https://tymeapp.space';
 
 // Product features — reused for the on-page Features grid AND the
 // SoftwareApplication.featureList schema. `icon` maps to a lucide-react icon name.
