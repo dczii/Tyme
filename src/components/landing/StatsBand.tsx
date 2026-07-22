@@ -20,7 +20,7 @@ interface Stat {
 const STATS: Stat[] = [
   { value: '1-click', label: 'Google sign-in' },
   { value: '2', label: 'Export formats · PDF + CSV' },
-  { value: '₱0', label: 'Free forever' },
+  { value: '$0', label: 'Free forever' },
   { value: '7-day', label: 'Week view' },
 ];
 
@@ -45,7 +45,7 @@ function StatNumber({ value }: { value: string }) {
     if (!match) return;
     const [, prefix, digits, suffix] = match;
     const target = parseInt(digits.replace(/,/g, ''), 10);
-    if (!target) return; // nothing to animate (e.g. "₱0")
+    if (!target) return; // nothing to animate (e.g. "$0")
 
     let started = false;
     const observer = new IntersectionObserver(

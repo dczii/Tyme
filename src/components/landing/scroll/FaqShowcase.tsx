@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   Timer,
   Sparkles,
-  Banknote,
+  FileText,
   Users,
   FileDown,
   ShieldCheck,
@@ -30,10 +30,10 @@ type FaqMeta = { tag: string; color: string; Icon: React.ComponentType<{ classNa
 const ACCENT = "#dda67a";
 const FAQ_META: FaqMeta[] = [
   { tag: "Basics", color: ACCENT, Icon: Timer },
+  { tag: "Time logs", color: ACCENT, Icon: FileText },
   { tag: "Picks", color: ACCENT, Icon: Sparkles },
-  { tag: "Billing", color: ACCENT, Icon: Banknote },
-  { tag: "Clients", color: ACCENT, Icon: Users },
-  { tag: "Reports", color: ACCENT, Icon: FileDown },
+  { tag: "Audience", color: ACCENT, Icon: Users },
+  { tag: "Export", color: ACCENT, Icon: FileDown },
   { tag: "Security", color: ACCENT, Icon: ShieldCheck },
 ];
 
@@ -405,7 +405,7 @@ export default function FaqShowcase() {
                 Frequently asked questions
               </h2>
               <p className='mt-3 max-w-md text-[#ecd0b9]/60'>
-                Everything freelancers and virtual assistants ask before they start tracking. Scroll
+                Everything people ask before they start tracking their time. Scroll
                 through the cards.
               </p>
             </div>

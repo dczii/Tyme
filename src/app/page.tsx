@@ -42,12 +42,12 @@ const steps = [
   {
     icon: MousePointerClick,
     title: "Log time on the calendar",
-    description: "Drop entries onto the weekly grid and tag them by client and project.",
+    description: "Drop entries onto the weekly grid and tag them by project and activity.",
   },
   {
     icon: FileDown,
-    title: "Export a branded report",
-    description: "Filter your hours, then export a polished PDF or CSV at invoice time.",
+    title: "Export a clean time log",
+    description: "Filter your hours, then export a polished PDF or CSV time log in one click.",
   },
 ];
 
@@ -146,16 +146,16 @@ export default function Home() {
               >
                 <div className='mx-auto mb-12 max-w-2xl text-center'>
                   <p className='font-mono text-xs uppercase tracking-widest text-[#dda67a]'>
-                    Why freelancers switch
+                    Why people switch
                   </p>
                   <h2
                     id='proof-heading'
                     className='mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl'
                   >
-                    Free, and built to bill
+                    Free, and built to log
                   </h2>
                   <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/75'>
-                    Track billable hours, export invoices, and keep every client project straight.
+                    Track your hours, export a shareable time log, and keep every project straight.
                   </p>
                 </div>
                 <StatsBand />
@@ -176,7 +176,7 @@ export default function Home() {
                     id='how-heading'
                     className='text-3xl font-bold tracking-tight text-white sm:text-4xl'
                   >
-                    From sign-in to invoice in three steps
+                    From sign-in to time log in three steps
                   </h2>
                 </Reveal>
                 <ol className='mt-12 grid gap-6 md:grid-cols-3'>
@@ -204,7 +204,7 @@ export default function Home() {
 
               {/* ===== Pricing (section 5) =====
             The price story is "free" — give it its own panel so the cost objection
-            is answered before the FAQ. Headline + ₱0 price line + inclusions + the
+            is answered before the FAQ. Headline + $0 price line + inclusions + the
             same dual CTA pair as the hero. SSR-rendered; the JSON-LD Offer is 0. */}
               <SectionComment label='PRICING (section 5) - free-forever panel + dual CTA' />
               <section
@@ -218,7 +218,7 @@ export default function Home() {
                     id='pricing-heading'
                     className='text-3xl font-bold tracking-tight text-white sm:text-4xl'
                   >
-                    Free forever, for freelancers and VAs
+                    Free forever, for everyone
                   </h2>
                 </Reveal>
                 <PricingPanel />
@@ -255,8 +255,8 @@ export default function Home() {
                       Start tracking your time today
                     </h2>
                     <p className='relative mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/75'>
-                      Join freelancers and virtual assistants who bill accurately and never lose an
-                      hour.
+                      Join everyone who tracks their hours, keeps a clean time log, and never loses
+                      an hour.
                     </p>
                     <div className='relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row'>
                       <PrimaryCta panel='final'>Start tracking free</PrimaryCta>
@@ -265,7 +265,7 @@ export default function Home() {
                       </SecondaryCta>
                     </div>
                     <p className='relative mt-5 font-mono text-xs text-[#ecd0b9]/50'>
-                      Free for freelancers and virtual assistants.
+                      Free for anyone who tracks their time.
                     </p>
                   </div>
                 </Reveal>

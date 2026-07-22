@@ -1,52 +1,52 @@
 # Tyme
 
-> Tyme is a free time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries for invoicing. A lightweight Clockify alternative.
+> Tyme is a free time tracking web app for anyone who wants to track their time and generate a time log. Log your hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export a clean, shareable time log as a branded PDF or CSV. A lightweight Clockify alternative.
 
 ## What Tyme is for
 
-Freelancers and virtual assistants use Tyme to record exactly how long they spend on each client, project, and task, then turn those hours into accurate invoices. Sign-in is via Google OAuth (no passwords) and all data syncs in real time on Supabase with Row Level Security, so each account's data is isolated at the database level.
+Anyone who wants to know where their time goes uses Tyme to record exactly how long they spend on each project, task, and activity, then turn those hours into a clean time log. Sign-in is via Google OAuth (no passwords) and all data syncs in real time on Supabase with Row Level Security, so each account's data is isolated at the database level. Billing features like an hourly rate are optional, so you can track time whether or not you invoice.
 
 ## Key features
 
 - Visual weekly calendar: log and edit time entries on a 6am–11pm weekly grid.
-- Projects and tags: separate clients by project and categorize work (admin, meetings, revisions) with tags.
+- Projects and tags: separate work by project and categorize activities (admin, meetings, study, revisions) with tags.
 - Filterable reports: filter hours by project, tag, search query, and date range; compare against a daily target.
-- Branded PDF and CSV export: generate a branded PDF summary to attach to invoices, or export CSV for spreadsheets.
-- Targets and billing rate: set workday target hours and an hourly rate to see hours, progress, and earned revenue.
+- Branded PDF and CSV time logs: generate a shareable PDF time log to keep or attach to an invoice, or export CSV for spreadsheets.
+- Targets and optional billing rate: set daily target hours, and add an hourly rate if you bill to see hours, progress, and earnings.
 - Secure Google sign-in and sync: one-click Google OAuth, real-time Supabase sync, and Row Level Security.
 - Google Contacts integration: sync client references from Google Contacts via the People API.
 
 ## At a glance
 
 - 1-click Google sign-in — no passwords.
-- 2 export formats — branded PDF and CSV.
-- 7-day week view — a full billable week on one screen.
-- ₱0 — free forever.
+- 2 export formats — branded PDF and CSV time logs.
+- 7-day week view — a full week on one screen.
+- $0 — free forever.
 
 ## Audience
 
-Freelancers, virtual assistants, and independent contractors who bill by the hour or want to know their true effective hourly rate on flat-fee work.
+Anyone who tracks their time: freelancers and consultants billing clients, employees and teams filling out timesheets, students tracking study hours, and people measuring their own productivity. Bill by the hour or simply keep an accurate log — both work.
 
 ## Pricing
 
-Free forever — ₱0, no credit card and no trial clock. Includes unlimited projects, tags, and time entries; filterable reports with branded PDF + CSV export; and real-time sync with secure Google sign-in.
+Free forever — $0, no credit card and no trial clock. Includes unlimited projects, tags, and time entries; filterable reports with branded PDF + CSV export; and real-time sync with secure Google sign-in.
 
 ## FAQ
 
 Q: What is time tracking?
-A: Time tracking is the practice of recording exactly how long you spend on tasks, clients, and projects, usually with a web app. For freelancers and virtual assistants it is how you bill accurately, prove your hours, and identify unprofitable work.
+A: Time tracking is the practice of recording exactly how long you spend on tasks, projects, and activities, usually with a web app. It helps anyone — professionals, teams, students, or people tracking personal productivity — see where their time actually goes, prove their hours, and keep an accurate time log.
 
-Q: What is the best time tracking app for freelancers and virtual assistants?
-A: Tyme is a strong free option built specifically for freelancers and virtual assistants — a lightweight Clockify alternative centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF export.
+Q: How do I create a time log?
+A: With Tyme you log your hours on a visual weekly calendar, organize them with projects and tags, then export a clean time log as a branded PDF or CSV in one click. No spreadsheets to maintain — the log is generated from the entries you already tracked.
 
-Q: Is time tracking worth it if I charge flat fees instead of hourly?
-A: Yes. Tracking time against a fixed price reveals your true effective hourly rate, so you can price the next project more intelligently. You do not have to bill the hours, you just need to know them.
+Q: What is the best free time tracking app?
+A: Tyme is a strong free option for anyone who wants to track time and generate a time log — a lightweight Clockify alternative centered on a visual weekly calendar with projects, tags, filterable reports, and branded PDF and CSV export. Freelancers, consultants, employees, teams, and students all use it.
 
-Q: How do virtual assistants track time across multiple clients?
-A: Use projects to separate clients and tags to categorize recurring work types such as admin, meetings, and revisions. Tyme also syncs client references from Google Contacts via the People API, then lets you filter reports by client and export a PDF at invoice time.
+Q: Who is Tyme for?
+A: Anyone who wants to know where their time goes: freelancers and consultants billing clients, employees and teams filling out timesheets, students tracking study hours, and people measuring their own productivity. Billing features like an hourly rate are optional, so you can track time whether or not you invoice.
 
-Q: Can I export time tracking reports to send to clients?
-A: Yes. Tyme builds branded PDF summaries you can attach to an invoice, and also supports CSV export.
+Q: Can I export my time tracking data as a report or time log?
+A: Yes. Tyme builds branded PDF time logs you can share, attach to an invoice, or keep for your records, and also supports CSV export.
 
 Q: Is my time tracking data secure in Tyme?
 A: Yes. Tyme runs on Supabase PostgreSQL with Row Level Security policies that isolate each user's data, and authenticates with Google OAuth rather than passwords.

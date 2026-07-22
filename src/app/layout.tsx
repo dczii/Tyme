@@ -20,19 +20,21 @@ export const metadata: Metadata = {
   // Keyword-first + benefit + brand, ≤60 chars (Google truncates ~60). Description
   // is ≤155 chars and closes on a call to action (#30). The fuller phrasing lives in
   // the OG/Twitter cards and JSON-LD below, so search snippets stay tight.
-  title: 'Time Tracking for Freelancers & VAs — Free | Tyme',
+  title: 'Time Tracking & Time Logs — Free | Tyme',
   description:
-    'Track billable hours on a visual weekly calendar, filter reports by project and tag, and export PDF invoices. Free for freelancers & VAs — start now.',
+    'Track your time on a visual weekly calendar, filter reports by project and tag, and export a clean PDF or CSV time log. Free for anyone who tracks time — start now.',
   applicationName: 'Tyme',
   authors: [{ name: 'Tyme' }],
   keywords: [
     'time tracking',
     'time tracking app',
     'time tracker',
-    'freelancer time tracking',
-    'virtual assistant time tracking',
+    'time log',
+    'time log app',
+    'timesheet app',
+    'work hours tracker',
+    'daily time log',
     'billable hours',
-    'timesheet',
     'weekly time log',
     'PDF time reports',
     'Clockify alternative',
@@ -46,18 +48,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Tyme',
-    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App & Time Log Generator',
     description:
-      'Track billable hours on a visual weekly calendar, filter reports by project, tag and date, and export branded PDF summaries. Free time tracking built for freelancers and VAs.',
+      'Track your time on a visual weekly calendar, filter reports by project, tag and date, and export a branded PDF or CSV time log. Free time tracking for anyone who tracks their time.',
     url: '/',
     locale: 'en_US',
     images: [{ url: '/og-image.png', alt: 'Tyme time tracking app logo' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tyme - Time Tracking App for Freelancers & Virtual Assistants',
+    title: 'Tyme - Time Tracking App & Time Log Generator',
     description:
-      'Free time tracking for freelancers and virtual assistants. Visual weekly calendar, filterable reports, and branded PDF exports.',
+      'Free time tracking for anyone who tracks their time. Visual weekly calendar, filterable reports, and branded PDF & CSV time logs.',
     images: ['/og-image.png'],
   },
   icons: {

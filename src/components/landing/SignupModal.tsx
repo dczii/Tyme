@@ -189,7 +189,7 @@ export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
                     Start tracking free
                   </h2>
                   <p id={descId} className="mt-2 text-xs text-[#ecd0b9]/70 max-w-[280px] leading-relaxed">
-                    Create your Tyme workspace — free for freelancers and virtual assistants.
+                    Create your Tyme workspace — free for anyone who tracks their time.
                   </p>
                 </div>
 

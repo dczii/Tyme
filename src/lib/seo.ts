@@ -24,15 +24,15 @@ export const productFeatures: ProductFeature[] = [
     icon: 'CalendarClock',
     title: 'Visual weekly calendar',
     description:
-      'Log billable hours by dropping entries onto a 6 AM–11 PM weekly grid — no stopwatch to babysit.',
+      'Log your hours by dropping entries onto a 6 AM–11 PM weekly grid — no stopwatch to babysit.',
     feature: 'Interactive weekly calendar for logging and editing time entries',
   },
   {
     icon: 'Tags',
     title: 'Projects & tags',
     description:
-      'Keep every client separate with projects, then categorize the work with tags like admin, meetings, or revisions.',
-    feature: 'Projects and tags to organize billable work by client',
+      'Keep every project separate, then categorize the work with tags like admin, meetings, study, or revisions.',
+    feature: 'Projects and tags to organize your time by project and activity',
   },
   {
     icon: 'FileBarChart2',
@@ -43,17 +43,17 @@ export const productFeatures: ProductFeature[] = [
   },
   {
     icon: 'FileDown',
-    title: 'Branded PDF & CSV export',
+    title: 'PDF & CSV time logs',
     description:
-      'Attach a branded PDF to your invoice or hand off a CSV to your spreadsheet — 2 formats, one click.',
-    feature: 'Branded PDF export and CSV export of tracked time',
+      'Export a clean, shareable time log as a branded PDF, or hand off a CSV to your spreadsheet — 2 formats, one click.',
+    feature: 'Branded PDF and CSV export of your tracked time as a shareable time log',
   },
   {
     icon: 'Target',
-    title: 'Targets & billing rate',
+    title: 'Targets & optional billing rate',
     description:
-      'Set a workday target and hourly rate so every report shows hours, progress, and earned revenue.',
-    feature: 'Configurable workday target hours and hourly billing rate',
+      'Set a daily target to stay on pace — and add an hourly rate if you bill, so reports show hours, progress, and earnings.',
+    feature: 'Configurable daily target hours and optional hourly billing rate',
   },
   {
     icon: 'ShieldCheck',
@@ -74,27 +74,27 @@ export const faqItems: FaqItem[] = [
   {
     question: 'What is time tracking?',
     answer:
-      'Time tracking is the practice of recording exactly how long you spend on tasks, clients, and projects, usually with a web app. For freelancers and virtual assistants it is how you bill accurately, prove your hours, and identify unprofitable work.',
+      'Time tracking is the practice of recording exactly how long you spend on tasks, projects, and activities, usually with a web app. It helps anyone — professionals, teams, students, or people tracking personal productivity — see where their time actually goes, prove their hours, and keep an accurate time log.',
   },
   {
-    question: 'What is the best time tracking app for freelancers and virtual assistants?',
+    question: 'How do I create a time log?',
     answer:
-      'Tyme is a strong free option built specifically for freelancers and virtual assistants — a lightweight Clockify alternative. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF summaries for invoicing.',
+      'With Tyme you log your hours on a visual weekly calendar, organize them with projects and tags, then export a clean time log as a branded PDF or CSV in one click. No spreadsheets to maintain — the log is generated from the entries you already tracked.',
   },
   {
-    question: 'Is time tracking worth it if I charge flat fees instead of hourly?',
+    question: 'What is the best free time tracking app?',
     answer:
-      'Yes. Tracking time against a fixed price reveals your true effective hourly rate, so you can price the next project more intelligently. You do not have to bill the hours, you just need to know them.',
+      'Tyme is a strong free option for anyone who wants to track time and generate a time log — a lightweight Clockify alternative. It centers on a visual weekly calendar, supports projects and tags, generates filterable reports, and exports branded PDF and CSV time logs. Freelancers, consultants, employees, teams, and students all use it.',
   },
   {
-    question: 'How do virtual assistants track time across multiple clients?',
+    question: 'Who is Tyme for?',
     answer:
-      'Use projects to separate clients and tags to categorize recurring work types such as admin, meetings, and revisions. Tyme also syncs client references from Google Contacts via the People API, then lets you filter reports by client and export a PDF at invoice time.',
+      'Anyone who wants to know where their time goes: freelancers and consultants billing clients, employees and teams filling out timesheets, students tracking study hours, and people measuring their own productivity. Billing features like an hourly rate are optional, so you can track time whether or not you invoice.',
   },
   {
-    question: 'Can I export time tracking reports to send to clients?',
+    question: 'Can I export my time tracking data as a report or time log?',
     answer:
-      'Yes. Tyme builds structured, branded PDF summaries with jsPDF that you can attach directly to an invoice, and also supports CSV export for spreadsheets.',
+      'Yes. Tyme builds structured, branded PDF time logs with jsPDF that you can share, attach to an invoice, or keep for your records, and also supports CSV export for spreadsheets.',
   },
   {
     question: 'Is my time tracking data secure in Tyme?',
@@ -115,21 +115,21 @@ export const structuredData = [
     operatingSystem: 'Web browser',
     url: `${SITE_URL}/`,
     description:
-      'Tyme is a time tracking web app for freelancers and virtual assistants. Log billable hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV summaries.',
+      'Tyme is a free time tracking web app for anyone who wants to track their time and generate a time log. Log hours on a visual weekly calendar, organize work with projects and tags, analyze filterable reports, and export branded PDF and CSV time logs.',
     audience: {
       '@type': 'Audience',
-      audienceType: 'Freelancers and Virtual Assistants',
+      audienceType: 'Freelancers, consultants, employees, teams, students, and anyone who tracks their time',
     },
     featureList: productFeatures.map((f) => f.feature),
-    // Free forever — mirrors the visible "₱0" price on the pricing panel (PHP).
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'PHP' },
+    // Free forever — mirrors the visible "$0" price on the pricing panel (USD).
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   },
   {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Tyme',
     url: `${SITE_URL}/`,
-    description: 'Free time tracking web app for freelancers and virtual assistants.',
+    description: 'Free time tracking and time log web app for anyone who tracks their time.',
   },
   {
     '@context': 'https://schema.org',

@@ -20,7 +20,7 @@ const featureIcons: Record<string, React.ComponentType<{ className?: string }>> 
 };
 
 /**
- * "Everything you need to bill with confidence" — built like wero's *What this
+ * "Everything you need to track time with confidence" — built like wero's *What this
  * means for merchants* beat: on desktop the heading column pins in place while the
  * feature cards are dealt onto the same spot one at a time, each rotating up into
  * view as the previous one tilts away, all scrubbed to the scroll position. A live
@@ -133,10 +133,10 @@ export default function FeatureShowcase() {
             id="features-heading"
             className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl"
           >
-            Everything you need to bill with confidence
+            Everything you need to track time with confidence
           </h2>
           <p className="mt-4 max-w-md text-lg text-[#ecd0b9]/70">
-            Purpose-built for the way freelancers and virtual assistants actually work.
+            Built for the way you actually work — track your time, then turn it into a clean log.
           </p>
 
           {/* Live "01 / 06 — title" indicator, desktop only (tracks the card-deal) */}

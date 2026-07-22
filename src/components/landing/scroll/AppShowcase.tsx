@@ -165,7 +165,7 @@ export default function AppShowcase() {
           Every hour, exactly where you logged it
         </h1>
         <p className='mx-auto mt-4 max-w-xl text-lg text-[#ecd0b9]/80'>
-          Free for freelancers and virtual assistants — no credit card.
+          Track your time, export a clean log. Free for anyone — no credit card.
         </p>
         <div className='pointer-events-auto mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row'>
           <PrimaryCta panel='hero'>Start tracking free</PrimaryCta>

@@ -30,11 +30,11 @@ export default function PricingPanel() {
             A free Clockify alternative
           </p>
           <p className='relative mt-4 text-5xl font-bold tracking-tight text-white sm:text-6xl'>
-            ₱0
+            $0
           </p>
           <p className='relative mt-2 text-lg font-semibold text-[#ecd0b9]/85'>Free forever</p>
           <p className='relative mx-auto mt-3 max-w-sm text-sm text-[#ecd0b9]/70'>
-            The full time tracking app for freelancers and virtual assistants — no credit card, no
+            The full time tracking app for anyone who tracks their time — no credit card, no
             trial clock.
           </p>
         </Reveal>
