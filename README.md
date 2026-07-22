@@ -3,7 +3,9 @@
 
 # ⏳ Tyme
 
-A professional, SaaS-style time-tracking application inspired by Clockify. Built with high-performance real-time data sync, rich interactive reports, and beautiful aesthetic designs.
+A free, SaaS-style time-tracking web app for **anyone who wants to track their time and generate a clean time log** — freelancers, consultants, employees, teams, students, or anyone measuring their own productivity. A lightweight Clockify alternative built with high-performance real-time data sync, rich interactive reports, and a beautiful "espresso" dark aesthetic. Billing features (hourly rate, branded invoices) are optional, so you can track time whether or not you invoice.
+
+**🌐 Live:** [tymeapp.space](https://tymeapp.space/)
 
 [![Next.js](https://img.shields.io/badge/next.js-%23000000.svg?style=flat&logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/react-%2320232a.svg?style=flat&logo=react&logoColor=%2361DAFB)](https://react.dev/)
@@ -18,7 +20,7 @@ A professional, SaaS-style time-tracking application inspired by Clockify. Built
 
 - **📅 Interactive Weekly Calendar**: Create, update, or remove entries visually. Modify entry durations using flexible hours and minutes fields (e.g. `0:15`, `1:30`).
 - **📊 Advanced Reports & Metrics**: Filter time entries by project, specific tags, search queries, or predefined/custom date ranges. Get aggregate insights and target comparisons.
-- **📄 Export to PDF**: Download elegant and structured PDF summaries of your tracked work built using `jsPDF`.
+- **📄 Export Time Logs (PDF & CSV)**: Download an elegant, structured PDF time log of your tracked work (built with `jsPDF`) to keep or attach to an invoice, or export CSV for spreadsheets.
 - **🔌 Google Contacts Integration**: Connect your account using Google OAuth to automatically synchronize client references from Google People API into your settings.
 - **⚙️ Customization**: Configure your daily workday target hours and choose between three custom branding logo styles (*Classic*, *Minimalist*, and *Hourglass*).
 - **🔒 Secure Sync**: Instant, real-time database synchronization via Supabase PostgreSQL with Row Level Security (RLS) policies.
@@ -44,7 +46,7 @@ Tyme/
 ├── src/
 │   ├── app/                          # Next.js App Router
 │   │   ├── layout.tsx                # Root layout: <html>/<body>, Analytics, TymeProvider
-│   │   ├── page.tsx                  # Redirects "/" → "/calendar"
+│   │   ├── page.tsx                  # Public marketing landing ("/") — SEO + scroll animations
 │   │   ├── providers.tsx             # Client Context: session, synced data & CRUD handlers
 │   │   ├── globals.css               # Global theme variables, animations & fonts
 │   │   └── (app)/                    # Authenticated route group
