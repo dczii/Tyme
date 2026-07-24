@@ -26,6 +26,30 @@ the anon key.
 - Time entries must have a non-empty description (≤ 2000 chars), a positive
   bounded duration (≤ 1440 minutes), and at most 50 tags.
 - All free-text fields are length-bounded to block storage-exhaustion payloads.
+- **The `/feedback` survey stores nothing.** There is no `feedback` table and no
+  new RLS surface: submissions go straight out as email via `POST /api/feedback`
+  and are never written to Postgres. This is a deliberate trade — it costs
+  aggregate reporting (you count your inbox, not a `group by`) and means a failed
+  send loses the response, which the UI states plainly instead of showing a false
+  success. It buys the removal of an entire storage attack surface: no forged
+  `created_at`, no unbounded row inserts, no client/DB validation drift.
+- `POST /api/feedback` ([src/app/api/feedback/route.ts](src/app/api/feedback/route.ts))
+  is the **only server-side code in the app**. It requires a valid Supabase access
+  token and re-validates every field before sending, so it cannot be used as an
+  open mail relay by anyone who finds the URL. Specifically:
+  - `kind` must be `review` or `features`; a review requires `rating` 1–5, and a
+    features submission requires at least one known feature (or free text) **and**
+    a known price band.
+  - Unknown feature ids and price bands are dropped rather than forwarded.
+  - All user-controlled strings are HTML-escaped before entering the email body.
+  - `reply_to` is only set when the supplied address actually parses — otherwise a
+    caller could point the owner's "Reply" at an address of their choosing.
+  - `RESEND_API_KEY` is server-only and must never carry the `NEXT_PUBLIC_` prefix.
+    It is read exclusively inside the route handler, so it cannot reach the client
+    bundle.
+  - **Known gap:** the route is not rate-limited. Any authenticated user can
+    trigger repeat sends, which is acceptable while sign-up is the throttle, but
+    add a per-user cap before opening registration widely.
 - Realtime (`postgres_changes`) delivers only rows the subscriber's JWT can
   SELECT, so RLS also gates the live stream.
 

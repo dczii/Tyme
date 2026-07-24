@@ -1,5 +1,5 @@
 import { createClient, User, Session, RealtimeChannel } from '@supabase/supabase-js';
-import { Project, Tag, TimeEntry, UserProfile } from '../types';
+import { FeedbackDraft, Project, Tag, TimeEntry, UserProfile } from '../types';
 
 // Initialize Supabase client
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -513,5 +513,38 @@ export const deleteEntryFromFS = async (userId: string, entryId: string) => {
     if (error) throw error;
   } catch (err) {
     handleSupabaseError(err, OperationType.DELETE, 'entries');
+  }
+};
+
+// --- Feedback survey ---
+// Nothing is persisted: the survey's only sink is email, so there is no feedback
+// table, no RLS surface, and no schema to keep in sync. A submission that fails to
+// send is simply not recorded, and the UI keeps the form filled so it can be retried.
+
+// Email a submission to the product owner via /api/feedback (same-origin, so it
+// needs no CSP change). Returns true only when the mail actually went out. Since
+// email is the only sink, false means the submission was LOST — callers must treat
+// it as a failure and let the user retry, never as a quiet success.
+// Never throws; the boolean is the whole contract.
+export const sendFeedbackEmail = async (draft: FeedbackDraft): Promise<boolean> => {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return false;
+
+    const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(draft),
+    });
+
+    const body = await res.json().catch(() => null);
+    return Boolean(res.ok && body?.emailed);
+  } catch (err) {
+    console.error('Feedback email dispatch failed:', err);
+    return false;
   }
 };

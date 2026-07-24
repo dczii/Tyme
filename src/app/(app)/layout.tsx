@@ -26,6 +26,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const currentView: PageView =
     pathname.startsWith('/reports') ? 'reports'
     : pathname.startsWith('/settings') ? 'settings'
+    : pathname.startsWith('/feedback') ? 'feedback'
     : 'calendar';
 
   // Global loading curtain during session check

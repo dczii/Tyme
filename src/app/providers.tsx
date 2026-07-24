@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { TimeEntry, Project, Tag, UserProfile } from '@/types';
+import { TimeEntry, Project, Tag, UserProfile, FeedbackDraft } from '@/types';
 import {
   initAuth,
   logoutUser,
@@ -17,6 +17,7 @@ import {
   subscribeToEntries,
   saveEntryToFS,
   deleteEntryFromFS,
+  sendFeedbackEmail,
   fetchGoogleContacts,
   GoogleContact,
 } from '@/lib/supabase';
@@ -55,6 +56,10 @@ interface TymeContextValue {
   handleDeleteProject: (id: string) => Promise<void>;
   handleAddTag: (name: string) => Tag;
   handleDeleteTag: (id: string) => Promise<void>;
+
+  // Feedback survey. Nothing is stored — email is the only sink — so this
+  // resolves false when the submission was lost and must be retried.
+  handleSubmitFeedback: (draft: FeedbackDraft) => Promise<boolean>;
 }
 
 const TymeContext = createContext<TymeContextValue | null>(null);
@@ -304,6 +309,15 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
     await deleteTagFromFS(supabaseUser.id, id);
   };
 
+  // --- Feedback survey ---
+
+  // Email is the only destination; there is no row to fall back on, so the caller
+  // gets the send result verbatim.
+  const handleSubmitFeedback = async (draft: FeedbackDraft): Promise<boolean> => {
+    if (!supabaseUser) throw new Error('Not signed in');
+    return sendFeedbackEmail(draft);
+  };
+
   const value: TymeContextValue = {
     user,
     authLoading,
@@ -328,6 +342,7 @@ export function TymeProvider({ children }: { children: React.ReactNode }) {
     handleDeleteProject,
     handleAddTag,
     handleDeleteTag,
+    handleSubmitFeedback,
   };
 
   return <TymeContext.Provider value={value}>{children}</TymeContext.Provider>;

@@ -3,11 +3,12 @@
 import React from 'react';
 import {
   Clock,
-  FileBarChart2, 
-  Settings, 
-  ChevronLeft, 
-  ChevronRight, 
-  LogOut 
+  FileBarChart2,
+  Settings,
+  MessageSquareQuote,
+  ChevronLeft,
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 import { PageView, UserProfile } from '../types';
 import BrandLogo from './BrandLogo';
@@ -43,6 +44,7 @@ export default function Sidebar({
     { id: 'calendar' as PageView, label: 'Calendar', icon: Clock },
     { id: 'reports' as PageView, label: 'Reports', icon: FileBarChart2 },
     { id: 'settings' as PageView, label: 'Settings', icon: Settings },
+    { id: 'feedback' as PageView, label: 'Feedback', icon: MessageSquareQuote },
   ];
 
   const cycleLogo = () => {
@@ -67,7 +69,7 @@ export default function Sidebar({
                 key={item.id}
                 id={`mobile-nav-${item.id}`}
                 onClick={() => onViewChange(item.id)}
-                className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl min-w-[64px] transition-all duration-200 cursor-pointer
+                className={`flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-2xl min-w-[56px] transition-all duration-200 cursor-pointer
                   ${isActive
                     ? 'text-[#dda67a]'
                     : 'text-[#bdae9c]/50 active:text-[#bdae9c]/80'
@@ -93,7 +95,7 @@ export default function Sidebar({
           {/* User avatar button for logout */}
           <button
             onClick={onLogout}
-            className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-2xl min-w-[64px] cursor-pointer text-[#bdae9c]/50 active:text-red-400 transition-all duration-200"
+            className="flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-2xl min-w-[56px] cursor-pointer text-[#bdae9c]/50 active:text-red-400 transition-all duration-200"
             title="Sign out"
           >
             <img 
