@@ -55,8 +55,14 @@ export default function MobileCtaBar() {
         };
 
         // Hide while a "big CTA already visible" panel is on screen.
+        // `zoneTriggers` is declared with `let` and seeded to `[]` first because
+        // ScrollTrigger.create() fires onToggle synchronously for any zone that is
+        // already on screen at load (the hero is). Referencing a `const` from that
+        // callback would hit its temporal dead zone; the seeded array reads as empty
+        // during creation and the true initial state is primed below (see `inZone =`).
         const zones = gsap.utils.toArray<HTMLElement>('[data-cta-hide-zone]');
-        const zoneTriggers = zones.map((zone) =>
+        let zoneTriggers: ScrollTrigger[] = [];
+        zoneTriggers = zones.map((zone) =>
           ScrollTrigger.create({
             trigger: zone,
             start: 'top 80%',
