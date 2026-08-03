@@ -32,6 +32,24 @@ user_invocable: true
 4. **Escalate to Claude when quality is low.** If Grok's output misses, don't keep retrying blindly — pull the task back to a Claude subagent (opus/fable). Judge the output, not the price tag.
 5. **The acceptance bar for code is real verification** — lint · typecheck · build · tests · review — not "parses as JSON." A high retry rate is fine for generated content, never for shippable code.
 6. **Hard gates stay in Claude.** Money-safety, release, and security/auth changes get a Fable/Opus gate regardless of who wrote them (the three CLAUDE.md hard rules).
+7. **A version bump isn't done until the release notes exist.** See below — this is the standing close-out for any shipped change.
+
+## Release close-out (after every version bump)
+
+The repo's ritual is bump → commit → push to `main`. **Ship release notes as part of that same close-out, not as a follow-up someone has to ask for:**
+
+1. Bump `version` in `package.json` (patch for fixes, minor for features) as part of the change.
+2. Add a `## [X.Y.Z] — YYYY-MM-DD` section to [CHANGELOG.md](CHANGELOG.md) in the existing house style — `### Fixed` / `### Added` / `### Housekeeping` subsections, prose that names the actual symptom, cause, and fix (not "fixed a bug"), and a closing line stating what verification passed (`tsc --noEmit`, `next build`, browser check).
+3. Commit both together: imperative summary + `, bump version to X.Y.Z`. Push to `main`.
+4. Cut the GitHub release off that pushed commit:
+   ```
+   gh release create vX.Y.Z --title "Tyme vX.Y.Z" --notes-file <file>
+   ```
+   Body follows the v2.8.5 shape: one-line product blurb + live URL, a `## Fixed in X.Y.Z` / `## Added in X.Y.Z` section derived from the CHANGELOG entry, then a `## Since <last release>` roll-up when releases have been skipped. Write the notes to a scratch file and pass `--notes-file` — don't inline multi-paragraph markdown into `--notes`.
+
+**This step never gets delegated to Grok.** Release is a hard gate (rule 6): Claude writes the CHANGELOG entry and the release body, because both are user-facing prose about what actually changed, and Grok only ever saw a slice of the diff. Grok may draft a per-commit summary as input; Claude edits and owns the published text.
+
+Verify before publishing: the release notes must describe what's *in the pushed commit* — re-read the diff, don't paraphrase the plan you had going in.
 
 ## Picking the executor
 
