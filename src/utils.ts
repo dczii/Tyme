@@ -57,8 +57,20 @@ export function padZero(num: number): string {
 }
 
 // Resolve a report date preset to an inclusive "YYYY-MM-DD" range, relative to today
+// Every range option the Reports date picker can resolve on its own.
+// 'custom' is deliberately absent: it carries its own explicit start/end
+// dates, so it is resolved by resolveDateRange() instead.
+export type DateRangePreset =
+  | 'thisWeek'
+  | 'lastWeek'
+  | 'thisMonth'
+  | 'lastMonth'
+  | 'last7'
+  | 'last30'
+  | 'allTime';
+
 export function getPresetDateRange(
-  preset: 'thisWeek' | 'lastWeek' | 'thisMonth' | 'lastMonth' | 'allTime'
+  preset: DateRangePreset
 ): { minDateStr: string; maxDateStr: string } {
   const today = new Date();
 
@@ -85,8 +97,33 @@ export function getPresetDateRange(
     const last = new Date(today.getFullYear(), today.getMonth(), 0);
     return { minDateStr: formatDateYYYYMMDD(first), maxDateStr: formatDateYYYYMMDD(last) };
   }
+  if (preset === 'last7') {
+    const start = new Date(today);
+    start.setDate(today.getDate() - 6); // inclusive of today
+    return { minDateStr: formatDateYYYYMMDD(start), maxDateStr: formatDateYYYYMMDD(today) };
+  }
+  if (preset === 'last30') {
+    const start = new Date(today);
+    start.setDate(today.getDate() - 29); // inclusive of today
+    return { minDateStr: formatDateYYYYMMDD(start), maxDateStr: formatDateYYYYMMDD(today) };
+  }
   // allTime
   return { minDateStr: '2000-01-01', maxDateStr: '2100-12-31' };
+}
+
+// Resolve any Reports range selection — preset or explicit custom dates —
+// into the YYYY-MM-DD bounds the filters, chart axis and exports all share.
+// Custom bounds are normalized so an inverted pick still yields a valid range.
+export function resolveDateRange(
+  preset: DateRangePreset | 'custom',
+  customStart: string,
+  customEnd: string
+): { minDateStr: string; maxDateStr: string } {
+  if (preset !== 'custom') return getPresetDateRange(preset);
+  if (!customStart || !customEnd) return getPresetDateRange('thisMonth');
+  return customStart <= customEnd
+    ? { minDateStr: customStart, maxDateStr: customEnd }
+    : { minDateStr: customEnd, maxDateStr: customStart };
 }
 
 // Format Date object to "YYYY-MM-DD"

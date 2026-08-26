@@ -27,14 +27,16 @@ import {
   formatDateFriendly,
   calculateDurationMinutes,
   getPresetDateRange,
+  resolveDateRange,
 } from "../utils";
 import BrandLogo from "./BrandLogo";
+import DateRangePicker, { DateRangeSelection } from "./DateRangePicker";
 import { jsPDF } from "jspdf";
 import { toast } from "sonner";
 import { useTyme } from "@/app/providers";
 
-// Predefined filtering options
-type PresetFilterType = "thisWeek" | "lastWeek" | "thisMonth" | "lastMonth" | "allTime";
+// Predefined filtering options (presets + the explicit "custom" calendar range)
+type PresetFilterType = DateRangeSelection;
 
 interface ReportsViewProps {
   entries: TimeEntry[];
@@ -56,12 +58,23 @@ export default function ReportsView({
   // Signed-in account — used to brand the PDF header with the user's own email
   const { user } = useTyme();
 
-  // Preset select
+  // Active range selection — a named preset, or "custom" backed by the dates below
   const [datePreset, setDatePreset] = useState<PresetFilterType>("thisMonth");
 
-  // Custom dates
-  const [customStart, setCustomStart] = useState<string>("2026-06-01");
-  const [customEnd, setCustomEnd] = useState<string>("2026-06-30");
+  // Custom dates, seeded from the default preset so they are never stale
+  const [customStart, setCustomStart] = useState<string>(
+    () => getPresetDateRange("thisMonth").minDateStr,
+  );
+  const [customEnd, setCustomEnd] = useState<string>(
+    () => getPresetDateRange("thisMonth").maxDateStr,
+  );
+
+  // Single source of truth for the reporting window: filters, the chart X axis
+  // and both exports all read these bounds.
+  const activeRange = useMemo(
+    () => resolveDateRange(datePreset, customStart, customEnd),
+    [datePreset, customStart, customEnd],
+  );
 
   // Filter criteria options
   const [selectedProjId, setSelectedProjId] = useState<string>("");
@@ -78,8 +91,7 @@ export default function ReportsView({
 
   // 1. Filter Logic
   const filteredEntries = useMemo(() => {
-    // Determine start and end ranges based on presets (relative to today)
-    const { minDateStr, maxDateStr } = getPresetDateRange(datePreset);
+    const { minDateStr, maxDateStr } = activeRange;
 
     return entries
       .filter((entry) => {
@@ -106,7 +118,7 @@ export default function ReportsView({
         return true;
       })
       .sort((a, b) => b.date.localeCompare(a.date)); // Sort by newest date first
-  }, [entries, datePreset, selectedProjId, selectedTag, searchQuery]);
+  }, [entries, activeRange, selectedProjId, selectedTag, searchQuery]);
 
   // 2. Metrics aggregates
   const totalMinutes = useMemo(() => {
@@ -570,7 +582,10 @@ export default function ReportsView({
 
   // Quick reset helper
   const handleResetFilters = () => {
+    const defaultRange = getPresetDateRange("thisMonth");
     setDatePreset("thisMonth");
+    setCustomStart(defaultRange.minDateStr);
+    setCustomEnd(defaultRange.maxDateStr);
     setSelectedProjId("");
     setSelectedTag("");
     setSearchQuery("");
@@ -639,7 +654,7 @@ export default function ReportsView({
       minDateStr = dateSorted[0].date;
       maxDateStr = dateSorted[dateSorted.length - 1].date;
     } else {
-      ({ minDateStr, maxDateStr } = getPresetDateRange(datePreset));
+      ({ minDateStr, maxDateStr } = activeRange);
     }
 
     const start = new Date(minDateStr + "T00:00:00");
@@ -647,14 +662,14 @@ export default function ReportsView({
     const arr: Date[] = [];
     const current = new Date(start);
 
-    let maxLimit = 100; // safety
+    let maxLimit = 366; // safety — a custom range can span a full year
     while (current <= end && maxLimit > 0) {
       arr.push(new Date(current));
       current.setDate(current.getDate() + 1);
       maxLimit--;
     }
     return arr;
-  }, [datePreset, filteredEntries]);
+  }, [datePreset, activeRange, filteredEntries]);
 
   // 2. Fetch specific duration mapped to indices list for high-precision SVG drawing on print
   const printChartData = useMemo(() => {
@@ -695,11 +710,10 @@ export default function ReportsView({
       return `${toMMDDYYYY(minD)} - ${toMMDDYYYY(maxD)}`;
     }
 
-    const { minDateStr, maxDateStr } = getPresetDateRange(datePreset);
-    const minD = new Date(minDateStr + "T00:00:00");
-    const maxD = new Date(maxDateStr + "T00:00:00");
+    const minD = new Date(activeRange.minDateStr + "T00:00:00");
+    const maxD = new Date(activeRange.maxDateStr + "T00:00:00");
     return `${toMMDDYYYY(minD)} - ${toMMDDYYYY(maxD)}`;
-  }, [datePreset, filteredEntries]);
+  }, [datePreset, activeRange, filteredEntries]);
 
   // 4. Description groupings for donut charts and summary listing
   const descriptionAggregates = useMemo(() => {
@@ -998,9 +1012,10 @@ export default function ReportsView({
         {/* 4. Visual Analytics Section */}
         <div className='space-y-6'>
           {/* Replicated Full-Width Timeline Hours Chart (styled to match screenshot) */}
-          <div className='bg-[#11171d] border border-[#232f3b]/70 rounded-2xl shadow-2xl overflow-hidden'>
-            {/* Screenshot top-bar replicate flow */}
-            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#17212a] px-5 py-3.5 border-b border-[#232f3b]/60 gap-4'>
+          <div className='bg-[#11171d] border border-[#232f3b]/70 rounded-2xl shadow-2xl'>
+            {/* Screenshot top-bar replicate flow — no overflow-hidden on the card
+                so the date-range popover can escape it; corners rounded here instead */}
+            <div className='relative z-20 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-[#17212a] rounded-t-2xl px-5 py-3.5 border-b border-[#232f3b]/60 gap-4'>
               <div className='flex items-center gap-1.5'>
                 <span className='text-xs font-mono text-[#ecd0b9]/55 font-bold uppercase tracking-wider'>
                   Total:
@@ -1010,35 +1025,25 @@ export default function ReportsView({
                 </span>
               </div>
 
-              <div className='flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end'>
-                <div className='flex items-center gap-2'>
-                  <span className='text-[10px] uppercase font-mono text-[#ecd0b9]/50 font-bold tracking-wider'>
-                    Date Range:
-                  </span>
-                  <div className='relative'>
-                    <select
-                      value={datePreset}
-                      onChange={(e) => setDatePreset(e.target.value as PresetFilterType)}
-                      className='text-xs font-sans font-bold bg-[#11171d] hover:bg-[#1a2530] text-white border border-[#2d3a46] rounded-xl pl-3 pr-8 py-1.5 outline-none cursor-pointer transition appearance-none min-w-[120px] md:min-w-[140px]'
-                    >
-                      <option value='thisWeek'>This Week</option>
-                      <option value='lastWeek'>Last Week</option>
-                      <option value='thisMonth'>Current Month</option>
-                      <option value='lastMonth'>Previous Month</option>
-                      <option value='allTime'>All Records</option>
-                    </select>
-                    <div className='absolute inset-y-0 right-2 flex items-center pr-1 pointer-events-none text-[#ecd0b9]/50'>
-                      <svg className='h-3 w-3 fill-current' viewBox='0 0 20 20'>
-                        <path d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+              <div className='flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end'>
+                <span className='hidden md:inline text-[10px] uppercase font-mono text-[#ecd0b9]/50 font-bold tracking-wider'>
+                  Date Range:
+                </span>
+                <DateRangePicker
+                  preset={datePreset}
+                  customStart={customStart}
+                  customEnd={customEnd}
+                  onChange={({ preset, customStart: nextStart, customEnd: nextEnd }) => {
+                    setDatePreset(preset);
+                    setCustomStart(nextStart);
+                    setCustomEnd(nextEnd);
+                  }}
+                />
               </div>
             </div>
 
             {/* Chart canvas area precisely replicating the screenshot */}
-            <div className='p-3 md:p-6 bg-[#11171d]'>
+            <div className='p-3 md:p-6 bg-[#11171d] rounded-b-2xl'>
               <div className='w-full overflow-x-auto'>
                 <div className='min-w-[500px] md:min-w-[800px] select-none'>
                   <svg viewBox='0 0 1000 240' className='w-full h-auto font-sans'>
@@ -1109,14 +1114,11 @@ export default function ReportsView({
                       const y = 200 - barHeight;
 
                       // Calculate label step intervals so angled labels do not overlap
-                      const labelStepInterval =
-                        printChartData.length <= 7
-                          ? 1
-                          : printChartData.length <= 15
-                            ? 2
-                            : printChartData.length <= 22
-                              ? 3
-                              : 4;
+                      // Keep at most ~22 angled labels regardless of range length
+                      const labelStepInterval = Math.max(
+                        1,
+                        Math.ceil(printChartData.length / 22),
+                      );
                       const shouldShowLabel =
                         idx % labelStepInterval === 0 || idx === printChartData.length - 1;
 
