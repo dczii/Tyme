@@ -3,6 +3,43 @@
 All notable changes to Tyme are documented here. Versions match the
 `version` field in `package.json` (shown live in the app's sidebar footer).
 
+## [2.10.0] — 2026-08-26
+
+### Added
+
+- **Date range picker on `/reports`.** The plain preset `<select>` is replaced by a
+  popover: a quick-range list on the left and a two-month, Monday-first calendar on
+  the right for picking an arbitrary start and end date. Click a start day, hover to
+  preview the span, click an end day, Apply. Hand-rolled — no new dependencies.
+- **Two new quick ranges**, `Last 7 Days` and `Last 30 Days`, alongside the existing
+  this/last week, this/last month and all-records options.
+- The trigger button now reports the **resolved** span and its length
+  (`Aug 1 – Aug 31, 2026 · 31 days`) rather than just the name of a preset.
+
+### Changed
+
+- **Custom ranges are wired end to end.** `customStart`/`customEnd` existed in state
+  but nothing read them; a new `activeRange` memo is now the single source of truth
+  for the entry filter, the chart X axis, the PDF header and filename, and the CSV
+  export. `resolveDateRange()` in `utils.ts` resolves a preset or an explicit custom
+  range through one path, normalizing an inverted pick.
+- Chart X-axis labels thin proportionally to the number of days (at most ~22 labels)
+  instead of capping at every fourth one.
+- The chart card lost its `overflow-hidden` — which clipped the popover — and rounds
+  its children's corners instead.
+
+### Fixed
+
+- `datesInRange` capped at 100 days, which would have silently truncated the chart
+  for any custom range longer than that. Raised to 366.
+
+### Accessibility
+
+- The popover is a labelled `dialog` with `aria-haspopup`/`aria-expanded` on its
+  trigger, dismisses on outside click and `Escape`, honours `prefers-reduced-motion`
+  via `useReducedMotion`, and keeps a ≥44px trigger. Under `md:` it collapses to a
+  single month with a horizontally scrollable preset row.
+
 ## [2.9.0] — 2026-07-24
 
 ### Added
