@@ -3,6 +3,15 @@
 All notable changes to Tyme are documented here. Versions match the
 `version` field in `package.json` (shown live in the app's sidebar footer).
 
+## [2.10.1] — 2026-09-24
+
+### Added
+
+- **Windsurf animation rules (`.windsurf/rules/`).** Windsurf copies of the
+  animation skills already shipped under `.claude/skills/` and `.codex/skills/`
+  (animate, css-animations, motion-react, motion-brief, review/improve animations,
+  and friends). Tooling only — no app changes.
+
 ## [2.10.0] — 2026-08-26
 
 ### Added
