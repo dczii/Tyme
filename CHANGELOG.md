@@ -3,6 +3,27 @@
 All notable changes to Tyme are documented here. Versions match the
 `version` field in `package.json` (shown live in the app's sidebar footer).
 
+## [2.10.2] — 2026-10-22
+
+### Fixed
+
+- **Calendar grid scrolls on short screens.** The calendar view was missing
+  `min-h-0`, so its content area grew past the viewport and the app root's
+  `overflow-hidden` clipped the late hours with no way to reach them. The grid
+  now scrolls inside its own area, and the day header row stays pinned while
+  you scroll (the grid uses `overflow-clip` so `sticky` works).
+- **Entry blocks show as much description as fits.** The description was capped
+  at a fixed 44px (about three lines) however tall the block was. It now fills the
+  block's height and ends with an ellipsis once it runs out of room. Very short
+  blocks drop the duration footer so the description still shows, and hovering a
+  block shows the full description.
+
+### Changed
+
+- Entry blocks no longer scale on hover, and their transition covers only colors and
+  shadow instead of `transition-all`. The scale fought with Framer Motion's own
+  `scale` and made text shimmer on a grid you hover constantly.
+
 ## [2.10.1] — 2026-09-24
 
 ### Added

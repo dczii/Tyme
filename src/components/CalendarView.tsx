@@ -48,6 +48,13 @@ interface CalendarViewProps {
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6); // 06:00 to 23:00 - standard active hours
 const ROW_HEIGHT = 56; // tall row for nice click targets and reading text
 
+// Fixed vertical chrome inside a desktop entry block, used to work out how many
+// description lines fit before clamping with an ellipsis. Keep in sync with the block's classes.
+const BLOCK_CHROME_PX = 22; // p-2.5 top + bottom, 1px borders
+const BLOCK_PROJECT_ROW_PX = 23; // mt-0.5 + 15px row + mb-1.5
+const BLOCK_FOOTER_PX = 28; // mt-2 + pt-1 + border + 15px row
+const BLOCK_LINE_PX = 15; // text-xs leading-tight
+
 const formatHoursAndMinutes = (minutes: number): string => {
   const hrs = Math.floor(minutes / 60);
   const mins = minutes % 60;
@@ -938,7 +945,7 @@ export default function CalendarView({
   }, [dragGhostPosition, draggedEntryId]);
 
   return (
-    <div className='flex-1 flex flex-col min-w-0 z-10'>
+    <div className='flex-1 flex flex-col min-w-0 min-h-0 z-10'>
       {/* 1. Header Area with dynamic details */}
       <header className='relative z-45 p-4 border-b shrink-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-[#120805]/40 backdrop-blur-md border-[#321c11]/45'>
         <div>
@@ -1516,10 +1523,10 @@ export default function CalendarView({
         </div>
 
         {/* DESKTOP WEEKLY GRID (>= md) */}
-        <div className='hidden md:block p-6 min-w-[700px] overflow-x-auto'>
+        <div className='hidden md:block p-6 min-w-[700px]'>
           <div
             id='calendar-week-grid'
-            className='border border-[#3c2518]/45 rounded-3xl overflow-hidden bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
+            className='border border-[#3c2518]/45 rounded-3xl overflow-clip bg-[#130d0a]/30 backdrop-blur-2xl shadow-2xl flex flex-col'
           >
           {/* Calendar Headers columns */}
           <div className='grid grid-cols-[44px_repeat(7,1fr)] md:grid-cols-[60px_repeat(7,1fr)] border-b border-[#3c2518]/45 bg-[#1a0f0a]/75 backdrop-blur-md relative z-10 sticky top-0'>
@@ -1640,6 +1647,14 @@ export default function CalendarView({
                           : null;
                         const hasOverlap = checkHasOverlap(entry);
                         const pos = getEntryPositionStyles(entry);
+                        const blockHeight = parseFloat(pos.height);
+                        const textSpace = blockHeight - BLOCK_CHROME_PX - (proj ? BLOCK_PROJECT_ROW_PX : 0);
+                        // Footer only when it leaves room for at least one line of description
+                        const showFooter = textSpace - BLOCK_FOOTER_PX >= BLOCK_LINE_PX;
+                        const descriptionLines = Math.max(
+                          1,
+                          Math.floor((showFooter ? textSpace - BLOCK_FOOTER_PX : textSpace) / BLOCK_LINE_PX),
+                        );
 
                         const isDragging = draggedEntryId === entry.id;
 
@@ -1654,17 +1669,18 @@ export default function CalendarView({
                             onDragStart={(e: any) => handleEntryDragStart(entry, e)}
                             onDragEnd={handleDragEnd}
                             onClick={() => { if (!draggedEntryId) setEditingEntry(entry); }}
-                            className={`absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col justify-between border select-none transition-all duration-150 pointer-events-auto group overflow-hidden
+                            className={`absolute left-1 right-1 rounded-xl p-1.5 md:p-2.5 shadow-md flex flex-col border select-none transition-[background-color,border-color,box-shadow] duration-150 pointer-events-auto group overflow-hidden
                               bg-white/70 dark:bg-[#1a110d]/75 backdrop-blur-md border-white/50 dark:border-[#3d2416]/50 hover:bg-white/90 dark:hover:bg-[#251813]/90 hover:border-[#a66e46]/60 hover:shadow-lg
-                              ${isDragging ? 'opacity-30 border-dashed cursor-grabbing scale-[0.97]' : 'cursor-grab hover:scale-[1.01]'}`}
+                              ${isDragging ? 'border-dashed cursor-grabbing' : 'cursor-grab'}`}
                           style={{
                             ...pos,
                             borderLeft: `4px solid ${proj?.color || "#a66e46"}`,
                             borderColor: hasOverlap ? "#ef4444" : undefined,
                           }}
+                          title={entry.description || undefined}
                         >
                           {/* Inner Content header text */}
-                          <div className='min-w-0'>
+                          <div className='min-w-0 min-h-0 flex-1 overflow-hidden'>
                             {/* Project detail */}
                             {proj && (
                               <div className='flex items-center gap-1 mt-0.5 mb-1.5'>
@@ -1682,13 +1698,17 @@ export default function CalendarView({
                             )}
 
                             {/* Description */}
-                            <p className='text-[10px] md:text-xs font-semibold leading-tight max-h-[44px] overflow-hidden text-ellipsis dark:text-[#fcdbbd] text-slate-800 break-words group-hover:text-[#dda67a] transition-colors'>
+                            <p
+                              className='text-[10px] md:text-xs font-semibold leading-tight overflow-hidden dark:text-[#fcdbbd] text-slate-800 break-words group-hover:text-[#dda67a] transition-colors'
+                              style={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: descriptionLines }}
+                            >
                               {entry.description || "No Description"}
                             </p>
                           </div>
 
                           {/* Footer details + quick adjust layout icons */}
-                          <div className='flex justify-between items-end mt-2 pt-1 border-t border-white/20 dark:border-[#3d2416]/50'>
+                          {showFooter && (
+                          <div className='flex justify-between items-end shrink-0 mt-2 pt-1 border-t border-white/20 dark:border-[#3d2416]/50'>
                             <span className='text-[10px] font-mono text-[#ecd0b9] font-bold shrink-0'>
                               {formatHoursAndMinutes(entry.durationMinutes)}
                             </span>
@@ -1704,6 +1724,7 @@ export default function CalendarView({
                               </div>
                             )}
                           </div>
+                          )}
                           </motion.div>
                         );
                       })}
