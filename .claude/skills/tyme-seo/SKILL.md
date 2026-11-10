@@ -28,7 +28,7 @@ Both the **visible landing sections** (FeatureShowcase, FaqShowcase) and the **J
 
 ## GEO (AI answer engines)
 
-[public/llms.txt](public/llms.txt) is a hand-written plain-text product summary (what/features/audience/pricing/FAQ) served at `/llms.txt`. When features or FAQ change in seo.ts, **update llms.txt to match** — it is not generated.
+[public/llms.txt](public/llms.txt) is a hand-written plain-text product summary (what/features/audience/pricing/FAQ) served at `/llms.txt`. When features or FAQ change in seo.ts, **update llms.txt to match** — it is not generated. Keep its `## Links` section as Markdown `[text](url)` links: Lighthouse's Agentic Browsing `llms-txt` audit fails a file with no Markdown links (bare URLs don't count) and also wants an H1 and at least 50 characters.
 
 ## Landing-page HTML hygiene
 

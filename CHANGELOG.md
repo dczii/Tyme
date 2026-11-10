@@ -3,6 +3,15 @@
 All notable changes to Tyme are documented here. Versions match the
 `version` field in `package.json` (shown live in the app's sidebar footer).
 
+## [2.10.3] — 2026-11-10
+
+### Fixed
+
+- **Agentic Browsing score is now 3/3 in PageSpeed Insights / Lighthouse.** The
+  `llms-txt` audit failed because `/llms.txt` had no Markdown links (it only had a
+  bare URL). The Links section now uses `[text](url)` links to the home page,
+  sign-in, and sitemap. The accessibility-tree and CLS audits already passed.
+
 ## [2.10.2] — 2026-10-22
 
 ### Fixed

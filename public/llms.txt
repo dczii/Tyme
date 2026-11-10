@@ -53,4 +53,6 @@ A: Yes. Tyme runs on Supabase PostgreSQL with Row Level Security policies that i
 
 ## Links
 
-- Home: https://tymeapp.space/
+- [Tyme home](https://tymeapp.space/): product overview, features, pricing, and FAQ
+- [Sign in or create an account](https://tymeapp.space/login): start tracking time for free
+- [Sitemap](https://tymeapp.space/sitemap.xml): all public pages
